@@ -36,7 +36,7 @@ onMounted(()=>{
 .navBarBox{ background-color: rgba(0, 0, 0, 0);}
 .statusBar {}
 .navBar {
-	padding: 0 30rpx;
+	padding: 30rpx 30rpx;
 	padding: 0, 8rpx;
 	display: flex;
 	align-items: center;
@@ -50,7 +50,7 @@ onMounted(()=>{
 	margin-right: 30rpx;
 }
 .page{
-	height: 100%;
+	height: 100vh;
 	width: 100%;
 	background-image: url("/static/images/tour-1.jpg");
 }
