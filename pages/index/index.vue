@@ -1,16 +1,16 @@
 <template>
 	<view class="content">
-		<image class="logo" src="/static/homeRegular.png"></image>
 		<view class="text-area">
 			<text class="title">{{title}}</text>
 			<el-button type="warning">button1</el-button>
 		</view>
+		<tab-bar :selected=1></tab-bar>
 	</view>
 </template>
 
 <script setup>
-
-const title = 'Hello1'	
+import tabBar from '/components/tabBar.vue'
+const title = 'Hello1';	
 </script>
 
 <style>

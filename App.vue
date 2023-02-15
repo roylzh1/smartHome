@@ -2,6 +2,7 @@
 	// 只能在App.vue里监听应用的生命周期
 	export default {
 		onLaunch: function() {
+			uni.hideTabBar()
 			console.log('App Launch')
 		},
 		onShow: function() {
