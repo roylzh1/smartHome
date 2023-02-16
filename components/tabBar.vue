@@ -1,8 +1,8 @@
 <template>
 	<view class="tab-bar">
 		<view v-for="(item,index) in list" :key="index" class="tab-bar-item" @click="switchTab(item, index)">
-			<image class="tab_img" :src="selected === index ? item.selectedIconPath : item.iconPath"></image>
-			<view class="tab_text" :style="{color: selected === index ? selectedColor : color}">{{item.text}}</view>
+			<image class="tab_img" :src="selected == index ? item.selectedIconPath : item.iconPath"></image>
+			<view class="tab_text" :style="{color: selected == index ? selectedColor : color}">{{item.text}}</view>
 		</view>
 		<view class="box">
 			<view class="backgroundColor"></view>
@@ -14,7 +14,7 @@
 	export default {
 		props: {
 			selected: { // 当前角色
-				type: Number,
+				type: String,
 				default: 0
 			}
 			

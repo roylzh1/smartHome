@@ -4,7 +4,7 @@
 			<text class="title">{{title}}</text>
 			<el-button type="warning">button1</el-button>
 		</view>
-		<tab-bar :selected=1></tab-bar>
+		<tab-bar selected="1" ></tab-bar>
 	</view>
 </template>
 
