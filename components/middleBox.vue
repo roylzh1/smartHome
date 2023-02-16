@@ -17,7 +17,6 @@
 <script setup>
 import { ref } from "vue";
     defineProps({
-		type: String,
 		title: String,
 		open: String,
 		close: String,
@@ -33,7 +32,7 @@ import { ref } from "vue";
 <style scoped>
 	.content{
 		position: relative;
-		height: 115rpx;
+		height: 250rpx;
 		width: 335rpx;
 		border-radius: 30rpx;
 		overflow: hidden;
@@ -45,15 +44,15 @@ import { ref } from "vue";
 		width: 100%;
 		border-radius: 30rpx;
 		display: flex;
-		justify-content: space-between;
-		align-items: center;
+		flex-direction: column;
+		justify-content: space-around;
 		overflow: hidden;
 		z-index: 3;
 		transition: 0.5s;
 	}
 	.title{
 		height: 30rpx;
-		width: 200rpx;
+		width: 80rpx;
 		margin-left: 20rpx;
 		z-index: 3;
 		font-weight: 800;
@@ -81,8 +80,8 @@ import { ref } from "vue";
 		transition: 0.5s;
 	}
 	.thing{
-		height: 70%;
-		width: 70%;
+		height: 60%;
+		width: 60%;
 		z-index: 5;
 		transition: 0.5s;
 	}
@@ -91,8 +90,8 @@ import { ref } from "vue";
 		height: 100%;
 		width: 100%;
 		background-color: rgba(74,74,74,.8);
-		filter: blur(10px);
-		-webkit-transform: scale(3);
+		filter: blur(20px);
+		-webkit-transform: scale(2);
 		z-index: 1;
 		transition: 0.5s;
 	}

@@ -4,6 +4,11 @@
 			<text class="title">{{title}}</text>
 			<el-button type="warning">button1</el-button>
 		</view>
+		<view class="test">
+			<view class="box1"></view>
+			<view class="box2"></view>
+			<view class="box2"></view>
+		</view>
 		<tab-bar selected="1" ></tab-bar>
 	</view>
 </template>
@@ -38,5 +43,24 @@ const title = 'Hello1';
 	.title {
 		font-size: 36rpx;
 		color: #8f8f94;
+	}
+	.test{
+		display: flex;
+		justify-content: space-around;
+		align-content: flex-start;
+		flex-wrap: nowrap;
+		height: 200px;
+		width: 300px;
+		border: black 3px solid;
+	}
+	.box1{
+		height: 180px;
+		width: 140px;
+		border: blue 3px solid;
+	}
+	.box2{
+		height: 50px;
+		width: 140px;
+		border: yellow 3px solid;
 	}
 </style>
