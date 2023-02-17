@@ -43,7 +43,7 @@
 		align-items: baseline;
 	}
 	.content1{
-		margin-top: 30rpx;
+		margin-top: 50rpx;
 	}
 	.smallBox{
 		display: flex;

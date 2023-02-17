@@ -1,14 +1,15 @@
 <template>
 	<view class="content2">
-		<global-box v-for="(item,index) in itemArray" :title="item.title" :open="item.open" :photoOpen="item.photoOpen"></global-box>
+		<global-box v-for="(item,index) in itemArray" :title="item.title" :open="item.open" :photoOpen="item.photoOpen" @popup="popupHandler"></global-box>
 	</view>
 </template>
 
 <script setup>
 	import globalBox from '/components/globalBox.vue'
+	const emit = defineEmits(['popupNav']);
 	const itemArray = [
 		{
-			title: "环境",
+			title: "恒温器",
 			open: "20.0-22.0",
 			photoOpen: "/static/images/fan-globe.png"
 		},{
@@ -29,6 +30,9 @@
 			photoOpen: "/static/images/lock.png"
 		}
 	];
+	const popupHandler = name =>{
+		emit('popupNav',name);
+	}
 </script>
 
 <style scoped>
@@ -41,5 +45,8 @@
 		margin-top: 10rpx;
 		z-index: 3;
 		overflow-x: auto;
+	}
+	::-webkit-scrollbar {
+	  display: none;
 	}
 </style>

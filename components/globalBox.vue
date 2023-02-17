@@ -1,6 +1,6 @@
 <template>
 	<view @click="handleClick" class="content">
-		<view class="backgroundColor" ></view>
+		<view class="backgroundColor"></view>
 		<view class="s-content">	
 		<view class="thing-content" >
 			<image class="thing" :src="photoOpen"></image>
@@ -9,30 +9,33 @@
 			<view class="title" >{{title}}</view>
 			<view class="status">{{open}}</view>
 		</view>
-		
 		</view>
 	</view>	
 </template>
 
 <script setup>
 import { ref } from "vue";
-    defineProps({
+    const prop = defineProps({
 		title: String,
 		open: String,
 		photoOpen: String,
 	});
-	let selected = ref(false);
+	const emit = defineEmits(['popup']);
 	const handleClick = ()=>{
-		 selected.value = !selected.value;
+		emit('popup',prop.title);
+		
 	}
 </script>
 
 <style scoped>
 	.content{
 		position: relative;
+		display: inline-block;
 		height: 80rpx;
-		margin-right: 10rpx;
-		padding-right: 20rpx;
+		width:fit-content;
+		min-width: 200rpx;
+		margin-left: 30rpx;
+		padding-right: 11rpx;
 		border-radius: 30rpx;
 		overflow: hidden;
 		transition: 0.5s;
@@ -41,7 +44,9 @@ import { ref } from "vue";
 	.s-content{
 		position: relative;
 		height: 100%;
-		width: 100%;
+		width:fit-content;
+		min-width: 200rpx;
+		max-width: 250rpx;
 		border-radius: 30rpx;
 		display: flex;
 		flex-direction: row;
@@ -53,7 +58,6 @@ import { ref } from "vue";
 	}
 	.title{
 		height: 25rpx;
-		width: 80rpx;
 		z-index: 3;
 		font-weight: 500;
 		transition: 0.5s;
@@ -61,7 +65,8 @@ import { ref } from "vue";
 		color: #ffffff;
 	}
 	.status{
-		height: 30rpx;
+		height: 30rpx;		
+		width: auto;
 		padding-top: 10rpx;
 		padding-right: 5rpx;
 		color: #8a8a8a;
@@ -71,7 +76,9 @@ import { ref } from "vue";
 		transition: 0.5s;
 	}
 	.statusBox{
+		display: inline-block;
 		margin-bottom: 5rpx;
+		width: fit-content;
 	}
 	.thing-content{
 		display: flex;
@@ -85,8 +92,8 @@ import { ref } from "vue";
 		transition: 0.5s;
 	}
 	.thing{
-		height: 60%;
-		width: 60%;
+		height: 65%;
+		width: 65%;
 		z-index: 5;
 		transition: 0.5s;
 	}
@@ -94,11 +101,12 @@ import { ref } from "vue";
 		position: absolute;
 		height: 100%;
 		width: 100%;
-		background-color: rgba(74,74,74,0.7);
+		background-color: hsla(0,0%,25%,.7);
 		backdrop-filter: blur(10px);
 		-webkit-backdrop-filter: blur(10px);
 		-webkit-transform: scale(3);
 		z-index: 1;
 		transition: 0.5s;
 	}
+	
 </style>

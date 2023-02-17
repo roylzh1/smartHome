@@ -62,7 +62,7 @@
 		left: 0;
 		right: 0;
 		height: 80px;
-		z-index: 1;
+		z-index: 10;
 		display: flex;
 		justify-content: center;
 		align-items: center;
@@ -79,11 +79,11 @@
 		position: absolute;
 		height: 100%;
 		width: 110%;
-		background-color: hsla(0,0%,60%,.3);
-		backdrop-filter: blur(20px);
+		background-color: hsla(0,0%,50%,.4);
+		backdrop-filter: blur(30px);
 		-webkit-backdrop-filter: blur(20px);
 		overflow: hidden;
-		-webkit-transform: scale(3);
+		-webkit-transform: scale(1);
 		z-index: 2;
 	}
 

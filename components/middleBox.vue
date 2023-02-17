@@ -1,6 +1,6 @@
 <template>
 	<view @click="handleClick" class="content">
-		<view class="backgroundColor" :style="{backgroundColor: selected == true ? `rgba(255,255,255,.8)` : `rgba(74,74,74,0.7)`}"></view>
+		<view class="backgroundColor" :style="{backgroundColor: selected == true ? `rgba(255,255,255,.8)` : `hsla(0,0%,25%,.6)`}"></view>
 		<view class="s-content">	
 		<view class="thing-content" :style="{backgroundColor: selected == true ? `rgba(240,214,105,1)` : `rgba(0,0,0,.5)`}">
 			<image class="thing" :src="selected == true ? photoOpen : photoClose" ></image>

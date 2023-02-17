@@ -1,6 +1,6 @@
 <template>
 	<view class="backGround"></view>
-	<view class="page">
+	<view class="page" :style="{position: ifScroll === true ? `` : `fixed`}">
 		<!-- 导航栏 -->
 		<view class="navBarBox">
 			<!--:style="headerStyle" :style="opacityStyle"-->
@@ -16,7 +16,7 @@
 		<view class="content">
 			<h1 class="title">我的家</h1>
 			<view class="topNaviagtion">
-				<top-navigation></top-navigation>
+				<top-navigation @popupNav="popupNavHandler"></top-navigation>
 			</view>
 			<view class="room">
 				<room :itemArray="livingRoom" title="门厅"></room>
@@ -24,6 +24,7 @@
 			</view>
 		</view>
 		<tab-bar selected="0"></tab-bar>
+			<air-popup v-show="airPopupIfShow" :class="airPopupIfShow == true ? 'content-fade-up-animation' : ''" @airComplete="closeAirHandler"></air-popup>
 	</view>
 </template>
 
@@ -33,12 +34,14 @@
 	} from '@dcloudio/uni-app'
 	import {
 		onMounted,
+		onUnmounted,
 		reactive,
 		ref
 	} from 'vue';
 	import tabBar from '/components/tabBar.vue'
 	import room from '/components/room.vue'
 	import topNavigation from '/components/topNaviagtion.vue'
+	import airPopup from '/components/airPopup.vue'
 	const livingRoom = [
 		{
 			type: "middle",
@@ -115,27 +118,36 @@
 			photoOpen: "/static/images/fan-open.png"
 		}
 	];
-	let headerStyle = reactive({
-		backgroundColor: 'rgba(255, 255, 255, 0)',
-	});
+	let ifScroll = ref(true);
+	let airPopupIfShow = ref(false);//空调弹窗
 	let opacityStyle = reactive({
 		opacity: 0
 	});
+	let navPopup = {};
+	const popupNavHandler = name=>{
+		ifScroll.value = false;
+		airPopupIfShow.value = true;
+		
+	}
+	const closeAirHandler = ()=>{
+		ifScroll.value = true;
+		airPopupIfShow.value = false;
+	}
 	onMounted(() => {
 		//获取手机状态栏高度
 		uni.hideTabBar({
 			animation: false
 		});
+		navPopup = uni.createAnimation();
 	});
 	onPageScroll(e => {
-		
 		let opacity = e.scrollTop / 50;
 		if (opacity > 1) {
 			opacity = 1;
 		}
-		//headerStyle.backgroundColor = `rgba(255, 255, 255, ${opacity})`;
 		opacityStyle.opacity = `${opacity}`;
-	})
+	});
+	
 </script>
 
 <style scoped>
@@ -169,7 +181,7 @@
 	}
 
 	.backGround {
-		height: 105vh;
+		height: 100vh;
 		width: 100%;
 		position: fixed;
 		top: 0;
@@ -177,13 +189,12 @@
 		background-image: url("/static/images/tour-1.jpg");
 		background-repeat: no-repeat;
 		background-size: cover;
-		background-position: 50%;
+		background-position: 70%;
 		z-index: 1;
 	}
 	.page{
-		height: 110vh;
+		height: 120vh;
 		width: 100%;
-		overflow: hidden;
 		z-index: 2;
 	}
 	.content {
@@ -219,7 +230,8 @@
 	}
 	.topNaviagtion{
 		z-index: 3;
-		margin-left: 30rpx;
+		margin-top: 10rpx;
+		margin-bottom: -10rpx;
 	}
 	.backgroundColor {
 		position: absolute;
@@ -232,4 +244,33 @@
 		-webkit-transform: scale(3);
 		z-index: 1;
 	}
+	.content-fade-up-animation {
+	  animation-duration: .4s;
+	  animation-name: fadeInUp;
+	  -webkit-animation-duration: .4s;
+	  animation-timing-function: cubic-bezier(0.280, 0.840, 0.420, 1);
+	  -webkit-animation-fill-mode: backwards;
+	  -webkit-animation-name: fadeInUp;
+	}
+
+	/* Content fade up animation */
+	
+	@keyframes fadeInUp {
+	  from {
+	    transform: translateY(100%);
+	  }
+	
+	  to {
+	    transform: translateY(0);
+	  }
+	}
+@-webkit-keyframes fadeInUp {
+  from {
+    transform: translateY(100%);
+  }
+  to {
+    transform: translateY(0);
+  }
+}
+
 </style>
