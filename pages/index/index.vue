@@ -8,6 +8,8 @@
 			<view class="box1"></view>
 			<view class="box2"></view>
 			<view class="box2"></view>
+			<view class="box2"></view>
+			<view>{{a}}</view>
 		</view>
 		<tab-bar selected="1" ></tab-bar>
 	</view>
@@ -16,6 +18,7 @@
 <script setup>
 import tabBar from '/components/tabBar.vue'
 const title = 'Hello1';	
+const a = String.fromCharCode(97);
 </script>
 
 <style>
@@ -46,11 +49,11 @@ const title = 'Hello1';
 	}
 	.test{
 		display: flex;
-		justify-content: space-around;
-		align-content: flex-start;
-		flex-wrap: nowrap;
-		height: 200px;
-		width: 300px;
+		flex-direction: row;
+		justify-content: flex-start;
+		align-content: space-between;
+		flex-wrap: wrap;
+		width: 330px;
 		border: black 3px solid;
 	}
 	.box1{

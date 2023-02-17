@@ -15,6 +15,7 @@
 			}
 		}
 	],
+	
 	"globalStyle": {
 		"navigationStyle": "custom",
 		"backgroundColor": "#F8F8F8"

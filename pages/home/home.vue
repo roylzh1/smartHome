@@ -1,4 +1,5 @@
 <template>
+	<view class="backGround"></view>
 	<view class="page">
 		<!-- 导航栏 -->
 		<view class="navBarBox">
@@ -14,6 +15,9 @@
 		<!-- 页面内容 -->
 		<view class="content">
 			<h1 class="title">我的家</h1>
+			<view class="topNaviagtion">
+				<top-navigation></top-navigation>
+			</view>
 			<view class="room">
 				<room :itemArray="livingRoom" title="门厅"></room>
 				<room :itemArray="myRoom" title="卧室"></room>
@@ -34,6 +38,7 @@
 	} from 'vue';
 	import tabBar from '/components/tabBar.vue'
 	import room from '/components/room.vue'
+	import topNavigation from '/components/topNaviagtion.vue'
 	const livingRoom = [
 		{
 			type: "middle",
@@ -60,6 +65,27 @@
 	];
 	const myRoom = [
 		{
+			type: "small",
+			title: "顶灯",
+			open: "开",
+			close: "关",
+			photoClose: "/static/images/bulb.png",
+			photoOpen: "/static/images/bulb-light.png"
+		},{
+			type: "middle",
+			title: "大门",
+			open: "已开",
+			close: "已锁",
+			photoClose: "/static/images/lock.png",
+			photoOpen: "/static/images/unlock.png",
+		},{
+			type: "small",
+			title: "吊灯",
+			open: "开",
+			close: "关",
+			photoClose: "/static/images/chandelier.png",
+			photoOpen: "/static/images/chandelier-light.png"
+		},{
 			type: "small",
 			title: "顶灯",
 			open: "开",
@@ -142,14 +168,24 @@
 		z-index: 6;
 	}
 
-	.page {
-		height: 150vh;
+	.backGround {
+		height: 105vh;
 		width: 100%;
+		position: fixed;
+		top: 0;
+		left: 0;
 		background-image: url("/static/images/tour-1.jpg");
+		background-repeat: no-repeat;
+		background-size: cover;
+		background-position: 50%;
 		z-index: 1;
-		
 	}
-
+	.page{
+		height: 110vh;
+		width: 100%;
+		overflow: hidden;
+		z-index: 2;
+	}
 	.content {
 		display: flex;
 		flex-direction: column;
@@ -163,6 +199,7 @@
 		font-size: 35px;
 		margin-left: 30rpx;
 		margin-top: 50rpx;
+		z-index: 3;
 	}
 	.room{
 		margin: 0 30rpx;
@@ -180,12 +217,17 @@
 		margin-left: -55rpx;
 		letter-spacing: 3rpx;
 	}
+	.topNaviagtion{
+		z-index: 3;
+		margin-left: 30rpx;
+	}
 	.backgroundColor {
 		position: absolute;
 		height: 100%;
 		width: 100%;
-		background-color: rgba(74,74,74);
-		filter: blur(12px);
+		background-color: hsla(0,0%,60%,.3);
+		backdrop-filter: blur(20px);
+		-webkit-backdrop-filter: blur(20px);
 		overflow: hidden;
 		-webkit-transform: scale(3);
 		z-index: 1;

@@ -1,3 +1,8 @@
+<template>
+	<view >
+		
+	</view>
+</template>
 <script>
 	// 只能在App.vue里监听应用的生命周期
 	export default {
@@ -13,10 +18,6 @@
 		}
 	}
 </script>
-<style>
-	.status_bar {
-	       height: 10vh;
-	       width: 100%;
-		   background-color: rgba(0, 0, 0, 0);
-	   }
+<style scoped>
+
 </style>

@@ -17,14 +17,14 @@
 				type: String,
 				default: 0
 			}
-			
+
 		},
-		
+
 		data() {
 			return {
 				color: "#bababa",
 				selectedColor: "#ffffff",
-				
+
 				list: [{ // 最少2个、最多5个 tab
 					"pagePath": "/pages/home/home", // 页面路径，必须在 pages 中先定义
 					"iconPath": "/static/tabbar/home-solid-unSelect.png", // 图片路径
@@ -67,26 +67,26 @@
 		justify-content: center;
 		align-items: center;
 	}
-	
-.box{
-	position: absolute;
-	height: 100%;
-	width: 110%;
-	overflow: hidden;
-}
+
+	.box {
+		position: absolute;
+		height: 100%;
+		width: 110%;
+		overflow: hidden;
+	}
+
 	.backgroundColor {
 		position: absolute;
 		height: 100%;
 		width: 110%;
-		background-image: url("/static/images/tour-1.jpg");
-		background-repeat: no-repeat;
-		background-size: cover;
-		background-position: 50%;
-		filter: blur(10px);
+		background-color: hsla(0,0%,60%,.3);
+		backdrop-filter: blur(20px);
+		-webkit-backdrop-filter: blur(20px);
 		overflow: hidden;
-		-webkit-transform: scale(2);
+		-webkit-transform: scale(3);
 		z-index: 2;
 	}
+
 	.tab-bar-item {
 		flex: 1;
 		text-align: center;
@@ -102,6 +102,7 @@
 		width: 32px;
 		height: 32px;
 	}
+
 	.tab_text {
 		font-size: 10px;
 		padding-bottom: 20px;

@@ -5,7 +5,7 @@
 			<image class="img" src="/static/images/rightArrow.png"></image>
 		</view>	
 		<view class="gridBox" >
-			<view v-for="item in itemArray" :style="{gridArea: item.type == 'middle' ? `a` : ''}">
+			<view v-for="(item,index) in itemArray" :style="{gridRowStart: item.type == 'middle' ? `span 2` : 'span 1'}">
 				<middle-box v-if="item.type == 'middle'" class="item" :title="item.title" :open="item.open" :close="item.close" :photoClose="item.photoClose" :photoOpen="item.photoOpen"></middle-box>
 			<small-box v-if="item.type !='middle'" :title="item.title" :open="item.open" :close="item.close" :photoClose="item.photoClose" :photoOpen="item.photoOpen"></small-box>
 			</view>
@@ -30,11 +30,13 @@
 		color: #ffffff;
 		font-weight: 700;
 		font-size: 35rpx;
+		z-index: 3;
 	}
 	.img{
 		height: 30rpx;
 		width: 30rpx;
 		margin-left: 10rpx;
+		z-index: 3;
 	}
 	.navBar{
 		display: flex;
@@ -51,18 +53,12 @@
 	.gridBox{
 		display: grid;
 		grid-template-columns: 50% 50% ;
-		grid-template-rows: 50% 50%;
 		grid-gap:10rpx 10rpx;
-		grid-auto-flow: column;
-		grid-template-areas: 'a b '
-		                     'a c ';
+		grid-auto-flow: row dense;
 		align-items: space-between;
 		justify-content: space-between;
-		height: 250rpx;
 		width: 100%;
 		margin-top: 15rpx;
 	}
-	.item{
-		grid-area: a; 
-	}
+
 </style>

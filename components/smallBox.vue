@@ -1,11 +1,11 @@
 <template>
 	<view @click="handleClick" class="content">
-		<view class="backgroundColor" :style="{backgroundColor: selected == true ? `rgba(255,255,255,.8)` : `rgba(74,74,74,0.8)`}"></view>
+		<view class="backgroundColor" :style="{backgroundColor: selected == true ? `rgba(255,255,255,.8)` : `rgba(74,74,74,0.7)`}"></view>
 		<view class="s-content">	
 		<view class="thing-content" :style="{backgroundColor: selected == true ? `rgba(240,214,105,1)` : `rgba(0,0,0,.5)`}">
 			<image class="thing" :src="selected == true ? photoOpen : photoClose" ></image>
 		</view>
-		<view>
+		<view class="statusBox">
 			<view class="title" :style="{color: selected == true ?`rgba(0,0,0,1)` : `#ffffff`}">{{title}}</view>
 			<view class="status">{{selected ? open : close}}</view>
 		</view>
@@ -38,6 +38,7 @@ import { ref } from "vue";
 		border-radius: 30rpx;
 		overflow: hidden;
 		transition: 0.5s;
+		z-index: 3;
 	}
 	.s-content{
 		position: relative;
@@ -63,11 +64,14 @@ import { ref } from "vue";
 		height: 30rpx;
 		width: 80rpx;
 		margin-left: 20rpx;
-		padding-top: 20rpx;
+		padding-top: 10rpx;
 		color: #8a8a8a;
-		font-weight: 700;
+		font-weight: 600;
 		z-index: 3;
 		transition: 0.5s;
+	}
+	.statusBox{
+		margin-bottom: 15rpx;
 	}
 	.thing-content{
 		display: flex;
@@ -85,13 +89,15 @@ import { ref } from "vue";
 		width: 70%;
 		z-index: 5;
 		transition: 0.5s;
+
 	}
 	.backgroundColor {
 		position: absolute;
 		height: 100%;
 		width: 100%;
-		background-color: rgba(74,74,74,.8);
-		filter: blur(10px);
+		background-color: hsla(0,0%,60%,.3);
+		backdrop-filter: blur(20px);
+		-webkit-backdrop-filter: blur(20px);
 		-webkit-transform: scale(3);
 		z-index: 1;
 		transition: 0.5s;
