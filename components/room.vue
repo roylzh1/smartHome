@@ -6,10 +6,9 @@
 		</view>	
 		<view class="gridBox" >
 			<view v-for="(item,index) in itemArray" :style="{gridRowStart: item.type == 'middle' ? `span 2` : 'span 1'}">
-				<middle-box v-if="item.type == 'middle'" class="item" :title="item.title" :open="item.open" :close="item.close" :photoClose="item.photoClose" :photoOpen="item.photoOpen"></middle-box>
-			<small-box v-if="item.type !='middle'" :title="item.title" :open="item.open" :close="item.close" :photoClose="item.photoClose" :photoOpen="item.photoOpen"></small-box>
+				<middle-box @popup="popupHandler" v-if="item.type == 'middle'" class="item" :title="item.title" :open="item.open" :close="item.close" :photoClose="item.photoClose" :photoOpen="item.photoOpen"></middle-box>
+			<small-box @popup="popupHandler" v-if="item.type !='middle'" :title="item.title" :open="item.open" :close="item.close" :photoClose="item.photoClose" :photoOpen="item.photoOpen"></small-box>
 			</view>
-			
 		</view>
 	</view>
 	
@@ -18,11 +17,14 @@
 <script setup>
 	import middleBox from '/components/middleBox.vue';
 	import smallBox from '/components/smallBox.vue';
-	defineProps({
+	const props = defineProps({
 		itemArray: Array,
 		title: String
 	});
-	let doorPhoto = "/static/images/lock.png";
+	const emit = defineEmits(['popupBox']);
+	const popupHandler = (name) => {
+		emit('popupBox',props.title,name);
+	}
 </script>
 
 <style scoped>

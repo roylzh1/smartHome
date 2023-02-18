@@ -1,46 +1,42 @@
 {
 	"pages": [ //pages数组中第一项表示应用启动页，参考：https://uniapp.dcloud.io/collocation/pages
-	{
-		"path": "pages/home/home",
-		"style": {
-			"navigationBarTitleText": "uni-app",
-			"navigationStyle": "custom"
-		}
-	},
 		{
-			"path": "pages/index/index",
-			"style": {
-				"navigationBarTitleText": "uni-app",
-				"navigationStyle": "custom"
-			}
+			"path": "pages/home/home"
+
+		},
+		{
+			"path": "pages/index/index"
+
+		}, {
+			"path": "pages/airConditioner/airConditioner"
 		}
 	],
-	
+
 	"globalStyle": {
 		"navigationStyle": "custom",
 		"backgroundColor": "#F8F8F8"
 	},
 	"uniIdRouter": {},
 	"tabBar": {
-			"height": "60px",
-			"fontSize": "10px",
-			"iconWidth": "40px",
-	        "color": "#7A7E83", // tab 上的文字默认颜色
-	        "selectedColor": "#3cc51f", // tab 上的文字选中时的颜色
-	        "borderStyle": "rgba(68,59,28,0)", // tabbar 上边框的颜色，可选值 black/white
-	        "backgroundColor": "rgba(68,59,28,0.7)",  // tab 的背景色
-	        "list": [{ // 最少2个、最多5个 tab
-	            "pagePath": "pages/home/home", // 页面路径，必须在 pages 中先定义
-				"iconPath": "static/tabbar/home-solid.png", // 图片路径
-	            "text": "家庭" // tab 上按钮文字
-	        },  {
-	            "pagePath": "pages/index/index",
-				"iconPath": "static/tabbar/doughnut-chart-regular.png",
-	            "text": "自动化"
-	        }, {
-	            "pagePath": "pages/index/index",
-				"iconPath": "static/tabbar/star-solid.png",
-	            "text": "发现"
-	        }]
-	    }
+		"height": "60px",
+		"fontSize": "10px",
+		"iconWidth": "40px",
+		"color": "#7A7E83", // tab 上的文字默认颜色
+		"selectedColor": "#3cc51f", // tab 上的文字选中时的颜色
+		"borderStyle": "rgba(68,59,28,0)", // tabbar 上边框的颜色，可选值 black/white
+		"backgroundColor": "rgba(68,59,28,0.7)", // tab 的背景色
+		"list": [{ // 最少2个、最多5个 tab
+			"pagePath": "pages/home/home", // 页面路径，必须在 pages 中先定义
+			"iconPath": "static/tabbar/home-solid.png", // 图片路径
+			"text": "家庭" // tab 上按钮文字
+		}, {
+			"pagePath": "pages/index/index",
+			"iconPath": "static/tabbar/doughnut-chart-regular.png",
+			"text": "自动化"
+		}, {
+			"pagePath": "pages/index/index",
+			"iconPath": "static/tabbar/star-solid.png",
+			"text": "发现"
+		}]
+	}
 }

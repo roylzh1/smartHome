@@ -1,6 +1,6 @@
 <template>
 	<view class="backGround"></view>
-	<view class="page" :style="{position: ifScroll === true ? `` : `fixed`}">
+	<view class="page">
 		<!-- 导航栏 -->
 		<view class="navBarBox">
 			<!--:style="headerStyle" :style="opacityStyle"-->
@@ -16,15 +16,17 @@
 		<view class="content">
 			<h1 class="title">我的家</h1>
 			<view class="topNaviagtion">
-				<top-navigation @popupNav="popupNavHandler"></top-navigation>
+				<top-navigation @popupNav="globalControlHandler"></top-navigation>
 			</view>
 			<view class="room">
-				<room :itemArray="livingRoom" title="门厅"></room>
-				<room :itemArray="myRoom" title="卧室"></room>
+				<room @popupBox="popupBoxHandler" :itemArray="livingRoom" title="门厅"></room>
+				<room @popupBox="popupBoxHandler" :itemArray="myRoom" title="卧室"></room>
 			</view>
 		</view>
 		<tab-bar selected="0"></tab-bar>
-			<air-popup v-show="airPopupIfShow" :class="airPopupIfShow == true ? 'content-fade-up-animation' : ''" @airComplete="closeAirHandler"></air-popup>
+		<popup-box @touchmove.stop.prevent id="light" :title="popupMessage.title" :name="popupMessage.name"
+			v-if="popupBoxIfShow" :class="popupBoxIfShow == true ? 'content-fade-up-animation' : ''"
+			@lightComplete="closeBoxHandler"></popup-box>
 	</view>
 </template>
 
@@ -41,113 +43,119 @@
 	import tabBar from '/components/tabBar.vue'
 	import room from '/components/room.vue'
 	import topNavigation from '/components/topNaviagtion.vue'
-	import airPopup from '/components/airPopup.vue'
-	const livingRoom = [
-		{
-			type: "middle",
-			title: "大门",
-			open: "已开",
-			close: "已锁",
-			photoClose: "/static/images/lock.png",
-			photoOpen: "/static/images/unlock.png",
-		},{
-			type: "small",
-			title: "顶灯",
-			open: "开",
-			close: "关",
-			photoClose: "/static/images/bulb.png",
-			photoOpen: "/static/images/bulb-light.png"
-		},{
-			type: "small",
-			title: "吊灯",
-			open: "开",
-			close: "关",
-			photoClose: "/static/images/chandelier.png",
-			photoOpen: "/static/images/chandelier-light.png"
-		}
-	];
-	const myRoom = [
-		{
-			type: "small",
-			title: "顶灯",
-			open: "开",
-			close: "关",
-			photoClose: "/static/images/bulb.png",
-			photoOpen: "/static/images/bulb-light.png"
-		},{
-			type: "middle",
-			title: "大门",
-			open: "已开",
-			close: "已锁",
-			photoClose: "/static/images/lock.png",
-			photoOpen: "/static/images/unlock.png",
-		},{
-			type: "small",
-			title: "吊灯",
-			open: "开",
-			close: "关",
-			photoClose: "/static/images/chandelier.png",
-			photoOpen: "/static/images/chandelier-light.png"
-		},{
-			type: "small",
-			title: "顶灯",
-			open: "开",
-			close: "关",
-			photoClose: "/static/images/bulb.png",
-			photoOpen: "/static/images/bulb-light.png"
-		},{
-			type: "small",
-			title: "吊灯",
-			open: "开",
-			close: "关",
-			photoClose: "/static/images/chandelier.png",
-			photoOpen: "/static/images/chandelier-light.png"
-		},{
-			type: "small",
-			title: "阅读灯",
-			open: "开",
-			close: "关",
-			photoClose: "/static/images/tableLamp.png",
-			photoOpen: "/static/images/tableLamp-light.png"
-		},{
-			type: "small",
-			title: "风扇",
-			open: "开",
-			close: "关",
-			photoClose: "/static/images/fan.png",
-			photoOpen: "/static/images/fan-open.png"
-		}
-	];
-	let ifScroll = ref(true);
-	let airPopupIfShow = ref(false);//空调弹窗
+	import popupBox from '/components/popupBox.vue'
+	const livingRoom = [{
+		type: "middle",
+		title: "大门",
+		open: "已开",
+		close: "已锁",
+		photoClose: "/static/images/lock.png",
+		photoOpen: "/static/images/unlock.png",
+	}, {
+		type: "small",
+		title: "顶灯",
+		open: "开",
+		close: "关",
+		photoClose: "/static/images/bulb.png",
+		photoOpen: "/static/images/bulb-light.png"
+	}, {
+		type: "small",
+		title: "吊灯",
+		open: "开",
+		close: "关",
+		photoClose: "/static/images/chandelier.png",
+		photoOpen: "/static/images/chandelier-light.png"
+	}];
+	const myRoom = [{
+		type: "small",
+		title: "顶灯",
+		open: "开",
+		close: "关",
+		photoClose: "/static/images/bulb.png",
+		photoOpen: "/static/images/bulb-light.png"
+	}, {
+		type: "middle",
+		title: "大门",
+		open: "已开",
+		close: "已锁",
+		photoClose: "/static/images/lock.png",
+		photoOpen: "/static/images/unlock.png",
+	}, {
+		type: "small",
+		title: "吊灯",
+		open: "开",
+		close: "关",
+		photoClose: "/static/images/chandelier.png",
+		photoOpen: "/static/images/chandelier-light.png"
+	}, {
+		type: "small",
+		title: "顶灯",
+		open: "开",
+		close: "关",
+		photoClose: "/static/images/bulb.png",
+		photoOpen: "/static/images/bulb-light.png"
+	}, {
+		type: "small",
+		title: "吊灯",
+		open: "开",
+		close: "关",
+		photoClose: "/static/images/chandelier.png",
+		photoOpen: "/static/images/chandelier-light.png"
+	}, {
+		type: "small",
+		title: "阅读灯",
+		open: "开",
+		close: "关",
+		photoClose: "/static/images/tableLamp.png",
+		photoOpen: "/static/images/tableLamp-light.png"
+	}, {
+		type: "small",
+		title: "风扇",
+		open: "开",
+		close: "关",
+		photoClose: "/static/images/fan.png",
+		photoOpen: "/static/images/fan-open.png"
+	}];
+
+	let popupBoxIfShow = ref(false); //普通弹窗
+	let popupMessage = reactive({
+		title: '',
+		name: ''
+	});
+	let lightName = ref('');
 	let opacityStyle = reactive({
 		opacity: 0
 	});
-	let navPopup = {};
-	const popupNavHandler = name=>{
-		ifScroll.value = false;
-		airPopupIfShow.value = true;
-		
+	const popupBoxHandler = (title, name) => {
+		popupBoxIfShow.value = true;
+		popupMessage.title = title;
+		popupMessage.name = name;
 	}
-	const closeAirHandler = ()=>{
-		ifScroll.value = true;
-		airPopupIfShow.value = false;
+	const closeBoxHandler = () => {
+		popupBoxIfShow.value = false;
+	}
+	const globalControlHandler = name => {
+		uni.navigateTo({
+			url: `/pages/airConditioner/airConditioner?name=${name}`,
+			animationType: 'pop-in',
+				animationDuration: 500
+		});
 	}
 	onMounted(() => {
 		//获取手机状态栏高度
 		uni.hideTabBar({
 			animation: false
 		});
-		navPopup = uni.createAnimation();
+
 	});
 	onPageScroll(e => {
 		let opacity = e.scrollTop / 50;
 		if (opacity > 1) {
 			opacity = 1;
+			return;
 		}
 		opacityStyle.opacity = `${opacity}`;
 	});
-	
 </script>
 
 <style scoped>
@@ -192,11 +200,13 @@
 		background-position: 70%;
 		z-index: 1;
 	}
-	.page{
+
+	.page {
 		height: 120vh;
 		width: 100%;
 		z-index: 2;
 	}
+
 	.content {
 		display: flex;
 		flex-direction: column;
@@ -212,10 +222,12 @@
 		margin-top: 50rpx;
 		z-index: 3;
 	}
-	.room{
+
+	.room {
 		margin: 0 30rpx;
 	}
-	.text{
+
+	.text {
 		position: absolute;
 		color: #ffffff;
 		height: 50rpx;
@@ -228,49 +240,54 @@
 		margin-left: -55rpx;
 		letter-spacing: 3rpx;
 	}
-	.topNaviagtion{
+
+	.topNaviagtion {
 		z-index: 3;
 		margin-top: 10rpx;
 		margin-bottom: -10rpx;
 	}
+
 	.backgroundColor {
 		position: absolute;
 		height: 100%;
 		width: 100%;
-		background-color: hsla(0,0%,60%,.3);
+		background-color: hsla(0, 0%, 60%, .3);
 		backdrop-filter: blur(20px);
 		-webkit-backdrop-filter: blur(20px);
 		overflow: hidden;
 		-webkit-transform: scale(3);
 		z-index: 1;
 	}
+
 	.content-fade-up-animation {
-	  animation-duration: .4s;
-	  animation-name: fadeInUp;
-	  -webkit-animation-duration: .4s;
-	  animation-timing-function: cubic-bezier(0.280, 0.840, 0.420, 1);
-	  -webkit-animation-fill-mode: backwards;
-	  -webkit-animation-name: fadeInUp;
+		animation-duration: .2s;
+		animation-name: fadeInUp;
+		-webkit-animation-duration: .2s;
+		animation-timing-function: cubic-bezier(0.280, 0.840, 0.420, 1);
+		-webkit-animation-fill-mode: backwards;
+		-webkit-animation-name: fadeInUp;
 	}
 
 	/* Content fade up animation */
-	
-	@keyframes fadeInUp {
-	  from {
-	    transform: translateY(100%);
-	  }
-	
-	  to {
-	    transform: translateY(0);
-	  }
-	}
-@-webkit-keyframes fadeInUp {
-  from {
-    transform: translateY(100%);
-  }
-  to {
-    transform: translateY(0);
-  }
-}
 
+	@keyframes fadeInUp {
+		from {
+			transform: translateY(100%);
+		}
+
+		to {
+			transform: translateY(0);
+		}
+	}
+
+	@-webkit-keyframes fadeInUp {
+		from {
+			display: block;
+			transform: translateY(100%);
+		}
+
+		to {
+			transform: translateY(0);
+		}
+	}
 </style>
