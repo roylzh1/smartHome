@@ -10,7 +10,7 @@
 	const itemArray = [
 		{
 			title: "恒温器",
-			open: "20.0-22.0",
+			open: "1台开着",
 			photoOpen: "/static/images/fan-globe.png"
 		},{
 			title: "灯",
