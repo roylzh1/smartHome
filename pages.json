@@ -9,6 +9,8 @@
 
 		}, {
 			"path": "pages/airConditioner/airConditioner"
+		}, {
+			"path": "pages/lamp/lamp"
 		}
 	],
 

@@ -10,12 +10,12 @@
 <script setup>
 	defineProps({
 		height: {
-			type: Number,
-			default: 250
+			type: String,
+			default: '250'
 		},
 		width: {
-			type: Number,
-			default: 450
+			type: String,
+			default: '450'
 		},
 	})
 </script>

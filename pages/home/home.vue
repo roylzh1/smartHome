@@ -139,8 +139,15 @@
 		popupBoxIfShow.value = false;
 	}
 	const globalControlHandler = name => {
+		if(name==='恒温器')
 		uni.navigateTo({
 			url: `/pages/airConditioner/airConditioner?name=${name}`,
+			animationType: 'pop-in',
+				animationDuration: 500
+		});
+		if(name==='灯')
+		uni.navigateTo({
+			url: `/pages/lamp/lamp?name=${name}`,
 			animationType: 'pop-in',
 				animationDuration: 500
 		});
