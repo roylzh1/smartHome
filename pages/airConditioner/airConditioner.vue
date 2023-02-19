@@ -19,7 +19,7 @@
 									:style="{color: ifAirOpen == true ?`rgba(240,214,105,1)` : `#c8c8c8`}">{{airStatus}}
 								</view>
 								<view class="air-status-text-num"
-									:style="{color: ifAirOpen == true ?`rgba(240,214,105,1)` : `#c8c8c8`}">1台</view>
+									:style="{color: ifAirOpen == true ?`rgba(240,214,105,1)` : `#c8c8c8`}">{{livingRoom.filter(item=>item.status===true).length}}台</view>
 							</view>
 							<view class="air-open">
 								<view class="temperatureBox" :style="{color: isCold? '#1296db':'#1afa29'}">
@@ -43,12 +43,12 @@
 					</template>
 				</card>
 			</view>
-			<view class="air-room">
-				<view class="global-title">卧室</view>
-				<square-box @popup="popupBoxHandler" :title="livingRoom.title" :open="livingRoom.open" :close="livingRoom.close" :temperature="livingRoom.temperature"></square-box>
+			<view class="air-room" v-for="room in livingRoom">
+				<view class="global-title">{{room.name}}</view>
+				<square-box @popup="popupBoxHandler" :isCold="isCold?'#1296db':'#1afa29'" :title="room.name+'空调'" :open="room.open" :close="room.close" :temperature="room.temperature" :wind="room.wind" :status="room.status" @checkStatus="checkStatusHandler"></square-box>
 			</view>
 		</view>
-		<popup-box-air @touchmove.stop.prevent :isCold="isCold" :temperature="temperatureValue" :title="popupMessage.title" v-if="popupBoxIfShow" :class="popupBoxIfShow == true ? 'content-fade-up-animation' : ''" @lightComplete="closeBoxHandler"></popup-box-air>
+		<popup-box-air @touchmove.stop.prevent :isCold="isCold" :wind="popupMessage.wind" :temperature="temperatureValue" :title="popupMessage.title" v-if="popupBoxIfShow" :class="popupBoxIfShow == true ? 'content-fade-up-animation' : ''" @lightComplete="closeBoxHandler"></popup-box-air>
 	</view>
 </template>
 
@@ -62,11 +62,14 @@
 	} from "vue";
 	import card from '/components/card.vue'
 	import squareBox from '/components/squareBox.vue'
-	import popupBoxAir from '/components//popupBoxAir.vue'
+	import popupBoxAir from '/components/popupBoxAir.vue'
 	const name = ref('');
 	onLoad((option) => {
 		console.log(option);
 		name.value = option.name;
+		if(livingRoom.filter(item=>item.status===true).length != 0){//全关了
+			airHandler();
+		}
 	});
 	const temperatureValue = ref(26);
 	const imageSrc = ref('/static/images/center-airconditioner.png');
@@ -80,9 +83,31 @@
 	const popupBoxIfShow = ref(false);
 	let popupMessage = reactive({
 		title: '',
-		temperature: ''
+		temperature: '',
+		wind: ''
 	});
 	const openAirHandler = () => {
+		ifAirOpen.value = !ifAirOpen.value;
+		if (ifAirOpen.value) {
+			airStatus.value = '开启中';
+			if (isCold.value)
+				imageSrc.value = '/static/images/center-airconditioner-open.png';
+			else
+				imageSrc.value = '/static/images/center-airconditioner-open-hot.png';
+			level.value = 0;
+			livingRoom.forEach(item=>{item.status=true});//全局控制
+		} else {
+			airStatus.value = '关闭';
+			if (isCold.value)
+				imageSrc.value = '/static/images/center-airconditioner.png';
+			else
+				imageSrc.value = '/static/images/center-airconditioner-hot.png';
+			level.value = 1;
+			livingRoom.forEach(item=>item.status=false);
+		}
+
+	};
+	const airHandler = () => {
 		ifAirOpen.value = !ifAirOpen.value;
 		if (ifAirOpen.value) {
 			airStatus.value = '开启中';
@@ -99,15 +124,19 @@
 				imageSrc.value = '/static/images/center-airconditioner-hot.png';
 			level.value = 1;
 		}
-
+	
 	};
 	const temperatureHandler = type => {
 		if (type === 0) {
-			if (temperatureValue.value > 16)
-				temperatureValue.value--;
+			if (temperatureValue.value > 16){
+				--temperatureValue.value;
+				livingRoom.forEach(item=>item.temperature = temperatureValue.value.toString());
+			}	
 		} else {
-			if (temperatureValue.value < 32)
-				temperatureValue.value++;
+			if (temperatureValue.value < 32){
+				++temperatureValue.value;
+				livingRoom.forEach(item=>item.temperature = temperatureValue.value.toString());
+			}
 		}
 	};
 	const vHandler = () => {
@@ -117,12 +146,14 @@
 				vSrc.value = `/static/images/v${vLevel.value}.png`;
 			else
 				vSrc.value = `/static/images/v${vLevel.value}-hot.png`;
+			livingRoom.forEach(item=>item.wind = vLevel.value.toString());//统一
 		} else {
 			vLevel.value = 0;
 			if (isCold.value)
 				vSrc.value = `/static/images/v${vLevel.value}.png`;
 			else
 				vSrc.value = `/static/images/v${vLevel.value}-hot.png`;
+			livingRoom.forEach(item=>item.wind = "0");//统一
 		}
 	}
 	const modeHandler = () => {
@@ -144,21 +175,67 @@
 				imageSrc.value = '/static/images/center-airconditioner.png';
 		}
 	};
-	const popupBoxHandler = (title,temperature) => {
+	const checkStatusHandler = (status,name1) =>{
+		const name = name1.split('空调')[0]
+		let index = livingRoom.findIndex((item)=>item.name === name);
+		livingRoom[index].status = !livingRoom[index].status;//切换状态
+		if(!status){//关单个空调
+			if(livingRoom.filter(item=>item.status===true).length === 0){//全关了
+				airHandler();
+			}
+		}else{//开
+			if(!ifAirOpen.value){//中控没开,开了单个空调
+				airHandler();
+			}
+		}
+	}
+	const popupBoxHandler = (title,temperature,wind) => {
 		popupBoxIfShow.value = true;
 		popupMessage.temperature = temperature;
 		popupMessage.title = title;
-		console.log(temperature);
+		popupMessage.wind = wind;
 	};
-	const closeBoxHandler = () => {
+	const closeBoxHandler = (newLevel) => {
+		console.log(newLevel);
 		popupBoxIfShow.value = false;
 	}
-	const livingRoom = {
-		title: "卧室空调",
+	const livingRoom = reactive([{
+		name: "门厅",
 		open: "已开",
 		close: "已关",
 		temperature: "26",
-	};
+		wind: "0",
+		status: true,
+	},{
+		name: "主卧",
+		open: "已开",
+		close: "已关",
+		temperature: "24",
+		wind: "1",
+		status: true,
+	},{
+		name: "客卧",
+		open: "已开",
+		close: "已关",
+		temperature: "24",
+		wind: "2",
+		status: false,
+	},{
+		name: "书房",
+		open: "已开",
+		close: "已关",
+		temperature: "22",
+		wind: "3",
+		status: true,
+	},{
+		name: "洗手间",
+		open: "已开",
+		close: "已关",
+		temperature: "28",
+		wind: "0",
+		status: true,
+	}]);
+	
 	const complete = () => {
 		uni.switchTab({
 			url: '/pages/home/home',

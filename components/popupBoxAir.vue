@@ -28,10 +28,11 @@
 	const prop = defineProps({
 		title: String,
 		temperature: Number,
+		wind: String,
 		isCold: Boolean
 	});
 	const emit = defineEmits(['lightComplete']);
-	let level = ref(0);
+	let level = ref(prop.wind);
 	let beforeIndex = 0;
 	let nowIndex = 0;
 	let moveY = ref(800);
@@ -40,7 +41,7 @@
 	const hot = ref('');
 	const className = ref('');
 	const complete = () => {
-		emit('lightComplete');
+		emit('lightComplete',level.value);
 	};
 
 	const moveHandler = (e) => {
@@ -82,14 +83,18 @@
 		}
 	};
 	onMounted(() => {
-		temperatureValue.value = prop.temperature
+		temperatureValue.value = prop.temperature;
+		if(prop.wind == 0) moveY.value = 300;
+		if(prop.wind == 1) moveY.value = 200;
+		if(prop.wind == 2) moveY.value = 100;
+		if(prop.wind == 3) moveY.value = 0;
 		if (!prop.isCold) {
 			hot.value = '-hot';
-			vImage.value = `/static/images/v0${hot.value}.png`;
+			vImage.value = `/static/images/v${level.value}${hot.value}.png`;
 			className.value = 'adjust-hot';
 		} else {
 			hot.value = '';
-			vImage.value = `/static/images/v0${hot.value}.png`;
+			vImage.value = `/static/images/v${level.value}${hot.value}.png`;
 			className.value = 'adjust-cold';
 		}
 	})

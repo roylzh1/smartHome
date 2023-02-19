@@ -25,7 +25,7 @@
 			</view>
 		</view>
 		<tab-bar selected="0"></tab-bar>
-		<popup-light-box @touchmove.stop.prevent id="light" :title="popupMessage.title" :name="popupMessage.name"
+		<popup-light-box @touchmove.stop.prevent :title="popupMessage.title" :name="popupMessage.name"
 			v-if="popupBoxIfShow" :class="popupBoxIfShow == true ? 'content-fade-up-animation' : ''"
 			@lightComplete="closeBoxHandler"></popup-light-box>
 	</view>
@@ -132,7 +132,10 @@
 		popupMessage.title = title;
 		popupMessage.name = name;
 	}
-	const closeBoxHandler = () => {
+	const closeBoxHandler = (judege) => {
+		if(!judege) {
+			//拿ID才能做出判断是那盏灯熄灭
+		}
 		popupBoxIfShow.value = false;
 	}
 	const globalControlHandler = name => {

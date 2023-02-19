@@ -30,6 +30,7 @@ import { ref } from "vue";
 		 selected.value = !selected.value;
 	};
 	const pressHandler = () => {
+		if(!selected.value)
 		selected.value = !selected.value;
 		emit('popup',props.title);
 	}

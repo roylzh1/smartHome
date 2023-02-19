@@ -63,56 +63,6 @@
 </script>
 
 <style scoped>
-	.lightContent {
-		position: fixed;
-		top: 140rpx;
-		left: 0;
-		height: 100vh;
-		width: 100vw;
-		border-radius: 80rpx 80rpx 0 0;
-		overflow: scroll;
-		-webkit-overflow-scrolling: touch;
-		z-index: 12;
-	}
-
-	.lightContent1 {
-		position: fixed;
-		left: 0;
-		height: 100vh;
-		width: 100vw;
-		border-radius: 80rpx 80rpx 0 0;
-		overflow: hidden;
-		z-index: 12;
-	}
-
-	.lightHeader {
-		position: relative;
-		height: 100rpx;
-		background-color: rgba(0, 0, 0, .5);
-	}
-
-	.lightHeader-text {
-		position: absolute;
-		left: 50%;
-		top: 50%;
-		transform: translate(-50%, -50%);
-		-webkit-transform: translate(-50%, -50%);
-		font-weight: 700;
-		letter-spacing: 2px;
-		color: #ffffff;
-		z-index: 12;
-	}
-
-	.lightHeader-return {
-		position: absolute;
-		left: 90%;
-		top: 50%;
-		transform: translate(-50%, -50%);
-		-webkit-transform: translate(-50%, -50%);
-		font-weight: 700;
-		color: #1afa29;
-	}
-
 	.lighting {
 		height: 80%;
 		width: 100%;
