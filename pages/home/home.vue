@@ -1,5 +1,6 @@
 <template>
 	<view class="backGround"></view>
+	<view :class="popupBoxIfShow == true ? 'backGround-up':''"></view>
 	<view class="page">
 		<!-- 导航栏 -->
 		<view class="navBarBox">
@@ -24,9 +25,9 @@
 			</view>
 		</view>
 		<tab-bar selected="0"></tab-bar>
-		<popup-box @touchmove.stop.prevent id="light" :title="popupMessage.title" :name="popupMessage.name"
+		<popup-light-box @touchmove.stop.prevent id="light" :title="popupMessage.title" :name="popupMessage.name"
 			v-if="popupBoxIfShow" :class="popupBoxIfShow == true ? 'content-fade-up-animation' : ''"
-			@lightComplete="closeBoxHandler"></popup-box>
+			@lightComplete="closeBoxHandler"></popup-light-box>
 	</view>
 </template>
 
@@ -43,7 +44,7 @@
 	import tabBar from '/components/tabBar.vue'
 	import room from '/components/room.vue'
 	import topNavigation from '/components/topNaviagtion.vue'
-	import popupBox from '/components/popupBox.vue'
+	import popupLightBox from '/components/popupLightBox.vue'
 	const livingRoom = [{
 		type: "middle",
 		title: "大门",
@@ -258,7 +259,17 @@
 		-webkit-transform: scale(3);
 		z-index: 1;
 	}
-
+.backGround-up {
+		height: 100vh;
+		width: 100%;
+		position: fixed;
+		top: 0;
+		left: 0;
+		background-color: hsla(0,0%,0%,.1);
+		backdrop-filter: blur(2px);
+		-webkit-transform: scale(1);
+		z-index: 7;
+	}
 	.content-fade-up-animation {
 		animation-duration: .2s;
 		animation-name: fadeInUp;

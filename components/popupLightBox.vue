@@ -1,23 +1,21 @@
 <template>
-	<view class="lightContent">
-		<view class="lightContent1">
-			<view class="lightHeader">
-				<view class="lightHeader-text">{{title+name}}</view>
-				<view class="lightHeader-return" @click="complete">完成</view>
-			</view>
-			<view class="lighting">
-				<image class="logo" :style="{filter: `grayscale(${level}) brightness(${2-level})`}" src="../static/images/lighting.png"></image>
-				<view class="adjust-content"  @touchmove="moveHandler">
-					<view class="adjust" :style="{transform:`translateY(${moveY}px)`}"></view>
-				</view>
+	<popup-card :title="title+name" @return="complete">
+		<view class="lighting">
+			<image class="logo" :style="{filter: `grayscale(${level}) brightness(${2-level})`}"
+				src="../static/images/lighting.png"></image>
+			<view class="adjust-content" @touchmove="moveHandler">
+				<view class="adjust" :style="{transform:`translateY(${moveY}px)`}"></view>
 			</view>
 		</view>
-		<view class="backgroundColor"></view>
-	</view>
+	</popup-card>
 </template>
 
 <script setup>
-import { onMounted, ref } from "vue";
+	import {
+		onMounted,
+		ref
+	} from "vue";
+	import popupCard from '/components/popupCard.vue'
 	const prop = defineProps({
 		title: String,
 		name: String
@@ -27,37 +25,39 @@ import { onMounted, ref } from "vue";
 	let beforeIndex = 0;
 	let nowIndex = 0;
 	let moveY = ref(0);
-	const complete = ()=>{
-		console.log(prop.name)
-		emit('lightComplete');
+	const complete = () => {
+		if (level.value == 1)
+			emit('lightComplete', false);
+		else
+			emit('lightComplete');
 	};
-		
-	const moveHandler = (e)=>{
+
+	const moveHandler = (e) => {
 		e.preventDefault();
 		beforeIndex = nowIndex;
 		nowIndex = e.changedTouches[0].clientY;
-		if(nowIndex<=500){
+		if (nowIndex <= 500) {
 			moveY.value = 0;
 			level.value = 0;
 			return;
-		}	
-		if(nowIndex<=600){
+		}
+		if (nowIndex <= 600) {
 			moveY.value = 100;
 			level.value = .3;
 			return;
-		}	
-		if(nowIndex<=700){
+		}
+		if (nowIndex <= 700) {
 			moveY.value = 200;
 			level.value = .7;
 			return;
 		}
-		if(nowIndex<=800){
+		if (nowIndex <= 800) {
 			moveY.value = 300;
 			level.value = 1;
 			return;
 		}
 	}
-	onMounted(()=>{
+	onMounted(() => {
 
 	})
 </script>
@@ -74,6 +74,7 @@ import { onMounted, ref } from "vue";
 		-webkit-overflow-scrolling: touch;
 		z-index: 12;
 	}
+
 	.lightContent1 {
 		position: fixed;
 		left: 0;
@@ -83,6 +84,7 @@ import { onMounted, ref } from "vue";
 		overflow: hidden;
 		z-index: 12;
 	}
+
 	.lightHeader {
 		position: relative;
 		height: 100rpx;
@@ -110,7 +112,8 @@ import { onMounted, ref } from "vue";
 		font-weight: 700;
 		color: #1afa29;
 	}
-	.lighting{
+
+	.lighting {
 		height: 80%;
 		width: 100%;
 		display: flex;
@@ -118,15 +121,17 @@ import { onMounted, ref } from "vue";
 		justify-content: center;
 		align-items: center;
 	}
-	.adjust-content{
+
+	.adjust-content {
 		margin-top: 100rpx;
 		height: 300px;
 		width: 100px;
 		border-radius: 50rpx;
-		background-color: hsla(0,0%,0%,.4);
+		background-color: hsla(0, 0%, 0%, .4);
 		overflow: hidden;
 	}
-	.adjust{
+
+	.adjust {
 		height: 100%;
 		width: 100%;
 		border-radius: 50rpx;
@@ -134,10 +139,12 @@ import { onMounted, ref } from "vue";
 		-webkit-overflow-scrolling: touch;
 		overflow-scrolling: touch;
 	}
-	.logo{
+
+	.logo {
 		height: 250rpx;
 		width: 250rpx;
 	}
+
 	.backgroundColor {
 		height: 100%;
 		width: 100%;
@@ -147,5 +154,4 @@ import { onMounted, ref } from "vue";
 		-webkit-transform: scale(1);
 		z-index: 11;
 	}
-	
 </style>

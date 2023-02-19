@@ -1,6 +1,7 @@
 <template>
 	<view class="content">
 		<view class="backGround"></view>
+		<view :class="popupBoxIfShow == true ? 'backGround-up':''"></view>
 		<view class="page">
 			<view class="air-header">
 				<view class="airHeader-text">{{name}}</view>
@@ -12,15 +13,22 @@
 					<template #default>
 						<view class="box">
 							<view class="air-status">
-								<image @click="openAirHandler" class="air-status-logo" :src="imageSrc" :style="{filter: `grayscale(${level}) brightness(${level+1})`}"></image>
-								<view class="air-status-text" :style="{color: ifAirOpen == true ?`rgba(240,214,105,1)` : `#c8c8c8`}">{{airStatus}}</view>
-								<view class="air-status-text-num" :style="{color: ifAirOpen == true ?`rgba(240,214,105,1)` : `#c8c8c8`}">1台</view>
+								<image @click="openAirHandler" class="air-status-logo" :src="imageSrc"
+									:style="{filter: `grayscale(${level}) brightness(${level+1})`}"></image>
+								<view class="air-status-text"
+									:style="{color: ifAirOpen == true ?`rgba(240,214,105,1)` : `#c8c8c8`}">{{airStatus}}
+								</view>
+								<view class="air-status-text-num"
+									:style="{color: ifAirOpen == true ?`rgba(240,214,105,1)` : `#c8c8c8`}">1台</view>
 							</view>
 							<view class="air-open">
-								<view class="temperatureBox" :style="{color: isCold? '#1296db':'#1afa29'}">{{temperatureValue}}°C</view>
+								<view class="temperatureBox" :style="{color: isCold? '#1296db':'#1afa29'}">
+									{{temperatureValue}}°C</view>
 								<view class="temperature-text">
-									<image @click="temperatureHandler(0)" class="tempLogo" src="/static/images/tempDown.png"></image>
-									<image @click="temperatureHandler(1)" class="tempLogo" src="/static/images/tempUp.png"></image>
+									<image @click="temperatureHandler(0)" class="tempLogo"
+										src="/static/images/tempDown.png"></image>
+									<image @click="temperatureHandler(1)" class="tempLogo"
+										src="/static/images/tempUp.png"></image>
 								</view>
 							</view>
 							<view class="vChange">
@@ -35,7 +43,12 @@
 					</template>
 				</card>
 			</view>
+			<view class="air-room">
+				<view class="global-title">卧室</view>
+				<square-box @popup="popupBoxHandler" :title="livingRoom.title" :open="livingRoom.open" :close="livingRoom.close" :temperature="livingRoom.temperature"></square-box>
+			</view>
 		</view>
+		<popup-box-air @touchmove.stop.prevent :isCold="isCold" :temperature="temperatureValue" :title="popupMessage.title" v-if="popupBoxIfShow" :class="popupBoxIfShow == true ? 'content-fade-up-animation' : ''" @lightComplete="closeBoxHandler"></popup-box-air>
 	</view>
 </template>
 
@@ -48,6 +61,8 @@
 		reactive
 	} from "vue";
 	import card from '/components/card.vue'
+	import squareBox from '/components/squareBox.vue'
+	import popupBoxAir from '/components//popupBoxAir.vue'
 	const name = ref('');
 	onLoad((option) => {
 		console.log(option);
@@ -62,47 +77,88 @@
 	const ifAirOpen = ref(false);
 	const airStatus = ref('关闭');
 	const level = ref(1);
-	const openAirHandler = ()=>{
+	const popupBoxIfShow = ref(false);
+	let popupMessage = reactive({
+		title: '',
+		temperature: ''
+	});
+	const openAirHandler = () => {
 		ifAirOpen.value = !ifAirOpen.value;
-		if(ifAirOpen.value){
+		if (ifAirOpen.value) {
 			airStatus.value = '开启中';
-			imageSrc.value = '/static/images/center-airconditioner-open.png';
+			if (isCold.value)
+				imageSrc.value = '/static/images/center-airconditioner-open.png';
+			else
+				imageSrc.value = '/static/images/center-airconditioner-open-hot.png';
 			level.value = 0;
-		}	
-		else{
+		} else {
 			airStatus.value = '关闭';
-			imageSrc.value = '/static/images/center-airconditioner.png';
+			if (isCold.value)
+				imageSrc.value = '/static/images/center-airconditioner.png';
+			else
+				imageSrc.value = '/static/images/center-airconditioner-hot.png';
 			level.value = 1;
 		}
-			
+
 	};
 	const temperatureHandler = type => {
-		if(type === 0){
-			if(temperatureValue.value>16)
+		if (type === 0) {
+			if (temperatureValue.value > 16)
 				temperatureValue.value--;
-		}else{
-			if(temperatureValue.value<32)
+		} else {
+			if (temperatureValue.value < 32)
 				temperatureValue.value++;
 		}
 	};
-	const vHandler = ()=>{
-		if(vLevel.value<3){
+	const vHandler = () => {
+		if (vLevel.value < 3) {
 			vLevel.value++;
-			vSrc.value = `/static/images/v${vLevel.value}.png`;
-		}else{
+			if (isCold.value)
+				vSrc.value = `/static/images/v${vLevel.value}.png`;
+			else
+				vSrc.value = `/static/images/v${vLevel.value}-hot.png`;
+		} else {
 			vLevel.value = 0;
-			vSrc.value = `/static/images/v${vLevel.value}.png`;
-		}	
+			if (isCold.value)
+				vSrc.value = `/static/images/v${vLevel.value}.png`;
+			else
+				vSrc.value = `/static/images/v${vLevel.value}-hot.png`;
+		}
 	}
-	const modeHandler = ()=>{
-		if(isCold.value){
+	const modeHandler = () => {
+		if (isCold.value) {
 			isCold.value = !isCold.value;
 			modeSrc.value = `/static/images/hot.png`;
-		}else{
+			vSrc.value = `/static/images/v${vLevel.value}-hot.png`;
+			if (ifAirOpen.value)
+				imageSrc.value = '/static/images/center-airconditioner-open-hot.png';
+			else
+				imageSrc.value = '/static/images/center-airconditioner-hot.png';
+		} else {
 			isCold.value = !isCold.value;
 			modeSrc.value = `/static/images/cold.png`;
-		}	
+			vSrc.value = `/static/images/v${vLevel.value}.png`;
+			if (ifAirOpen.value)
+				imageSrc.value = '/static/images/center-airconditioner-open.png';
+			else
+				imageSrc.value = '/static/images/center-airconditioner.png';
+		}
+	};
+	const popupBoxHandler = (title,temperature) => {
+		popupBoxIfShow.value = true;
+		popupMessage.temperature = temperature;
+		popupMessage.title = title;
+		console.log(temperature);
+	};
+	const closeBoxHandler = () => {
+		popupBoxIfShow.value = false;
 	}
+	const livingRoom = {
+		title: "卧室空调",
+		open: "已开",
+		close: "已关",
+		temperature: "26",
+	};
 	const complete = () => {
 		uni.switchTab({
 			url: '/pages/home/home',
@@ -204,7 +260,8 @@
 		margin-left: 30rpx;
 		margin-top: 15rpx;
 	}
-	.temperatureBox{
+
+	.temperatureBox {
 		display: flex;
 		justify-content: center;
 		align-items: center;
@@ -218,18 +275,21 @@
 		font-weight: 600;
 		border-radius: 50%;
 	}
-	.temperature-text{
+
+	.temperature-text {
 		margin-top: 20rpx;
 		display: flex;
 		justify-content: center;
 	}
-	.tempLogo{
+
+	.tempLogo {
 		height: 60rpx;
 		width: 60rpx;
 		margin-top: 20rpx;
 		margin-left: 10rpx;
 		margin-right: 10rpx;
 	}
+
 	.vChange {
 		display: flex;
 		flex-direction: column;
@@ -240,7 +300,8 @@
 		margin-right: 10rpx;
 		margin-top: 15rpx;
 	}
-	.vLogo{
+
+	.vLogo {
 		height: 60rpx;
 		width: 60rpx;
 	}
@@ -257,10 +318,60 @@
 		background-position: 70%;
 		z-index: 2;
 	}
+.backGround-up {
+		height: 100vh;
+		width: 100%;
+		position: fixed;
+		top: 0;
+		left: 0;
+		background-color: hsla(0,0%,0%,.1);
+		backdrop-filter: blur(5px);
+		-webkit-backdrop-filter: blur(5px);
+		-webkit-transform: scale(1);
+		z-index: 5;
+	}
+	.air-room {
+		display: flex;
+		flex-wrap: wrap;
+		height: 300rpx;
+		width: 350rpx;
+		margin-left: 30rpx;
+		margin-top: 30rpx;
+	}
 
 	.content {
 		height: 100vh;
 		width: 100vw;
 	}
+	.content-fade-up-animation {
+		animation-duration: .2s;
+		animation-name: fadeInUp;
+		-webkit-animation-duration: .2s;
+		animation-timing-function: cubic-bezier(0.280, 0.840, 0.420, 1);
+		-webkit-animation-fill-mode: backwards;
+		-webkit-animation-name: fadeInUp;
+	}
 	
+	/* Content fade up animation */
+	
+	@keyframes fadeInUp {
+		from {
+			transform: translateY(100%);
+		}
+	
+		to {
+			transform: translateY(0);
+		}
+	}
+	
+	@-webkit-keyframes fadeInUp {
+		from {
+			display: block;
+			transform: translateY(100%);
+		}
+	
+		to {
+			transform: translateY(0);
+		}
+	}
 </style>
