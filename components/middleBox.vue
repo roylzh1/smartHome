@@ -1,5 +1,5 @@
 <template>
-	<view @click="handleClick" class="content">
+	<view @longpress="pressHandler" @click="handleClick" class="content">
 		<view class="backgroundColor" :style="{backgroundColor: selected == true ? `rgba(255,255,255,.8)` : `hsla(0,0%,25%,.6)`}"></view>
 		<view class="s-content">	
 		<view class="thing-content" :style="{backgroundColor: selected == true ? `rgba(240,214,105,1)` : `rgba(0,0,0,.5)`}">
@@ -16,7 +16,7 @@
 
 <script setup>
 import { ref } from "vue";
-    defineProps({
+    const props = defineProps({
 		title: String,
 		open: String,
 		close: String,
@@ -24,8 +24,14 @@ import { ref } from "vue";
 		photoClose: String
 	});
 	let selected = ref(false);
+	const emit = defineEmits(['popup']);
 	const handleClick = ()=>{
 		 selected.value = !selected.value;
+	}
+	const pressHandler = () => {
+		if(!selected.value)
+		selected.value = !selected.value;
+		emit('popup',props.title);
 	}
 </script>
 

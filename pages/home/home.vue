@@ -1,7 +1,7 @@
 <template>
 	<view class="backGround"></view>
-	<view :class="popupBoxIfShow == true ? 'backGround-up':''"></view>
-	<view class="page">
+	<view  :class="popupBoxIfShow||ifShowAddRoom == true ? 'backGround-up':''"></view>
+	<view class="page" :style="{height: popupBoxIfShow||ifShowAddRoom||showAddFurniture||showRemoveFurniture == true ? '90vh':''}">
 		<!-- 导航栏 -->
 		<view class="navBarBox">
 			<!--:style="headerStyle" :style="opacityStyle"-->
@@ -9,7 +9,7 @@
 			<!-- 导航栏内容 -->
 			<view class="navBar">
 				<view class="text" :style="{opacity:opacityStyle.opacity}">我的家</view>
-				<image class="logo" src="/static/images/add-to-queue-regular.png"></image>
+				<image @click="addRoomHandler" class="logo" src="/static/images/add-to-queue-regular.png"></image>
 				<image class="logo" src="/static/images/more.png"></image>
 			</view>
 		</view>
@@ -20,14 +20,16 @@
 				<top-navigation @popupNav="globalControlHandler"></top-navigation>
 			</view>
 			<view class="room">
-				<room @popupBox="popupBoxHandler" :itemArray="livingRoom" title="门厅"></room>
-				<room @popupBox="popupBoxHandler" :itemArray="myRoom" title="卧室"></room>
+				<room @addOrRemove="furnitureHandler" @popupBox="popupBoxHandler" :itemArray="livingRoom" title="门厅"></room>
+				<room @addOrRemove="furnitureHandler" @popupBox="popupBoxHandler" :itemArray="myRoom" title="卧室"></room>
 			</view>
 		</view>
 		<tab-bar selected="0"></tab-bar>
 		<popup-light-box @touchmove.stop.prevent :title="popupMessage.title" :name="popupMessage.name"
-			v-if="popupBoxIfShow" :class="popupBoxIfShow == true ? 'content-fade-up-animation' : ''"
-			@lightComplete="closeBoxHandler"></popup-light-box>
+			v-show="popupBoxIfShow" :class="popupBoxIfShow == true ? 'content-fade-up-animation' : ''" @lightComplete="closeBoxHandler"></popup-light-box>
+		<add-new-room v-show="ifShowAddRoom" :class="ifShowAddRoom == true ? 'content-fade-up' : ''"   @addRoomComplete="closeAddRoomBoxHandler"></add-new-room>
+		<add-furniture v-show="showAddFurniture" :class="showAddFurniture == true ? 'content-fade-up' : ''" :name="whichRoom" @addRoomComplete="closeFurnitureHandler"></add-furniture>
+		<remove-furniture v-show="showRemoveFurniture" :class="showRemoveFurniture == true ? 'content-fade-up' : ''" :name="whichRoom" @addRoomComplete="closeFurnitureHandler"></remove-furniture>
 	</view>
 </template>
 
@@ -45,6 +47,9 @@
 	import room from '/components/room.vue'
 	import topNavigation from '/components/topNaviagtion.vue'
 	import popupLightBox from '/components/popupLightBox.vue'
+	import addNewRoom from '/components/addNewRoom.vue'
+	import addFurniture from '/components/addFurniture.vue'
+	import removeFurniture from '/components/removeFurniture.vue'
 	const livingRoom = [{
 		type: "middle",
 		title: "大门",
@@ -138,6 +143,14 @@
 		}
 		popupBoxIfShow.value = false;
 	}
+	const ifShowAddRoom = ref(false);
+	const addRoomHandler = ()=>{
+		ifShowAddRoom.value = true;
+	}
+	const closeAddRoomBoxHandler = ()=>{
+		ifShowAddRoom.value = false;
+	}
+	//全局控制导航
 	const globalControlHandler = name => {
 		if(name==='恒温器')
 		uni.navigateTo({
@@ -151,7 +164,23 @@
 			animationType: 'pop-in',
 				animationDuration: 500
 		});
+	};
+	const showAddFurniture = ref(false);
+	const showRemoveFurniture = ref(false);
+	const whichRoom = ref('');//判断是哪个房间增删家具
+	//增删家具
+	const furnitureHandler = (name,mode)=>{
+		whichRoom.value = name;//房间名
+		if(mode)//增加
+			showAddFurniture.value = true;
+			else//删除家具
+			showRemoveFurniture.value = true;
 	}
+	const closeFurnitureHandler = ()=>{
+		showAddFurniture.value= false;
+		showRemoveFurniture.value = false;
+	}
+	const disabledScroll = ()=> {}
 	onMounted(() => {
 		//获取手机状态栏高度
 		uni.hideTabBar({
@@ -270,15 +299,21 @@
 		z-index: 1;
 	}
 .backGround-up {
-		height: 100vh;
+		height: 100%;
 		width: 100%;
 		position: fixed;
 		top: 0;
 		left: 0;
 		background-color: hsla(0,0%,0%,.1);
-		backdrop-filter: blur(2px);
+		backdrop-filter: blur(3px);
 		-webkit-transform: scale(1);
 		z-index: 7;
+	}
+	.content-fade-up{
+		animation-duration: .2s;
+		animation-name: fadeInUp1;
+		animation-timing-function: cubic-bezier(0.280, 0.840, 0.420, 1);
+		-webkit-animation-fill-mode: backwards;
 	}
 	.content-fade-up-animation {
 		animation-duration: .2s;
@@ -288,8 +323,6 @@
 		-webkit-animation-fill-mode: backwards;
 		-webkit-animation-name: fadeInUp;
 	}
-
-	/* Content fade up animation */
 
 	@keyframes fadeInUp {
 		from {
@@ -309,6 +342,15 @@
 
 		to {
 			transform: translateY(0);
+		}
+	}
+	@keyframes fadeInUp1 {
+		from {
+			height: 0vh;
+		}
+	
+		to {
+			height: 35vh;
 		}
 	}
 </style>

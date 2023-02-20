@@ -1,19 +1,20 @@
 <template>
-	<view class="lightContent">
-		<view class="lightContent1">
+	<view class="lightContent" :style="{height: height+'vh'}">
+		<view class="lightContent1" :style="{height: height+'vh'}">
 			<view class="lightHeader">
 				<view class="lightHeader-text">{{title}}</view>
 				<view class="lightHeader-return" @click="complete">完成</view>
 			</view>
 			<slot></slot>
 		</view>
-		<view class="backgroundColor"></view>
+		<view class="backgroundColor" :style="{height: height+'vh'}"></view>
 	</view>
 </template>
 
 <script setup>
 	const prop = defineProps({
 		title: String,
+		height: Number
 	});
 	const emit = defineEmits(['return']);
 	const complete = ()=>{

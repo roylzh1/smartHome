@@ -1,5 +1,5 @@
 <template>
-	<view class="content">
+	<view class="lamp-content">
 		<view class="backGround"></view>
 		<view :class="popupBoxIfShow == true ? 'backGround-up':''"></view>
 		<view class="page">
@@ -16,11 +16,11 @@
 				</card>
 			</view>
 			<view class="air-room" v-for="room in livingRoom">
-				<view class="global-title">{{room.name}}</view>
-
+				<view class="global-title" >{{room.name}}</view>
+				<middle-box @popup="popupHandler" :title="room.name" :open="room.open" :close="room.close" :photoClose="room.photoClose" :photoOpen="room.photoOpen"></middle-box>
 			</view>
 		</view>
-
+		<popup-global-light v-show="popupBoxIfShow" :name="popupMessage.name" @touchmove.stop.prevent @lightComplete="closeBoxHandler" :class="popupBoxIfShow == true ? 'content-fade-up-animation' : ''"></popup-global-light>
 	</view>
 </template>
 
@@ -34,59 +34,65 @@
 	} from "vue";
 	import card from '/components/card.vue'
 	import mySwitch from '/components/mySwitch.vue'
+	import middleBox from '/components/middleBox.vue'
+	import popupGlobalLight from '/components/popupGlobalLight.vue'
 	const name = ref('');
 	onLoad((option) => {
 		console.log(option);
 		name.value = option.name;
 
 	});
+	const popupMessage = reactive({
+		name: ''
+	})
+	//开启弹窗
+	const popupHandler = (name) => {
+		popupMessage.name = name;
+		popupBoxIfShow.value = true;
+	}
 	const globalLightHandler = () => {
-		console.log(111)
+		
 	}
 	const popupBoxIfShow = ref(false);
-	const popupBoxHandler = () => {
-		popupBoxIfShow.value = true;
-
-	};
-	const closeBoxHandler = (newLevel) => {
-		console.log(newLevel);
+	//关闭弹窗
+	const closeBoxHandler = () => {
 		popupBoxIfShow.value = false;
 	}
 	const livingRoom = reactive([{
 		name: "门厅",
 		open: "已开",
 		close: "已关",
-		temperature: "26",
-		wind: "0",
 		status: true,
+		photoClose: "/static/images/bulb.png",
+		photoOpen: "/static/images/bulb-light.png"
 	}, {
 		name: "主卧",
 		open: "已开",
 		close: "已关",
-		temperature: "24",
-		wind: "1",
 		status: true,
+		photoClose: "/static/images/bulb.png",
+		photoOpen: "/static/images/bulb-light.png"
 	}, {
 		name: "客卧",
 		open: "已开",
 		close: "已关",
-		temperature: "24",
-		wind: "2",
 		status: false,
+		photoClose: "/static/images/chandelier.png",
+		photoOpen: "/static/images/chandelier-light.png"
 	}, {
 		name: "书房",
 		open: "已开",
 		close: "已关",
-		temperature: "22",
-		wind: "3",
 		status: true,
+		photoClose: "/static/images/chandelier.png",
+		photoOpen: "/static/images/chandelier-light.png"
 	}, {
 		name: "洗手间",
 		open: "已开",
 		close: "已关",
-		temperature: "28",
-		wind: "0",
 		status: true,
+		photoClose: "/static/images/chandelier.png",
+		photoOpen: "/static/images/chandelier-light.png"
 	}]);
 
 	const complete = () => {
@@ -145,7 +151,10 @@
 		margin-left: 10rpx;
 		color: #ffffff;
 	}
-
+	.air-room{
+		margin-top: 30rpx;
+		margin-left: 30rpx;
+	}
 
 	.backGround {
 		height: 100vh;
@@ -174,7 +183,7 @@
 	}
 
 
-	.content {
+	.lamp-content {
 		height: 100vh;
 		width: 100vw;
 	}
