@@ -7,12 +7,17 @@
 		{
 			"path": "pages/index/index"
 
+		}
+		,{
+		    "path" : "pages/device/device"
+		
 		}, {
 			"path": "pages/airConditioner/airConditioner"
 		}, {
 			"path": "pages/lamp/lamp"
 		}
-	],
+	    
+    ],
 
 	"globalStyle": {
 		"navigationStyle": "custom",
@@ -26,19 +31,23 @@
 		"color": "#7A7E83", // tab 上的文字默认颜色
 		"selectedColor": "#3cc51f", // tab 上的文字选中时的颜色
 		"borderStyle": "rgba(68,59,28,0)", // tabbar 上边框的颜色，可选值 black/white
-		"backgroundColor": "rgba(68,59,28,0.7)", // tab 的背景色
+		"backgroundColor": "rgba(68,59,28,0.7)", // tab 的背景色p
 		"list": [{ // 最少2个、最多5个 tab
 			"pagePath": "pages/home/home", // 页面路径，必须在 pages 中先定义
-			"iconPath": "static/tabbar/home-solid.png", // 图片路径
+			"iconPath": "static/tabbar/home-solid.png",
 			"text": "家庭" // tab 上按钮文字
 		}, {
 			"pagePath": "pages/index/index",
-			"iconPath": "static/tabbar/doughnut-chart-regular.png",
-			"text": "自动化"
+			"iconPath": "static/tabbar/sence.png",
+			"text": "场景"
+		}, {
+			"pagePath": "pages/device/device",
+			"iconPath": "static/tabbar/sence.png",
+			"text": "场景"
 		}, {
 			"pagePath": "pages/index/index",
-			"iconPath": "static/tabbar/star-solid.png",
-			"text": "发现"
+			"iconPath": "static/tabbar/sence.png",
+			"text": "场景"
 		}]
 	}
 }

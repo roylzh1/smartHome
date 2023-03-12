@@ -9,8 +9,8 @@
 	const emit = defineEmits(['popupNav']);
 	const itemArray = [
 		{
-			title: "恒温器",
-			open: "1台开着",
+			title: "观影模式",
+			open: "1",
 			photoOpen: "/static/images/fan-globe.png"
 		},{
 			title: "灯",

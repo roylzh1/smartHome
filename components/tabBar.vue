@@ -32,15 +32,20 @@
 					"text": "家庭" // tab 上按钮文字
 				}, {
 					"pagePath": "/pages/index/index",
-					"iconPath": "/static/tabbar/doughnut-chart-regular-unSelect.png",
-					"selectedIconPath": "/static/tabbar/doughnut-chart-regular.png",
-					"text": "自动化"
+					"iconPath": "/static/tabbar/sence-unSelect.png",
+					"selectedIconPath": "static/tabbar/sence.png",
+					"text": "场景"
 				}, {
-					"pagePath": "/pages/index/index",
-					"iconPath": "/static/tabbar/star-solid-unSelect.png",
-					"selectedIconPath": "/static/tabbar/star-solid.png",
-					"text": "探索"
-				}]
+					"pagePath": "/pages/device/device",
+					"iconPath": "/static/tabbar/device-unSelect.png",
+					"selectedIconPath": "/static/tabbar/device.png",
+					"text": "设备"
+				},{
+					"pagePath": "pages/index/index",
+					"iconPath": "static/tabbar/user-unSelect.png",
+					"selectedIconPath": "/static/tabbar/user.png",
+					"text": "我的"
+			}]
 			}
 		},
 		methods: {

@@ -152,7 +152,7 @@
 	}
 	//全局控制导航
 	const globalControlHandler = name => {
-		if(name==='恒温器')
+		if(name==='观影模式')
 		uni.navigateTo({
 			url: `/pages/airConditioner/airConditioner?name=${name}`,
 			animationType: 'pop-in',
