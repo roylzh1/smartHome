@@ -41,7 +41,7 @@
 					"selectedIconPath": "/static/tabbar/device.png",
 					"text": "设备"
 				},{
-					"pagePath": "pages/index/index",
+					"pagePath": "/pages/user/user",
 					"iconPath": "static/tabbar/user-unSelect.png",
 					"selectedIconPath": "/static/tabbar/user.png",
 					"text": "我的"

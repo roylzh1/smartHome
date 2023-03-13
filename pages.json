@@ -6,17 +6,18 @@
 		},
 		{
 			"path": "pages/index/index"
-
 		}
 		,{
 		    "path" : "pages/device/device"
 		
-		}, {
+		},{
+            "path" : "pages/user/user"
+        }
+		, {
 			"path": "pages/airConditioner/airConditioner"
 		}, {
 			"path": "pages/lamp/lamp"
 		}
-	    
     ],
 
 	"globalStyle": {
@@ -39,15 +40,15 @@
 		}, {
 			"pagePath": "pages/index/index",
 			"iconPath": "static/tabbar/sence.png",
-			"text": "场景"
+			"text": "场"
 		}, {
 			"pagePath": "pages/device/device",
 			"iconPath": "static/tabbar/sence.png",
-			"text": "场景"
+			"text": "场景1"
 		}, {
-			"pagePath": "pages/index/index",
+			"pagePath": "pages/user/user",
 			"iconPath": "static/tabbar/sence.png",
-			"text": "场景"
+			"text": "场景2"
 		}]
 	}
 }

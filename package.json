@@ -1,6 +1,8 @@
 {
   "dependencies": {
-    "element-plus": "^2.2.30"
+    "@vue/reactivity": "^3.2.47",
+    "element-plus": "^2.2.30",
+    "pinia": "^2.0.33"
   },
   "devDependencies": {
     "unplugin-auto-import": "^0.14.2",
