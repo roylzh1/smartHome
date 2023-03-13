@@ -16,12 +16,34 @@
 			<div class="login-btn" @click="loginHandler">{{loginBtn}}</div>
 			<div class="register" @click="LoginOrReg">没有账号?点击注册</div>
 		</view>
+		<card class="user-logined" height="500" width="600" v-if="isLogin">
+			<view class="info-box">
+				<view class="info-name">用户名</view>
+				<view class="info-item">
+					{{account.userinfo.userName}}
+				</view>
+			</view>
+			<view class="info-box">
+				<view class="info-name">邮箱</view>
+				<view class="info-item">
+					{{account.userinfo.email}}
+				</view>
+			</view>
+			<view class="info-box">
+				<view class="info-name">手机</view>
+				<view class="info-item">
+					{{account.userinfo.phoneNumber}}
+				</view>
+			</view>
+		</card>
 		<tab-bar selected="3"></tab-bar>
 	</view>
 </template>
 
 <script setup>
 	import tabBar from '/components/tabBar.vue';
+	import card from '/components/card.vue';
+	import myRequest from '/utils/request.js';
 	import {
 		useAccountStore
 	} from '@/store/account.js';
@@ -30,14 +52,14 @@
 		onMounted,
 		ref
 	} from "vue";
-	const axios = inject('axios');
 	const account = useAccountStore();
-	const isLogin = ref(false);
+	const isLogin = ref(false); //TODO:
 	const loginBtn = ref("登录");
 	const name = ref('');
 	const password = ref('');
 	onMounted(() => {
-		console.log(account.account)
+		console.log(account.userinfo);
+		console.log(account.homeList);
 		uni.getStorage({
 			key: 'smartHome_userToken',
 			success(res) {
@@ -46,6 +68,7 @@
 			}
 		})
 	});
+	//登录还是注册
 	const LoginOrReg = () => {
 		if (loginBtn.value == "登录") loginBtn.value = "注册";
 		else
@@ -53,16 +76,38 @@
 	}
 
 	const loginHandler = async () => {
-		console.log(name.value, password.value)
-		const result = await axios.post('User/Login', {
-			"userName": name.value,
-			"password": password.value
+		///登录
+		const res = await myRequest({
+			url: `User/Login`,
+			method: 'post',
+			data: {
+				userName: name.value,
+				password: password.value
+			}
 		});
-		console.log(result.data.message)
+		//console.log(res.data.message);token
+		if (res.data.status == 400) return;
+		isLogin.value = true;
 		uni.setStorage({
 			key: 'smartHome_userToken',
-			data: result.data.message
+			data: res.data.message,
+			success: function() {
+				console.log('success');
+			}
 		});
+		const res2 = await myRequest({
+			url: `User/GetUserInfo`,
+			method: 'get',
+			data: {
+				userName: name.value,
+			}
+		});
+		if (res2.data.status == 400) return;
+		console.log(res2.data.value)
+		account.userinfo.userName = name.value;
+		account.userinfo.userId = res2.data.value.id;
+		account.userinfo.email = res2.data.value.email;
+		account.userinfo.phoneNumber = res2.data.value.phone;
 	}
 </script>
 
@@ -147,5 +192,26 @@
 		right: 10px;
 		font-size: 10px;
 		color: #838383;
+	}
+
+	.user-logined {
+		margin-left: 30rpx;
+	}
+
+	.info-box {
+		margin-left: 30rpx;
+		margin-top: 10px;
+	}
+
+	.info-name {
+		font-size: 18px;
+		font-weight: 600;
+		color: #fff;
+	}
+
+	.info-item {
+		font-size: 18px;
+		font-weight: 400;
+		color: #fff;
 	}
 </style>

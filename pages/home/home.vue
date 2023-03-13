@@ -1,7 +1,9 @@
 <template>
 	<view class="backGround"></view>
-	<view  :class="popupBoxIfShow||ifShowAddRoom == true ? 'backGround-up':''"></view>
-	<view class="page" :style="{height: popupBoxIfShow||ifShowAddRoom||showAddFurniture||showRemoveFurniture == true ? '90vh':''}">
+	<!--模糊-->
+	<view :class="popupBoxIfShow||ifShowAddRoom||ifShowCheckHome == true ? 'backGround-up':''"></view>
+	<view class="page"
+		:style="{height: popupBoxIfShow||ifShowAddRoom||showAddFurniture||showRemoveFurniture||ifShowCheckHome == true ? '90vh':''}">
 		<!-- 导航栏 -->
 		<view class="navBarBox">
 			<!--:style="headerStyle" :style="opacityStyle"-->
@@ -10,7 +12,7 @@
 			<view class="navBar">
 				<view class="text" :style="{opacity:opacityStyle.opacity}">我的家</view>
 				<image @click="addRoomHandler" class="logo" src="/static/images/add-to-queue-regular.png"></image>
-				<image class="logo" src="/static/images/more.png"></image>
+				<image class="logo" @click="checkHomeHandler" src="/static/images/more.png"></image>
 			</view>
 		</view>
 		<!-- 页面内容 -->
@@ -20,16 +22,25 @@
 				<top-navigation @popupNav="globalControlHandler"></top-navigation>
 			</view>
 			<view class="room">
-				<room @addOrRemove="furnitureHandler" @popupBox="popupBoxHandler" :itemArray="livingRoom" title="门厅"></room>
+				<room @addOrRemove="furnitureHandler" @popupBox="popupBoxHandler" :itemArray="livingRoom" title="门厅">
+				</room>
 				<room @addOrRemove="furnitureHandler" @popupBox="popupBoxHandler" :itemArray="myRoom" title="卧室"></room>
 			</view>
 		</view>
 		<tab-bar selected="0"></tab-bar>
 		<popup-light-box @touchmove.stop.prevent :title="popupMessage.title" :name="popupMessage.name"
-			v-show="popupBoxIfShow" :class="popupBoxIfShow == true ? 'content-fade-up-animation' : ''" @lightComplete="closeBoxHandler"></popup-light-box>
-		<add-new-room v-show="ifShowAddRoom" :class="ifShowAddRoom == true ? 'content-fade-up' : ''"   @addRoomComplete="closeAddRoomBoxHandler"></add-new-room>
-		<add-furniture v-show="showAddFurniture" :class="showAddFurniture == true ? 'content-fade-up' : ''" :name="whichRoom" @addRoomComplete="closeFurnitureHandler"></add-furniture>
-		<remove-furniture v-show="showRemoveFurniture" :class="showRemoveFurniture == true ? 'content-fade-up' : ''" :name="whichRoom" @addRoomComplete="closeFurnitureHandler"></remove-furniture>
+			v-show="popupBoxIfShow" :class="popupBoxIfShow == true ? 'content-fade-up-animation' : ''"
+			@lightComplete="closeBoxHandler"></popup-light-box>
+		<add-new-room v-show="ifShowAddRoom" :class="ifShowAddRoom == true ? 'content-fade-up' : ''"
+			@addRoomComplete="closeAddRoomBoxHandler"></add-new-room>
+		<check-home v-show="ifShowCheckHome" :homeList="account.homeList"
+			:class="ifShowAddRoom == true ? 'content-fade-up' : ''" @checkHomeComplete="closecheckHomeBoxHandler"
+			@changeHome="changeHomeHandler">
+		</check-home>
+		<add-furniture v-show="showAddFurniture" :class="showAddFurniture == true ? 'content-fade-up' : ''"
+			:name="whichRoom" @addRoomComplete="closeFurnitureHandler"></add-furniture>
+		<remove-furniture v-show="showRemoveFurniture" :class="showRemoveFurniture == true ? 'content-fade-up' : ''"
+			:name="whichRoom" @addRoomComplete="closeFurnitureHandler"></remove-furniture>
 	</view>
 </template>
 
@@ -48,8 +59,16 @@
 	import topNavigation from '/components/topNaviagtion.vue'
 	import popupLightBox from '/components/popupLightBox.vue'
 	import addNewRoom from '/components/addNewRoom.vue'
+	import checkHome from '/components/checkHome.vue'
 	import addFurniture from '/components/addFurniture.vue'
 	import removeFurniture from '/components/removeFurniture.vue'
+	import myRequest from '/utils/request.js';
+	import {
+		useAccountStore
+	} from '@/store/account.js';
+	const account = useAccountStore();
+	let livingRoom = ref([]);
+	/*
 	const livingRoom = [{
 		type: "middle",
 		title: "大门",
@@ -72,6 +91,7 @@
 		photoClose: "/static/images/chandelier.png",
 		photoOpen: "/static/images/chandelier-light.png"
 	}];
+	*/
 	const myRoom = [{
 		type: "small",
 		title: "顶灯",
@@ -138,56 +158,118 @@
 		popupMessage.name = name;
 	}
 	const closeBoxHandler = (judege) => {
-		if(!judege) {
+		if (!judege) {
 			//拿ID才能做出判断是那盏灯熄灭
 		}
 		popupBoxIfShow.value = false;
 	}
+	//添加房间
 	const ifShowAddRoom = ref(false);
-	const addRoomHandler = ()=>{
+	const addRoomHandler = () => {
 		ifShowAddRoom.value = true;
 	}
-	const closeAddRoomBoxHandler = ()=>{
+	const closeAddRoomBoxHandler = () => {
 		ifShowAddRoom.value = false;
+	}
+	//查看家庭数量
+	const ifShowCheckHome = ref(false);
+	const checkHomeHandler = () => {
+		ifShowCheckHome.value = true;
+	}
+	const closecheckHomeBoxHandler = () => {
+		ifShowCheckHome.value = false;
+	} //更改家庭
+	const changeHomeHandler = async (index) => {
+		let homeId = account.homeList[index].id;
+		account.homeSeleted = homeId; //切换房号
+		//获取用户信息
+		const roomInfo = await myRequest({
+			url: `Room/GetRoom`,
+			method: 'get',
+			data: {
+				homeId,
+			}
+		});
+		if (roomInfo.data.status == 400) return;
+		console.log(roomInfo)
+
 	}
 	//全局控制导航
 	const globalControlHandler = name => {
-		if(name==='观影模式')
-		uni.navigateTo({
-			url: `/pages/airConditioner/airConditioner?name=${name}`,
-			animationType: 'pop-in',
+		if (name === '观影模式')
+			uni.navigateTo({
+				url: `/pages/airConditioner/airConditioner?name=${name}`,
+				animationType: 'pop-in',
 				animationDuration: 500
-		});
-		if(name==='灯')
-		uni.navigateTo({
-			url: `/pages/lamp/lamp?name=${name}`,
-			animationType: 'pop-in',
+			});
+		if (name === '灯')
+			uni.navigateTo({
+				url: `/pages/lamp/lamp?name=${name}`,
+				animationType: 'pop-in',
 				animationDuration: 500
-		});
+			});
 	};
 	const showAddFurniture = ref(false);
 	const showRemoveFurniture = ref(false);
-	const whichRoom = ref('');//判断是哪个房间增删家具
+	const whichRoom = ref(''); //判断是哪个房间增删家具
 	//增删家具
-	const furnitureHandler = (name,mode)=>{
-		whichRoom.value = name;//房间名
-		if(mode)//增加
+	const furnitureHandler = (name, mode) => {
+		whichRoom.value = name; //房间名
+		if (mode) //增加
 			showAddFurniture.value = true;
-			else//删除家具
+		else //删除家具
 			showRemoveFurniture.value = true;
 	}
-	const closeFurnitureHandler = ()=>{
-		showAddFurniture.value= false;
+	const closeFurnitureHandler = () => {
+		showAddFurniture.value = false;
 		showRemoveFurniture.value = false;
 	}
-	const disabledScroll = ()=> {}
-	onMounted(() => {
+	const disabledScroll = () => {}
+	//-------------------onMounted-------------------
+	onMounted(async () => {
 		//获取手机状态栏高度
 		uni.hideTabBar({
 			animation: false
 		});
+		//获取用户信息
+		const userInfo = await myRequest({
+			url: `User/GetUserInfo`,
+			method: 'get',
+			data: {
+				userName: 'admin',
+			}
+		});
+		if (userInfo.data.status == 400) return;
+		account.changeUserInfo({
+			userName: 'admin',
+			userId: userInfo.data.value.id,
+			email: userInfo.data.value.email,
+			phoneNumber: userInfo.data.value.phone
+		});
+		account.homeList = userInfo.data.value.homeList;
+		account.homeSeleted = userInfo.data.value.homeList[0].id; //默认为第一个家庭
+		const roomInfo = await myRequest({
+			url: `Room/GetRoom`,
+			method: 'get',
+			data: {
+				homeId: account.homeSeleted,
+			}
+		});
 
+		account.roomList = roomInfo.data
+		livingRoom.value = account.roomList[0].furnitures.map(f => {
+			return {
+				type: "small",
+				title: f.name,
+				open: "已开",
+				close: "已关",
+				photoClose: "/static/images/bulb.png",
+				photoOpen: "/static/images/bulb-light.png"
+			}
+		})
+		console.log(account.roomList)
 	});
+	//导航栏渐变
 	onPageScroll(e => {
 		let opacity = e.scrollTop / 50;
 		if (opacity > 1) {
@@ -298,23 +380,26 @@
 		-webkit-transform: scale(3);
 		z-index: 1;
 	}
-.backGround-up {
+
+	.backGround-up {
 		height: 100%;
 		width: 100%;
 		position: fixed;
 		top: 0;
 		left: 0;
-		background-color: hsla(0,0%,0%,.1);
+		background-color: hsla(0, 0%, 0%, .1);
 		backdrop-filter: blur(3px);
 		-webkit-transform: scale(1);
 		z-index: 7;
 	}
-	.content-fade-up{
+
+	.content-fade-up {
 		animation-duration: .2s;
 		animation-name: fadeInUp1;
 		animation-timing-function: cubic-bezier(0.280, 0.840, 0.420, 1);
 		-webkit-animation-fill-mode: backwards;
 	}
+
 	.content-fade-up-animation {
 		animation-duration: .2s;
 		animation-name: fadeInUp;
@@ -344,11 +429,12 @@
 			transform: translateY(0);
 		}
 	}
+
 	@keyframes fadeInUp1 {
 		from {
 			height: 0vh;
 		}
-	
+
 		to {
 			height: 35vh;
 		}
