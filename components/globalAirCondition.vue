@@ -17,10 +17,10 @@
 						<view class="temperatureBox" :style="{color: isCold? '#1296db':'#1afa29'}">
 							26°C</view>
 						<view class="temperature-text">
-							<image @click="temperatureHandler(0)" class="tempLogo"
-								src="/static/images/tempDown.png"></image>
-							<image @click="temperatureHandler(1)" class="tempLogo"
-								src="/static/images/tempUp.png"></image>
+							<image @click="temperatureHandler(0)" class="tempLogo" src="/static/images/tempDown.png">
+							</image>
+							<image @click="temperatureHandler(1)" class="tempLogo" src="/static/images/tempUp.png">
+							</image>
 						</view>
 					</view>
 					<view class="vChange">
@@ -67,7 +67,7 @@
 			else
 				imageSrc.value = '/static/images/center-airconditioner-open-hot.png';
 			level.value = 0;
-			livingRoom.forEach(item=>{item.status=true});//全局控制
+			//livingRoom.forEach(item=>{item.status=true});//全局控制
 		} else {
 			airStatus.value = '关闭';
 			if (isCold.value)
@@ -75,9 +75,9 @@
 			else
 				imageSrc.value = '/static/images/center-airconditioner-hot.png';
 			level.value = 1;
-			livingRoom.forEach(item=>item.status=false);
+			//livingRoom.forEach(item=>item.status=false);
 		}
-	
+
 	};
 	const airHandler = () => {
 		ifAirOpen.value = !ifAirOpen.value;
@@ -96,18 +96,18 @@
 				imageSrc.value = '/static/images/center-airconditioner-hot.png';
 			level.value = 1;
 		}
-	
+
 	};
 	const temperatureHandler = type => {
 		if (type === 0) {
-			if (temperatureValue.value > 16){
+			if (temperatureValue.value > 16) {
 				--temperatureValue.value;
-				livingRoom.forEach(item=>item.temperature = temperatureValue.value.toString());
-			}	
+				//livingRoom.forEach(item=>item.temperature = temperatureValue.value.toString());
+			}
 		} else {
-			if (temperatureValue.value < 32){
+			if (temperatureValue.value < 32) {
 				++temperatureValue.value;
-				livingRoom.forEach(item=>item.temperature = temperatureValue.value.toString());
+				//livingRoom.forEach(item=>item.temperature = temperatureValue.value.toString());
 			}
 		}
 	};
@@ -118,14 +118,14 @@
 				vSrc.value = `/static/images/v${vLevel.value}.png`;
 			else
 				vSrc.value = `/static/images/v${vLevel.value}-hot.png`;
-			livingRoom.forEach(item=>item.wind = vLevel.value.toString());//统一
+			//livingRoom.forEach(item=>item.wind = vLevel.value.toString());//统一
 		} else {
 			vLevel.value = 0;
 			if (isCold.value)
 				vSrc.value = `/static/images/v${vLevel.value}.png`;
 			else
 				vSrc.value = `/static/images/v${vLevel.value}-hot.png`;
-			livingRoom.forEach(item=>item.wind = "0");//统一
+			//livingRoom.forEach(item=>item.wind = "0");//统一
 		}
 	}
 	const modeHandler = () => {
@@ -150,36 +150,39 @@
 </script>
 
 <style scoped>
-	.g-content{
+	.g-content {
 		margin-top: 10px;
 	}
-	.g-title{
+
+	.g-title {
 		color: #ffffff;
 	}
+
 	.box {
 		display: flex;
 		flex-wrap: nowrap;
 		flex-direction: row;
 		justify-content: space-around;
 	}
+
 	.air-status-logo {
 		height: 80rpx;
 		width: 80rpx;
 		margin-top: 20rpx;
 		transition: 1s;
 	}
-	
+
 	.air-status-text {
 		font-weight: 700;
 		margin-top: 30rpx;
 		transition: 1s;
 	}
-	
+
 	.air-status-text-num {
 		margin-bottom: 10rpx;
 		transition: 1s;
 	}
-	
+
 	.air-status {
 		display: flex;
 		flex-direction: column;
@@ -189,7 +192,7 @@
 		margin-top: 15rpx;
 		margin-left: 10rpx;
 	}
-	
+
 	.air-open {
 		display: flex;
 		flex-direction: column;
@@ -199,6 +202,7 @@
 		margin-left: 30rpx;
 		margin-top: 15rpx;
 	}
+
 	.temperatureBox {
 		display: flex;
 		justify-content: center;
@@ -213,13 +217,13 @@
 		font-weight: 600;
 		border-radius: 50%;
 	}
-	
+
 	.temperature-text {
 		margin-top: 20rpx;
 		display: flex;
 		justify-content: center;
 	}
-	
+
 	.tempLogo {
 		height: 60rpx;
 		width: 60rpx;
@@ -227,7 +231,7 @@
 		margin-left: 10rpx;
 		margin-right: 10rpx;
 	}
-	
+
 	.vChange {
 		display: flex;
 		flex-direction: column;
@@ -238,11 +242,12 @@
 		margin-right: 10rpx;
 		margin-top: 15rpx;
 	}
-	
+
 	.vLogo {
 		height: 60rpx;
 		width: 60rpx;
 	}
+
 	.content-fade-up-animation {
 		animation-duration: .2s;
 		animation-name: fadeInUp;
@@ -251,25 +256,25 @@
 		-webkit-animation-fill-mode: backwards;
 		-webkit-animation-name: fadeInUp;
 	}
-	
+
 	/* Content fade up animation */
-	
+
 	@keyframes fadeInUp {
 		from {
 			transform: translateY(100%);
 		}
-	
+
 		to {
 			transform: translateY(0);
 		}
 	}
-	
+
 	@-webkit-keyframes fadeInUp {
 		from {
 			display: block;
 			transform: translateY(100%);
 		}
-	
+
 		to {
 			transform: translateY(0);
 		}

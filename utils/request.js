@@ -13,9 +13,18 @@ function myRequest(options) {
 			data: options.data,
 			header: headers,
 			success(data) {
+				//console.log(data)
+				if (data.data == '未认证') {
+					uni.switchTab({
+						url: `/pages/user/user`,
+						animationType: 'pop-in',
+						animationDuration: 500
+					});
+				}
 				res(data)
 			},
-			fail() {
+			fail(data) {
+				console.log(data)
 				rej()
 			}
 		})

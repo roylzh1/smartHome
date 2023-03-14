@@ -35,6 +35,7 @@
 					{{account.userinfo.phoneNumber}}
 				</view>
 			</view>
+			<view class="logout" @click="logoutHandler">登出</view>
 		</card>
 		<tab-bar selected="3"></tab-bar>
 	</view>
@@ -48,6 +49,9 @@
 		useAccountStore
 	} from '@/store/account.js';
 	import {
+		onLoad
+	} from '@dcloudio/uni-app'
+	import {
 		inject,
 		onMounted,
 		ref
@@ -57,9 +61,10 @@
 	const loginBtn = ref("登录");
 	const name = ref('');
 	const password = ref('');
-	onMounted(() => {
+	onMounted(async () => {
 		console.log(account.userinfo);
 		console.log(account.homeList);
+		/*
 		uni.getStorage({
 			key: 'smartHome_userToken',
 			success(res) {
@@ -67,6 +72,24 @@
 				isLogin.value = true;
 			}
 		})
+		*/
+		const res2 = await myRequest({
+			url: `User/GetUserInfo`,
+			method: 'get',
+			data: {
+				userName: name.value,
+			}
+		});
+		//未验证
+		if (res2.data.status == 400) {
+			isLogin.value = false;
+		};
+		console.log(res2.data.value)
+		account.userinfo.userName = res2.data.value.name;
+		account.userinfo.userId = res2.data.value.id;
+		account.userinfo.email = res2.data.value.email;
+		account.userinfo.phoneNumber = res2.data.value.phone;
+		isLogin.value = true;
 	});
 	//登录还是注册
 	const LoginOrReg = () => {
@@ -108,6 +131,10 @@
 		account.userinfo.userId = res2.data.value.id;
 		account.userinfo.email = res2.data.value.email;
 		account.userinfo.phoneNumber = res2.data.value.phone;
+	}
+	//登出
+	const logoutHandler = () => {
+
 	}
 </script>
 
@@ -213,5 +240,18 @@
 		font-size: 18px;
 		font-weight: 400;
 		color: #fff;
+	}
+
+	.logout {
+		display: flex;
+		justify-content: center;
+		align-items: center;
+		height: 30px;
+		width: 50px;
+		background-color: #fff;
+		border-radius: 5px;
+		margin-left: 30rpx;
+		margin-top: 80px;
+		font-size: 12px;
 	}
 </style>

@@ -3,8 +3,8 @@
 	<view class="content">
 		<h1 class="title">管理设备</h1>
 		<view class="room">
-			<view class="centerControl">
-				<global-air-condition></global-air-condition>
+			<view class="centerControl" v-show="hasAirCondition">
+				<global-air-condition @longpress="pressHandler"></global-air-condition>
 			</view>
 		</view>
 		<tab-bar selected="2"></tab-bar>
@@ -14,6 +14,29 @@
 <script setup>
 	import tabBar from '/components/tabBar.vue';
 	import globalAirCondition from '/components/globalAirCondition.vue'
+	import {
+		onMounted,
+		ref
+	} from "vue";
+	import myRequest from '/utils/request.js';
+	import {
+		useAccountStore
+	} from '@/store/account.js';
+	const account = useAccountStore();
+
+	const hasAirCondition = ref(true); //false
+	onMounted(() => {
+		if (account.airConditionCount != 0) {
+			hasAirCondition.value = true;
+		}
+	})
+	/*
+	uni.navigateTo({
+		url: `/pages/airConditioner/airConditioner?name=${name}`,
+		animationType: 'pop-in',
+		animationDuration: 500
+	});
+	*/
 </script>
 
 <style scoped>
@@ -39,11 +62,13 @@
 		z-index: 2;
 		color: #fff;
 	}
-	.centerControl{
+
+	.centerControl {
 		height: 100px;
 		width: 80vw;
 		z-index: 2;
 	}
+
 	.backGround {
 		height: 100vh;
 		width: 100%;

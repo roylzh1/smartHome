@@ -15,7 +15,8 @@ export const useAccountStore = defineStore('account', {
 		homeList: [],
 		//当前的家,默认0
 		homeSeleted: 0,
-		roomList: []
+		roomList: [],
+		airConditionCount: 0,
 	}),
 	actions: {
 		changeUserInfo(userinfo) {

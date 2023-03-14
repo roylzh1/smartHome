@@ -22,9 +22,8 @@
 				<top-navigation @popupNav="globalControlHandler"></top-navigation>
 			</view>
 			<view class="room">
-				<room @addOrRemove="furnitureHandler" @popupBox="popupBoxHandler" :itemArray="livingRoom" title="门厅">
-				</room>
-				<room @addOrRemove="furnitureHandler" @popupBox="popupBoxHandler" :itemArray="myRoom" title="卧室"></room>
+				<room v-for="(room,index) in roomList" @addOrRemove="furnitureHandler" @popupBox="popupBoxHandler"
+					:itemArray="roomList[index].furnitures" :title="room.name"></room>
 			</view>
 		</view>
 		<tab-bar selected="0"></tab-bar>
@@ -67,81 +66,7 @@
 		useAccountStore
 	} from '@/store/account.js';
 	const account = useAccountStore();
-	let livingRoom = ref([]);
-	/*
-	const livingRoom = [{
-		type: "middle",
-		title: "大门",
-		open: "已开",
-		close: "已锁",
-		photoClose: "/static/images/lock.png",
-		photoOpen: "/static/images/unlock.png",
-	}, {
-		type: "small",
-		title: "顶灯",
-		open: "开",
-		close: "关",
-		photoClose: "/static/images/bulb.png",
-		photoOpen: "/static/images/bulb-light.png"
-	}, {
-		type: "small",
-		title: "吊灯",
-		open: "开",
-		close: "关",
-		photoClose: "/static/images/chandelier.png",
-		photoOpen: "/static/images/chandelier-light.png"
-	}];
-	*/
-	const myRoom = [{
-		type: "small",
-		title: "顶灯",
-		open: "开",
-		close: "关",
-		photoClose: "/static/images/bulb.png",
-		photoOpen: "/static/images/bulb-light.png"
-	}, {
-		type: "middle",
-		title: "大门",
-		open: "已开",
-		close: "已锁",
-		photoClose: "/static/images/lock.png",
-		photoOpen: "/static/images/unlock.png",
-	}, {
-		type: "small",
-		title: "吊灯",
-		open: "开",
-		close: "关",
-		photoClose: "/static/images/chandelier.png",
-		photoOpen: "/static/images/chandelier-light.png"
-	}, {
-		type: "small",
-		title: "顶灯",
-		open: "开",
-		close: "关",
-		photoClose: "/static/images/bulb.png",
-		photoOpen: "/static/images/bulb-light.png"
-	}, {
-		type: "small",
-		title: "吊灯",
-		open: "开",
-		close: "关",
-		photoClose: "/static/images/chandelier.png",
-		photoOpen: "/static/images/chandelier-light.png"
-	}, {
-		type: "small",
-		title: "阅读灯",
-		open: "开",
-		close: "关",
-		photoClose: "/static/images/tableLamp.png",
-		photoOpen: "/static/images/tableLamp-light.png"
-	}, {
-		type: "small",
-		title: "风扇",
-		open: "开",
-		close: "关",
-		photoClose: "/static/images/fan.png",
-		photoOpen: "/static/images/fan-open.png"
-	}];
+	let roomList = ref([]);
 
 	let popupBoxIfShow = ref(false); //普通弹窗
 	let popupMessage = reactive({
@@ -235,13 +160,9 @@
 		const userInfo = await myRequest({
 			url: `User/GetUserInfo`,
 			method: 'get',
-			data: {
-				userName: 'admin',
-			}
 		});
-		if (userInfo.data.status == 400) return;
 		account.changeUserInfo({
-			userName: 'admin',
+			userName: userInfo.data.value.name,
 			userId: userInfo.data.value.id,
 			email: userInfo.data.value.email,
 			phoneNumber: userInfo.data.value.phone
@@ -255,19 +176,31 @@
 				homeId: account.homeSeleted,
 			}
 		});
-
+		roomList.value = [];
+		account.airConditionCount = 0;
 		account.roomList = roomInfo.data
-		livingRoom.value = account.roomList[0].furnitures.map(f => {
-			return {
-				type: "small",
-				title: f.name,
-				open: "已开",
-				close: "已关",
-				photoClose: "/static/images/bulb.png",
-				photoOpen: "/static/images/bulb-light.png"
+		roomList.value = roomInfo.data;
+		let tempFurnitures = [];
+		for (let i = 0; i < roomList.value.length; i++) {
+			for (let j = 0; j < roomList.value[i].furnitures.length; j++) {
+				let f = roomList.value[i].furnitures[j];
+				if (f.type == 4) {
+					account.airConditionCount += 1;
+					continue;
+				} //不显示空调
+				tempFurnitures.push({
+					type: f.size,
+					title: f.name,
+					open: "已开",
+					close: "已关",
+					photoClose: `/static/images/${f.type}.png`,
+					photoOpen: `/static/images/${f.type}-light.png`
+				});
 			}
-		})
-		console.log(account.roomList)
+			roomList.value[i].furnitures = tempFurnitures;
+			tempFurnitures = [];
+		}
+		console.log(roomList.value)
 	});
 	//导航栏渐变
 	onPageScroll(e => {
