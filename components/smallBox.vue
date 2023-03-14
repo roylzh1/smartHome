@@ -1,52 +1,74 @@
 <template>
-	<view @longpress="pressHandler" @click="handleClick" class="content">
-		<view class="backgroundColor" :style="{backgroundColor: selected == true ? `rgba(255,255,255,.8)` : `hsla(0,0%,25%,.6)`}"></view>
-		<view class="s-content">	
-		<view class="thing-content" :style="{backgroundColor: selected == true ? `rgba(240,214,105,1)` : `rgba(0,0,0,.5)`}">
-			<image class="thing" :src="selected == true ? photoOpen : photoClose" ></image>
+	<view @longpress="pressHandler" @click="handleClick" class="sbox-content">
+		<view class="sbox-backgroundColor"
+			:style="{backgroundColor: selected == true ? `rgba(255,255,255,.8)` : `hsla(0,0%,25%,.6)`}"></view>
+		<view class="sbox-s-content">
+			<view class="sbox-thing-content"
+				:style="{backgroundColor: selected == true ? `rgba(240,214,105,1)` : `rgba(0,0,0,.5)`}">
+				<image class="sbox-thing" :src="selected == true ? photoOpen : photoClose"></image>
+			</view>
+			<view class="sbox-statusBox">
+				<view class="sbox-title" :style="{color: selected == true ?`rgba(0,0,0,1)` : `#ffffff`}">{{title}}
+				</view>
+				<view class="sbox-status">{{selected ? open : close}}</view>
+			</view>
+
 		</view>
-		<view class="statusBox">
-			<view class="title" :style="{color: selected == true ?`rgba(0,0,0,1)` : `#ffffff`}">{{title}}</view>
-			<view class="status">{{selected ? open : close}}</view>
-		</view>
-		
-		</view>
-	</view>	
+	</view>
 </template>
 
 <script setup>
-import { ref } from "vue";
-    const props = defineProps({
+	import {
+		ref
+	} from "vue";
+	import myRequest from '/utils/request.js';
+	import {
+		useAccountStore
+	} from '@/store/account.js';
+	const account = useAccountStore();
+	const props = defineProps({
 		type: String,
 		title: String,
 		open: String,
 		close: String,
 		photoOpen: String,
-		photoClose: String
+		photoClose: String,
+		id: Number
 	});
 	const emit = defineEmits(['popup']);
 	let selected = ref(false);
-	const handleClick = ()=>{
-		 selected.value = !selected.value;
-	};
-	const pressHandler = () => {
-		if(!selected.value)
+	const handleClick = async () => {
 		selected.value = !selected.value;
-		emit('popup',props.title);
+		const res = await myRequest({
+			url: `Tcp/ChangeFurnitureState`,
+			method: 'get',
+			data: {
+				state: selected.value,
+				sessionId: account.homeTcp
+			}
+		});
+		console.log(res)
+	};
+	const pressHandler = async () => {
+		if (!selected.value)
+			selected.value = !selected.value;
+
+		emit('popup', props.title);
 	}
 </script>
 
 <style scoped>
-	.content{
+	.sbox-content {
 		position: relative;
 		height: 115rpx;
 		width: 335rpx;
 		border-radius: 30rpx;
 		overflow: hidden;
 		transition: 0.3s;
-		z-index: 3;
+		z-index: 5;
 	}
-	.s-content{
+
+	.sbox-s-content {
 		position: relative;
 		height: 100%;
 		width: 100%;
@@ -58,7 +80,8 @@ import { ref } from "vue";
 		z-index: 3;
 		transition: 0.3s;
 	}
-	.title{
+
+	.sbox-title {
 		height: 30rpx;
 		width: 200rpx;
 		margin-left: 20rpx;
@@ -66,7 +89,8 @@ import { ref } from "vue";
 		font-weight: 800;
 		transition: 0.3s;
 	}
-	.status{
+
+	.sbox-status {
 		height: 30rpx;
 		width: 80rpx;
 		margin-left: 20rpx;
@@ -76,10 +100,12 @@ import { ref } from "vue";
 		z-index: 3;
 		transition: 0.3s;
 	}
-	.statusBox{
+
+	.sbox-statusBox {
 		margin-bottom: 15rpx;
 	}
-	.thing-content{
+
+	.sbox-thing-content {
 		display: flex;
 		justify-content: center;
 		align-items: center;
@@ -90,18 +116,20 @@ import { ref } from "vue";
 		z-index: 3;
 		transition: 0.3s;
 	}
-	.thing{
+
+	.sbox-thing {
 		height: 70%;
 		width: 70%;
 		z-index: 5;
 		transition: 0.3s;
 
 	}
-	.backgroundColor {
+
+	.sbox-backgroundColor {
 		position: absolute;
 		height: 100%;
 		width: 100%;
-		background-color: hsla(0,0%,60%,.3);
+		background-color: hsla(0, 0%, 60%, .3);
 		backdrop-filter: blur(20px);
 		-webkit-backdrop-filter: blur(20px);
 		-webkit-transform: scale(3);

@@ -14,7 +14,7 @@ function myRequest(options) {
 			header: headers,
 			success(data) {
 				//console.log(data)
-				if (data.data == '未认证') {
+				if (data.data == '未认证' || data.data == '请先登录') {
 					uni.switchTab({
 						url: `/pages/user/user`,
 						animationType: 'pop-in',

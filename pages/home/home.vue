@@ -21,15 +21,34 @@
 			<view class="topNaviagtion">
 				<top-navigation @popupNav="globalControlHandler"></top-navigation>
 			</view>
-			<view class="room">
-				<room v-for="(room,index) in roomList" @addOrRemove="furnitureHandler" @popupBox="popupBoxHandler"
-					:itemArray="roomList[index].furnitures" :title="room.name"></room>
+			<view class="room" v-for="(r,index) in roomList" :key="index">
+				<view class="roomDetials">
+					<view class="r-navBar" @click="addOrRemoveHandler(r.id,r.name,index)">
+						<h3 class="r-title">{{r.name}}</h3>
+						<image class="r-img" src="/static/images/rightArrow.png"></image>
+						<change-furniture @hasClicked="furnitureHandler" class="furniture"
+							v-if="ifShowchangeFurniture[index]">
+						</change-furniture>
+					</view>
+					<view class="gridBox">
+						<view v-for="(item,i) in r.furnitures"
+							:style="{gridRowStart: item.type == 'middle' ? `span 2` : 'span 1'}">
+							<small-box @popup="popupHandler" v-if="item.type !='middle'" :title="item.title"
+								:open="item.open" :close="item.close" :photoClose="item.photoClose"
+								:photoOpen="item.photoOpen" id="item.id"></small-box>
+							<middle-box @popup="popupHandler" v-if="item.type == 'middle'" class="item"
+								:title="item.title" :open="item.open" :close="item.close" :photoClose="item.photoClose"
+								:photoOpen="item.photoOpen">
+							</middle-box>
+						</view>
+					</view>
+				</view>
 			</view>
 		</view>
 		<tab-bar selected="0"></tab-bar>
-		<popup-light-box @touchmove.stop.prevent :title="popupMessage.title" :name="popupMessage.name"
-			v-show="popupBoxIfShow" :class="popupBoxIfShow == true ? 'content-fade-up-animation' : ''"
-			@lightComplete="closeBoxHandler"></popup-light-box>
+		<popup-light-box @touchmove.stop.prevent :title="popupMessage.title" v-show="popupBoxIfShow"
+			:class="popupBoxIfShow == true ? 'content-fade-up-animation' : ''" @lightComplete="closeBoxHandler">
+		</popup-light-box>
 		<add-new-room v-show="ifShowAddRoom" :class="ifShowAddRoom == true ? 'content-fade-up' : ''"
 			@addRoomComplete="closeAddRoomBoxHandler"></add-new-room>
 		<check-home v-show="ifShowCheckHome" :homeList="account.homeList"
@@ -45,13 +64,16 @@
 
 <script setup>
 	import {
-		onPageScroll
+		onPageScroll,
+		onTabItemTap,
+		onShow,
 	} from '@dcloudio/uni-app'
 	import {
 		onMounted,
 		onUnmounted,
 		reactive,
-		ref
+		ref,
+		nextTick
 	} from 'vue';
 	import tabBar from '/components/tabBar.vue'
 	import room from '/components/room.vue'
@@ -59,6 +81,9 @@
 	import popupLightBox from '/components/popupLightBox.vue'
 	import addNewRoom from '/components/addNewRoom.vue'
 	import checkHome from '/components/checkHome.vue'
+	import changeFurniture from '/components/changeFurniture.vue';
+	import middleBox from '/components/middleBox.vue';
+	import smallBox from '/components/smallBox.vue';
 	import addFurniture from '/components/addFurniture.vue'
 	import removeFurniture from '/components/removeFurniture.vue'
 	import myRequest from '/utils/request.js';
@@ -67,17 +92,18 @@
 	} from '@/store/account.js';
 	const account = useAccountStore();
 	let roomList = ref([]);
-
+	let showRoom = ref(true);
 	let popupBoxIfShow = ref(false); //普通弹窗
 	let popupMessage = reactive({
 		title: '',
 		name: ''
 	});
 	let lightName = ref('');
+	const aaa = [1, 2, 3]
 	let opacityStyle = reactive({
 		opacity: 0
-	});
-	const popupBoxHandler = (title, name) => {
+	}); //<view v-for="(f,i) in r.furnitures" style="z-index:99">{{f.title}}</view>
+	const popupHandler = (title, name) => {
 		popupBoxIfShow.value = true;
 		popupMessage.title = title;
 		popupMessage.name = name;
@@ -95,6 +121,27 @@
 	}
 	const closeAddRoomBoxHandler = () => {
 		ifShowAddRoom.value = false;
+	}
+	//添加家具
+	let ifShowchangeFurniture = ref([]);
+	const addOrRemoveHandler = (roomId, roomName, index) => { //家具弹窗
+		ifShowchangeFurniture.value[index] = !ifShowchangeFurniture.value[index];
+		whichRoom.value = roomName; //房间id
+		console.log(roomId)
+	}
+	const furnitureHandler = (mode) => {
+		console.log(mode)
+		if (mode) //增加
+			showAddFurniture.value = true;
+		else //删除家具
+			showRemoveFurniture.value = true;
+	}
+	const closeFurnitureHandler = () => {
+		showAddFurniture.value = false;
+		showRemoveFurniture.value = false;
+	}
+	const clickFurniturehandler = (id) => {
+		console.log(id)
 	}
 	//查看家庭数量
 	const ifShowCheckHome = ref(false);
@@ -137,18 +184,7 @@
 	const showAddFurniture = ref(false);
 	const showRemoveFurniture = ref(false);
 	const whichRoom = ref(''); //判断是哪个房间增删家具
-	//增删家具
-	const furnitureHandler = (name, mode) => {
-		whichRoom.value = name; //房间名
-		if (mode) //增加
-			showAddFurniture.value = true;
-		else //删除家具
-			showRemoveFurniture.value = true;
-	}
-	const closeFurnitureHandler = () => {
-		showAddFurniture.value = false;
-		showRemoveFurniture.value = false;
-	}
+
 	const disabledScroll = () => {}
 	//-------------------onMounted-------------------
 	onMounted(async () => {
@@ -161,6 +197,8 @@
 			url: `User/GetUserInfo`,
 			method: 'get',
 		});
+		console.log(userInfo)
+		account.homeTcp = userInfo.data.value.homeList[0].sessionId; //默认为第一个家庭
 		account.changeUserInfo({
 			userName: userInfo.data.value.name,
 			userId: userInfo.data.value.id,
@@ -168,6 +206,59 @@
 			phoneNumber: userInfo.data.value.phone
 		});
 		account.homeList = userInfo.data.value.homeList;
+		account.homeSeleted = userInfo.data.value.homeList[0].id; //默认为第一个家庭
+		const roomInfo = await myRequest({
+			url: `Room/GetRoom`,
+			method: 'get',
+			data: {
+				homeId: account.homeSeleted,
+			}
+		});
+		roomList.value = [];
+		ifShowchangeFurniture.value = [];
+		account.airConditionCount = 0;
+		roomList.value = roomInfo.data;
+		let tempFurnitures = [];
+		for (let i = 0; i < roomList.value.length; i++) {
+			for (let j = 0; j < roomList.value[i].furnitures.length; j++) {
+				let f = roomList.value[i].furnitures[j];
+				if (f.type == 4) {
+					account.airConditionCount += 1;
+					continue;
+				} //不显示空调
+				tempFurnitures.push({
+					type: f.size,
+					title: f.name,
+					open: "已开",
+					close: "已关",
+					photoClose: `/static/images/${f.type}.png`,
+					photoOpen: `/static/images/${f.type}-light.png`,
+					id: f.id
+				});
+			}
+			roomList.value[i].furnitures = tempFurnitures;
+			ifShowchangeFurniture.value.push(false);
+			tempFurnitures = [];
+		}
+		console.log(roomList.value)
+		account.roomList = roomList.value;
+	});
+
+
+	onShow(async () => {
+		const userInfo = await myRequest({
+			url: `User/GetUserInfo`,
+			method: 'get',
+		});
+		console.log(userInfo)
+		account.changeUserInfo({
+			userName: userInfo.data.value.name,
+			userId: userInfo.data.value.id,
+			email: userInfo.data.value.email,
+			phoneNumber: userInfo.data.value.phone
+		});
+		account.homeList = userInfo.data.value.homeList;
+		account.homeTcp = userInfo.data.value.homeList[0].sessionId; //默认为第一个家庭
 		account.homeSeleted = userInfo.data.value.homeList[0].id; //默认为第一个家庭
 		const roomInfo = await myRequest({
 			url: `Room/GetRoom`,
@@ -194,14 +285,22 @@
 					open: "已开",
 					close: "已关",
 					photoClose: `/static/images/${f.type}.png`,
-					photoOpen: `/static/images/${f.type}-light.png`
+					photoOpen: `/static/images/${f.type}-light.png`,
+					id: f.id
 				});
 			}
 			roomList.value[i].furnitures = tempFurnitures;
 			tempFurnitures = [];
 		}
+		showRoom.value = false;
+
+		nextTick(() => {
+			showRoom.value = true;
+		})
+
 		console.log(roomList.value)
-	});
+	})
+
 	//导航栏渐变
 	onPageScroll(e => {
 		let opacity = e.scrollTop / 50;
@@ -282,6 +381,53 @@
 		margin: 0 30rpx;
 	}
 
+	.roomDetials {
+		z-index: 3;
+		margin-bottom: 10rpx;
+	}
+
+	.r-title {
+		color: #ffffff;
+		font-weight: 700;
+		font-size: 35rpx;
+		z-index: 3;
+	}
+
+	.r-img {
+		height: 30rpx;
+		width: 30rpx;
+		margin-left: 10rpx;
+		z-index: 3;
+	}
+
+	.r-navBar {
+		position: relative;
+		display: flex;
+		align-items: baseline;
+	}
+
+	.furniture {
+		position: absolute;
+		z-index: 99;
+		left: 150rpx;
+		top: -10rpx;
+		transition: .4s;
+		height: 60px;
+		width: 100px;
+	}
+
+	.gridBox {
+		display: grid;
+		grid-template-columns: 50% 50%;
+		grid-gap: 10rpx 10rpx;
+		grid-auto-flow: row dense;
+		align-items: space-between;
+		justify-content: space-between;
+		width: 100%;
+		margin-top: 15rpx;
+		z-index: 99;
+	}
+
 	.text {
 		position: absolute;
 		color: #ffffff;
@@ -299,7 +445,7 @@
 	.topNaviagtion {
 		z-index: 3;
 		margin-top: 10rpx;
-		margin-bottom: -10rpx;
+		margin-bottom: 10rpx;
 	}
 
 	.backgroundColor {

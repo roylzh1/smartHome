@@ -1,22 +1,27 @@
 <template>
-	<view @longpress="pressHandler" @click="handleClick" class="content">
-		<view class="backgroundColor" :style="{backgroundColor: selected == true ? `rgba(255,255,255,.8)` : `hsla(0,0%,25%,.6)`}"></view>
-		<view class="s-content">	
-		<view class="thing-content" :style="{backgroundColor: selected == true ? `rgba(240,214,105,1)` : `rgba(0,0,0,.5)`}">
-			<image class="thing" :src="selected == true ? photoOpen : photoClose" ></image>
+	<view @longpress="pressHandler" @click="handleClick" class="mbox-content">
+		<view class="mbox-backgroundColor"
+			:style="{backgroundColor: selected == true ? `rgba(255,255,255,.8)` : `hsla(0,0%,25%,.6)`}"></view>
+		<view class="mbox-s-content">
+			<view class="mbox-thing-content"
+				:style="{backgroundColor: selected == true ? `rgba(240,214,105,1)` : `rgba(0,0,0,.5)`}">
+				<image class="mbox-thing" :src="selected == true ? photoOpen : photoClose"></image>
+			</view>
+			<view class="mbox-statusBox">
+				<view class="mbox-title" :style="{color: selected == true ?`rgba(0,0,0,1)` : `#ffffff`}">{{title}}
+				</view>
+				<view class="mbox-status">{{selected ? open : close}}</view>
+			</view>
+
 		</view>
-		<view class="statusBox">
-			<view class="title" :style="{color: selected == true ?`rgba(0,0,0,1)` : `#ffffff`}">{{title}}</view>
-			<view class="status">{{selected ? open : close}}</view>
-		</view>
-		
-		</view>
-	</view>	
+	</view>
 </template>
 
 <script setup>
-import { ref } from "vue";
-    const props = defineProps({
+	import {
+		ref
+	} from "vue";
+	const props = defineProps({
 		title: String,
 		open: String,
 		close: String,
@@ -25,18 +30,18 @@ import { ref } from "vue";
 	});
 	let selected = ref(false);
 	const emit = defineEmits(['popup']);
-	const handleClick = ()=>{
-		 selected.value = !selected.value;
+	const handleClick = () => {
+		selected.value = !selected.value;
 	}
 	const pressHandler = () => {
-		if(!selected.value)
-		selected.value = !selected.value;
-		emit('popup',props.title);
+		if (!selected.value)
+			selected.value = !selected.value;
+		emit('popup', props.title);
 	}
 </script>
 
 <style scoped>
-	.content{
+	.mbox-content {
 		position: relative;
 		height: 250rpx;
 		width: 335rpx;
@@ -45,7 +50,8 @@ import { ref } from "vue";
 		transition: 0.5s;
 		z-index: 3;
 	}
-	.s-content{
+
+	.mbox-s-content {
 		position: relative;
 		height: 100%;
 		width: 100%;
@@ -57,7 +63,8 @@ import { ref } from "vue";
 		z-index: 3;
 		transition: 0.5s;
 	}
-	.title{
+
+	.mbox-title {
 		height: 30rpx;
 		width: 80rpx;
 		margin-left: 20rpx;
@@ -65,7 +72,8 @@ import { ref } from "vue";
 		font-weight: 800;
 		transition: 0.5s;
 	}
-	.status{
+
+	.mbox-status {
 		height: 30rpx;
 		width: 80rpx;
 		margin-left: 20rpx;
@@ -75,10 +83,12 @@ import { ref } from "vue";
 		z-index: 3;
 		transition: 0.5s;
 	}
-	.statusBox{
+
+	.mbox-statusBox {
 		margin-bottom: 5rpx;
 	}
-	.thing-content{
+
+	.mbox-thing-content {
 		display: flex;
 		justify-content: center;
 		align-items: center;
@@ -89,18 +99,20 @@ import { ref } from "vue";
 		z-index: 3;
 		transition: 0.5s;
 	}
-	.thing{
+
+	.mbox-thing {
 		height: 60%;
 		width: 60%;
 		z-index: 5;
 		transition: 0.5s;
 
 	}
-	.backgroundColor {
+
+	.mbox-backgroundColor {
 		position: absolute;
 		height: 100%;
 		width: 100%;
-		background-color: hsla(0,0%,60%,.3);
+		background-color: hsla(0, 0%, 60%, .3);
 		backdrop-filter: blur(20px);
 		-webkit-backdrop-filter: blur(20px);
 		-webkit-transform: scale(3);

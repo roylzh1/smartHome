@@ -1,7 +1,7 @@
 <template>
 	<view class="backGround"></view>
-	<view class="content">
-		<h1 class="title">我的</h1>
+	<view class="user-content">
+		<h1 class="title">账户</h1>
 		<view class="user-login" v-if="!isLogin">
 			<view class="form">
 				<view class="item" style="margin-top: 10px;">
@@ -16,26 +16,19 @@
 			<div class="login-btn" @click="loginHandler">{{loginBtn}}</div>
 			<div class="register" @click="LoginOrReg">没有账号?点击注册</div>
 		</view>
-		<card class="user-logined" height="500" width="600" v-if="isLogin">
-			<view class="info-box">
-				<view class="info-name">用户名</view>
-				<view class="info-item">
+		<card height="500" width="600" v-if="isLogin">
+			<view class="user-logined">
+				<view class="user-name-box">
 					{{account.userinfo.userName}}
 				</view>
-			</view>
-			<view class="info-box">
-				<view class="info-name">邮箱</view>
-				<view class="info-item">
+				<view class="info-box">
 					{{account.userinfo.email}}
 				</view>
-			</view>
-			<view class="info-box">
-				<view class="info-name">手机</view>
-				<view class="info-item">
+				<view class="info-box">
 					{{account.userinfo.phoneNumber}}
 				</view>
+				<view class="logout" @click="logoutHandler">登出</view>
 			</view>
-			<view class="logout" @click="logoutHandler">登出</view>
 		</card>
 		<tab-bar selected="3"></tab-bar>
 	</view>
@@ -49,7 +42,8 @@
 		useAccountStore
 	} from '@/store/account.js';
 	import {
-		onLoad
+		onLoad,
+		onShow
 	} from '@dcloudio/uni-app'
 	import {
 		inject,
@@ -61,7 +55,7 @@
 	const loginBtn = ref("登录");
 	const name = ref('');
 	const password = ref('');
-	onMounted(async () => {
+	onShow(async () => {
 		console.log(account.userinfo);
 		console.log(account.homeList);
 		/*
@@ -85,6 +79,8 @@
 			isLogin.value = false;
 		};
 		console.log(res2.data.value)
+		account.homeTcp = res2.data.value.homeList[0].sessionId;
+		account.homeSeleted = res2.data.value.homeList[0].id;
 		account.userinfo.userName = res2.data.value.name;
 		account.userinfo.userId = res2.data.value.id;
 		account.userinfo.email = res2.data.value.email;
@@ -127,21 +123,41 @@
 		});
 		if (res2.data.status == 400) return;
 		console.log(res2.data.value)
+		account.homeTcp = res2.data.value.homeList[0].sessionId;
+		account.homeSeleted = res2.data.value.homeList[0].id;
 		account.userinfo.userName = name.value;
 		account.userinfo.userId = res2.data.value.id;
 		account.userinfo.email = res2.data.value.email;
 		account.userinfo.phoneNumber = res2.data.value.phone;
+		uni.switchTab({
+			url: `/pages/home/home`,
+			animationType: 'pop-in',
+			animationDuration: 500
+		});
 	}
 	//登出
 	const logoutHandler = () => {
-
+		uni.setStorage({
+			key: 'smartHome_userToken',
+			data: '',
+			success: function() {
+				console.log('success');
+			}
+		});
+		uni.switchTab({
+			url: `/pages/home/home`,
+			animationType: 'pop-in',
+			animationDuration: 500
+		});
+		isLogin.value = false;
 	}
 </script>
 
 <style scoped>
-	.content {
+	.user-content {
 		display: flex;
 		flex-direction: column;
+		align-items: center;
 		height: 100vh;
 		width: 100vw;
 		z-index: 2;
@@ -150,7 +166,7 @@
 
 	.title {
 		padding-top: 30px;
-		margin-left: 30rpx;
+		margin-bottom: 5px;
 		height: 40px;
 		z-index: 2;
 		color: #fff;
@@ -176,7 +192,7 @@
 		align-items: flex-start;
 		flex-direction: column;
 		height: 200px;
-		width: 70%;
+		width: 80%;
 		background-color: rgba(255, 255, 255, .9);
 		border-radius: 20px;
 		z-index: 2;
@@ -184,17 +200,21 @@
 		font-size: 13px;
 	}
 
+
 	.form .item input {
 		width: 140px;
 		font-size: 12px;
+		font-weight: 600;
 		border: 0;
 		border-bottom: 2px solid #fff;
-		padding: 5px 10px;
+		padding: 5px 0px;
 		background: #ffffff00;
-		color: #f433ff;
+		margin-left: 30rpx;
+		color: #838383;
 	}
 
 	.item-name {
+		margin-top: 10px;
 		margin-left: 10px;
 		font-weight: 600;
 	}
@@ -204,7 +224,7 @@
 		justify-content: center;
 		align-items: center;
 		margin-left: 10px;
-		margin-top: 20px;
+		margin-top: 50px;
 		height: 30px;
 		width: 50px;
 		border-radius: 5px;
@@ -215,43 +235,67 @@
 
 	.register {
 		position: absolute;
-		bottom: 0;
+		bottom: 10px;
 		right: 10px;
 		font-size: 10px;
 		color: #838383;
 	}
 
 	.user-logined {
-		margin-left: 30rpx;
+		display: flex;
+		justify-content: center;
+		align-items: center;
+		flex-direction: column;
+	}
+
+	.user-name-box {
+		font-size: 38px;
+		font-weight: 800;
+		color: #fff;
 	}
 
 	.info-box {
-		margin-left: 30rpx;
-		margin-top: 10px;
+		margin-top: 5px;
+		font-size: 15px;
+		font-weight: 500;
+		color: #bfbfbf;
 	}
 
 	.info-name {
 		font-size: 18px;
 		font-weight: 600;
 		color: #fff;
+
 	}
 
 	.info-item {
 		font-size: 18px;
 		font-weight: 400;
 		color: #fff;
+		margin-left: 10px;
 	}
 
 	.logout {
 		display: flex;
 		justify-content: center;
 		align-items: center;
-		height: 30px;
-		width: 50px;
-		background-color: #fff;
+		height: 35px;
+		width: 90px;
+		font-size: 14px;
+		font-weight: 600;
+		background-color: rgba(240, 214, 105, 1);
 		border-radius: 5px;
-		margin-left: 30rpx;
-		margin-top: 80px;
-		font-size: 12px;
+		margin-top: 100px;
+	}
+
+	.navBarBox {
+		position: fixed;
+		top: 0;
+		left: 0;
+		right: 0;
+		bottom: 0;
+		height: 130rpx;
+		z-index: 6;
+		overflow: hidden;
 	}
 </style>

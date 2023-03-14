@@ -40,12 +40,12 @@
 					"iconPath": "/static/tabbar/device-unSelect.png",
 					"selectedIconPath": "/static/tabbar/device.png",
 					"text": "设备"
-				},{
+				}, {
 					"pagePath": "/pages/user/user",
 					"iconPath": "static/tabbar/user-unSelect.png",
 					"selectedIconPath": "/static/tabbar/user.png",
 					"text": "我的"
-			}]
+				}]
 			}
 		},
 		methods: {
@@ -53,7 +53,7 @@
 				let url = item.pagePath;
 				// 对应患者和医生的首页
 				uni.switchTab({
-					url
+					url,
 				});
 			}
 		}
@@ -84,7 +84,7 @@
 		position: absolute;
 		height: 100%;
 		width: 110%;
-		background-color: hsla(0,0%,50%,.4);
+		background-color: hsla(0, 0%, 50%, .4);
 		backdrop-filter: blur(30px);
 		-webkit-backdrop-filter: blur(20px);
 		overflow: hidden;

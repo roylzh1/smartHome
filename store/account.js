@@ -17,6 +17,7 @@ export const useAccountStore = defineStore('account', {
 		homeSeleted: 0,
 		roomList: [],
 		airConditionCount: 0,
+		homeTcp: ''
 	}),
 	actions: {
 		changeUserInfo(userinfo) {

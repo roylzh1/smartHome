@@ -1,5 +1,5 @@
 <template>
-	<popup-card :title="title+name" @return="complete">
+	<popup-card :title="title" @return="complete">
 		<view class="lighting">
 			<image class="logo" :style="{filter: `grayscale(${level}) brightness(${2-level})`}"
 				src="../static/images/lighting.png"></image>
@@ -18,7 +18,6 @@
 	import popupCard from '/components/popupCard.vue'
 	const prop = defineProps({
 		title: String,
-		name: String
 	});
 	const emit = defineEmits(['lightComplete']);
 	let level = ref(0);

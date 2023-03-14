@@ -1,41 +1,40 @@
 <template>
-	<card height=160 width=300 >
-		<view class="furnitureBox">
-			<view class="addFurniture" @click="clickHandler(true)" >
-				<view class="f-name">
-					添加配件
-				</view>
-				<image class="f-logo" src="../static/images/add-f.png"></image>
+	<view class="c-furnitureBox">
+		<view class="c-addFurniture" @click="clickHandler(true)">
+			<view class="c-f-name">
+				添加配件
 			</view>
-			<view class="removeFurniture" @click="clickHandler(false)">
-				<view  class="f-name">
-					删除配件
-				</view>
-				<image class="f-logo" src="../static/images/remove-f.png"></image>
-			</view>
+			<image class="c-f-logo" src="../static/images/add-f.png"></image>
 		</view>
-	</card>
+		<view class="c-removeFurniture" @click="clickHandler(false)">
+			<view class="c-f-name">
+				删除配件
+			</view>
+			<image class="c-f-logo" src="../static/images/remove-f.png"></image>
+		</view>
+	</view>
 </template>
 
 <script setup>
-	import card from '/components/card.vue'
 	const emit = defineEmits(['hasClicked'])
-	const clickHandler = (mode)=>{
-		emit('hasClicked',mode);
+	const clickHandler = (mode) => {
+		emit('hasClicked', mode);
 	}
 </script>
 
 <style scoped>
-	.furnitureBox{
+	.c-furnitureBox {
 		display: flex;
 		align-items: space-between;
 		flex-wrap: wrap;
-		height: 100%;
-		width: 100%;
-		background-color: hsla(0, 0%, 100%, 1);
-		
+		border-radius: 10px;
+		height: 60px;
+		width: 100px;
+		background-color: #fff;
+		z-index: 99;
 	}
-	.addFurniture{
+
+	.c-addFurniture {
 		display: flex;
 		justify-content: space-between;
 		align-items: center;
@@ -44,7 +43,8 @@
 		width: 100%;
 		border-bottom: 1px solid hsla(0, 0%, 50%, .3);
 	}
-	.removeFurniture{
+
+	.c-removeFurniture {
 		display: flex;
 		justify-content: space-between;
 		align-items: center;
@@ -52,15 +52,17 @@
 		height: 50%;
 		width: 100%;
 	}
-	.f-name{
-		margin-left: 30rpx;
+
+	.c-f-name {
+		margin-left: 25rpx;
 		font-size: 25rpx;
 		font-weight: 600;
 		width: 150rpx;
 	}
-	.f-logo{
-		margin-right: 30rpx;
-		width: 40rpx;
-		height: 40rpx;
+
+	.c-f-logo {
+		margin-right: 25rpx;
+		width: 30rpx;
+		height: 27rpx;
 	}
 </style>
