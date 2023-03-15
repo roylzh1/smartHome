@@ -13,11 +13,12 @@ export const useAccountStore = defineStore('account', {
 		},
 		//家庭信息
 		homeList: [],
-		//当前的家,默认0
+		//当前的家id
 		homeSeleted: 0,
 		roomList: [],
 		airConditionCount: 0,
-		homeTcp: ''
+		homeTcp: '',
+
 	}),
 	actions: {
 		changeUserInfo(userinfo) {

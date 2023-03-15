@@ -6,19 +6,19 @@
 		},
 		{
 			"path": "pages/index/index"
-		}
-		,{
-		    "path" : "pages/device/device"
-		
-		},{
-            "path" : "pages/user/user"
-        }
-		, {
+		}, {
+			"path": "pages/device/device"
+
+		}, {
+			"path": "pages/user/user"
+		}, {
 			"path": "pages/airConditioner/airConditioner"
 		}, {
 			"path": "pages/lamp/lamp"
+		}, {
+			"path": "pages/homeSetting/homeSetting"
 		}
-    ],
+	],
 
 	"globalStyle": {
 		"navigationStyle": "custom",

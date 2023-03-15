@@ -1,14 +1,9 @@
 <template>
-		<popup-small-card catchtouchmove="false"  @return="complete">
-		<template #default >
+	<popup-small-card catchtouchmove="false" @return="complete">
+		<template #default>
 			<view class="addContent">
 				<view class="add-room-title">{{name}} 添加配件</view>
-				<el-input
-					class="myInput"
-				    v-model="textarea"
-				    :rows="2"
-				    placeholder="            序列号"
-				  />
+				<input class="myInput" v-model="textarea" :rows="2" placeholder="  序列号" />
 			</view>
 		</template>
 	</popup-small-card>
@@ -19,17 +14,41 @@
 	import {
 		ref
 	} from "vue";
-	import popupSmallCard from '/components/popupSmallCard.vue'
+	import popupSmallCard from '/components/popupSmallCard.vue';
+	import myRequest from '/utils/request.js';
 	const prop = defineProps({
 		name: String,
+		roomId: Number,
+		homeId: Number
 	});
 	const emit = defineEmits(['addRoomComplete']);
 	const textarea = ref('')
-	const complete = () => {
+	const complete = async () => {
+		console.log(textarea.value + "id: " + prop.roomId);
+		const res = await myRequest({
+			url: `Room/InsertFurniture`,
+			method: 'get',
+			data: {
+				furnitureId: textarea.value,
+				roomId: prop.roomId,
+				homeId: prop.homeId
+			}
+		});
+		if (res.statusCode == 400)
+			uni.showToast({
+				title: '添加家具失败',
+				icon: 'none', //如果要纯文本，不要icon，将值设为'none'
+				duration: 2000 //持续时间为 2秒
+			})
+		else
+			uni.showToast({
+				title: '添加家具成功',
+				icon: 'success', //将值设置为 success 或者 ''
+				duration: 2000 //持续时间为 2秒
+			})
+		console.log(res)
 		emit('addRoomComplete');
 	};
-
-	
 </script>
 
 <style scoped>
@@ -42,17 +61,25 @@
 		z-index: 13;
 		color: black;
 	}
-	.myInput{
+
+	.myInput {
 		margin-top: 50rpx;
-		width: 300rpx;
+		width: 400rpx;
+		height: 40px;
+		padding-left: 10px;
+		padding-right: 10px;
+		border-radius: 6px;
+		background-color: #f4f4f4;
 	}
-	.add-room-title{
+
+	.add-room-title {
 		font-size: 40rpx;
 		margin-top: 50rpx;
 		font-weight: 700;
 		letter-spacing: 2px;
 		color: #000000;
 	}
+
 	.backgroundColor {
 		height: 100%;
 		width: 100%;
@@ -62,5 +89,4 @@
 		-webkit-transform: scale(1);
 		z-index: 11;
 	}
-
 </style>

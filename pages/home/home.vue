@@ -51,12 +51,10 @@
 		</popup-light-box>
 		<add-new-room v-show="ifShowAddRoom" :class="ifShowAddRoom == true ? 'content-fade-up' : ''"
 			@addRoomComplete="closeAddRoomBoxHandler"></add-new-room>
-		<check-home v-show="ifShowCheckHome" :homeList="account.homeList"
-			:class="ifShowAddRoom == true ? 'content-fade-up' : ''" @checkHomeComplete="closecheckHomeBoxHandler"
-			@changeHome="changeHomeHandler">
-		</check-home>
+
 		<add-furniture v-show="showAddFurniture" :class="showAddFurniture == true ? 'content-fade-up' : ''"
-			:name="whichRoom" @addRoomComplete="closeFurnitureHandler"></add-furniture>
+			:name="whichRoom" :roomId="roomId" :homeId="account.homeSeleted" @addRoomComplete="closeFurnitureHandler">
+		</add-furniture>
 		<remove-furniture v-show="showRemoveFurniture" :class="showRemoveFurniture == true ? 'content-fade-up' : ''"
 			:name="whichRoom" @addRoomComplete="closeFurnitureHandler"></remove-furniture>
 	</view>
@@ -99,15 +97,15 @@
 		name: ''
 	});
 	let lightName = ref('');
-	const aaa = [1, 2, 3]
 	let opacityStyle = reactive({
 		opacity: 0
-	}); //<view v-for="(f,i) in r.furnitures" style="z-index:99">{{f.title}}</view>
+	});
 	const popupHandler = (title, name) => {
 		popupBoxIfShow.value = true;
 		popupMessage.title = title;
 		popupMessage.name = name;
 	}
+
 	const closeBoxHandler = (judege) => {
 		if (!judege) {
 			//拿ID才能做出判断是那盏灯熄灭
@@ -123,20 +121,31 @@
 		ifShowAddRoom.value = false;
 	}
 	//添加家具
+	const showAddFurniture = ref(false);
+	const showRemoveFurniture = ref(false);
+	const whichRoom = ref(''); //判断是哪个房间增删家具 房间名
+	const roomId = ref(0);
 	let ifShowchangeFurniture = ref([]);
-	const addOrRemoveHandler = (roomId, roomName, index) => { //家具弹窗
+	const addOrRemoveHandler = (id, roomName, index) => { //家具弹窗
 		ifShowchangeFurniture.value[index] = !ifShowchangeFurniture.value[index];
 		whichRoom.value = roomName; //房间id
-		console.log(roomId)
+		roomId.value = id;
+		console.log('roomId:' + id)
 	}
 	const furnitureHandler = (mode) => {
-		console.log(mode)
+		//console.log(mode)
 		if (mode) //增加
 			showAddFurniture.value = true;
 		else //删除家具
 			showRemoveFurniture.value = true;
 	}
 	const closeFurnitureHandler = () => {
+		//刷新页面
+		uni.switchTab({
+			url: `/pages/home/home`,
+			animationType: 'pop-in',
+			animationDuration: 500
+		});
 		showAddFurniture.value = false;
 		showRemoveFurniture.value = false;
 	}
@@ -145,12 +154,17 @@
 	}
 	//查看家庭数量
 	const ifShowCheckHome = ref(false);
+	//跳转到家庭设置
 	const checkHomeHandler = () => {
-		ifShowCheckHome.value = true;
+		uni.navigateTo({
+			url: `/pages/homeSetting/homeSetting?homeId=${account.homeSeleted}`
+		});
+		//ifShowCheckHome.value = true;
 	}
 	const closecheckHomeBoxHandler = () => {
 		ifShowCheckHome.value = false;
-	} //更改家庭
+	}
+	//更改家庭
 	const changeHomeHandler = async (index) => {
 		let homeId = account.homeList[index].id;
 		account.homeSeleted = homeId; //切换房号
@@ -181,87 +195,21 @@
 				animationDuration: 500
 			});
 	};
-	const showAddFurniture = ref(false);
-	const showRemoveFurniture = ref(false);
-	const whichRoom = ref(''); //判断是哪个房间增删家具
-
 	const disabledScroll = () => {}
+
 	//-------------------onMounted-------------------
 	onMounted(async () => {
 		//获取手机状态栏高度
 		uni.hideTabBar({
 			animation: false
 		});
-		/*
-		//获取用户信息
-		const userInfo = await myRequest({
-			url: `User/GetUserInfo`,
-			method: 'get',
-		});
-		console.log(userInfo)
-		account.homeTcp = userInfo.data.value.homeList[0].sessionId; //默认为第一个家庭
-		account.changeUserInfo({
-			userName: userInfo.data.value.name,
-			userId: userInfo.data.value.id,
-			email: userInfo.data.value.email,
-			phoneNumber: userInfo.data.value.phone
-		});
-		account.homeList = userInfo.data.value.homeList;
-		account.homeSeleted = userInfo.data.value.homeList[0].id; //默认为第一个家庭
-		const roomInfo = await myRequest({
-			url: `Room/GetRoom`,
-			method: 'get',
-			data: {
-				homeId: account.homeSeleted,
-			}
-		});
-		roomList.value = [];
-		ifShowchangeFurniture.value = [];
-		account.airConditionCount = 0;
-		roomList.value = roomInfo.data;
-		let tempFurnitures = [];
-		for (let i = 0; i < roomList.value.length; i++) {
-			for (let j = 0; j < roomList.value[i].furnitures.length; j++) {
-				let f = roomList.value[i].furnitures[j];
-				if (f.type == 4) {
-					account.airConditionCount += 1;
-					continue;
-				} //不显示空调
-				tempFurnitures.push({
-					type: f.size,
-					title: f.name,
-					open: "已开",
-					close: "已关",
-					photoClose: `/static/images/${f.type}.png`,
-					photoOpen: `/static/images/${f.type}-light.png`,
-					id: f.id
-				});
-			}
-			roomList.value[i].furnitures = tempFurnitures;
-			ifShowchangeFurniture.value.push(false);
-			tempFurnitures = [];
-		}
-		console.log(roomList.value)
-		account.roomList = roomList.value;
-		*/
+
 	});
 
-
 	onShow(async () => {
-		const userInfo = await myRequest({
-			url: `User/GetUserInfo`,
-			method: 'get',
-		});
+		let userInfo = uni.getStorageSync('smartHome_userInfo');
 		console.log(userInfo)
-		account.changeUserInfo({
-			userName: userInfo.data.value.name,
-			userId: userInfo.data.value.id,
-			email: userInfo.data.value.email,
-			phoneNumber: userInfo.data.value.phone
-		});
-		account.homeList = userInfo.data.value.homeList;
-		account.homeTcp = userInfo.data.value.homeList[0].sessionId; //默认为第一个家庭
-		account.homeSeleted = userInfo.data.value.homeList[0].id; //默认为第一个家庭
+		//获取房间和家具信息
 		const roomInfo = await myRequest({
 			url: `Room/GetRoom`,
 			method: 'get',
@@ -269,9 +217,21 @@
 				homeId: account.homeSeleted,
 			}
 		});
+		account.changeUserInfo({
+			userName: userInfo.name,
+			userId: userInfo.id,
+			email: userInfo.email,
+			phoneNumber: userInfo.phone
+		});
+		account.homeList = userInfo.homeList;
+		account.homeTcp = userInfo.homeList[0].sessionId; //默认为第一个家庭
+		account.homeSeleted = userInfo.homeList[0].id; //默认为第一个家庭
+		console.log(account.homeList)
+
+
 		roomList.value = [];
 		account.airConditionCount = 0;
-		account.roomList = roomInfo.data
+		account.roomList = roomInfo.data;
 		roomList.value = roomInfo.data;
 		let tempFurnitures = [];
 		for (let i = 0; i < roomList.value.length; i++) {

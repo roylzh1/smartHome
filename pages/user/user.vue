@@ -56,26 +56,20 @@
 	const name = ref('');
 	const password = ref('');
 	onShow(async () => {
-		console.log(account.userinfo);
-		console.log(account.homeList);
-		const res2 = await myRequest({
-			url: `User/GetUserInfo`,
-			method: 'get',
-			data: {
-				userName: name.value,
-			}
-		});
-		//未验证
-		if (res2.data.status == 400) {
+		//获取用户token,验证失败token为空
+		const userToken = uni.getStorageSync('smartHome_userToken');
+		if (userToken == '') {
 			isLogin.value = false;
-		};
-		console.log(res2.data.value)
-		account.homeTcp = res2.data.value.homeList[0].sessionId;
-		account.homeSeleted = res2.data.value.homeList[0].id;
-		account.userinfo.userName = res2.data.value.name;
-		account.userinfo.userId = res2.data.value.id;
-		account.userinfo.email = res2.data.value.email;
-		account.userinfo.phoneNumber = res2.data.value.phone;
+			return;
+		}
+		//获取成功,拿用户信息
+		const userInfo = uni.getStorageSync('smartHome_userInfo');
+		account.homeTcp = userInfo.homeList[0].sessionId;
+		account.homeSeleted = userInfo.homeList[0].id;
+		account.userinfo.userName = userInfo.name;
+		account.userinfo.userId = userInfo.id;
+		account.userinfo.email = userInfo.email;
+		account.userinfo.phoneNumber = userInfo.phone;
 		isLogin.value = true;
 	});
 	//登录还是注册
@@ -95,16 +89,9 @@
 				password: password.value
 			}
 		});
-		//console.log(res.data.message);token
 		if (res.data.status == 400) return;
 		isLogin.value = true;
-		uni.setStorage({
-			key: 'smartHome_userToken',
-			data: res.data.message,
-			success: function() {
-				console.log('success');
-			}
-		});
+		uni.setStorageSync('smartHome_userToken', res.data.message);
 		const res2 = await myRequest({
 			url: `User/GetUserInfo`,
 			method: 'get',
@@ -114,14 +101,16 @@
 		});
 		if (res2.data.status == 400) return;
 		console.log(res2.data.value)
+		uni.setStorageSync('smartHome_userInfo', res2.data.value);
 		account.homeTcp = res2.data.value.homeList[0].sessionId;
 		account.homeSeleted = res2.data.value.homeList[0].id;
 		account.userinfo.userName = name.value;
 		account.userinfo.userId = res2.data.value.id;
 		account.userinfo.email = res2.data.value.email;
 		account.userinfo.phoneNumber = res2.data.value.phone;
+		//刷新页面
 		uni.switchTab({
-			url: `/pages/home/home`,
+			url: `/pages/user/user`,
 			animationType: 'pop-in',
 			animationDuration: 500
 		});
