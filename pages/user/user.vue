@@ -58,15 +58,6 @@
 	onShow(async () => {
 		console.log(account.userinfo);
 		console.log(account.homeList);
-		/*
-		uni.getStorage({
-			key: 'smartHome_userToken',
-			success(res) {
-				console.log('获取成功', res.data);
-				isLogin.value = true;
-			}
-		})
-		*/
 		const res2 = await myRequest({
 			url: `User/GetUserInfo`,
 			method: 'get',
@@ -145,7 +136,7 @@
 			}
 		});
 		uni.switchTab({
-			url: `/pages/home/home`,
+			url: `/pages/user/user`,
 			animationType: 'pop-in',
 			animationDuration: 500
 		});

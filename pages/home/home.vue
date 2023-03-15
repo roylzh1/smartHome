@@ -192,6 +192,7 @@
 		uni.hideTabBar({
 			animation: false
 		});
+		/*
 		//获取用户信息
 		const userInfo = await myRequest({
 			url: `User/GetUserInfo`,
@@ -242,6 +243,7 @@
 		}
 		console.log(roomList.value)
 		account.roomList = roomList.value;
+		*/
 	});
 
 
