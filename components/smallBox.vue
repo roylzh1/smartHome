@@ -33,7 +33,9 @@
 		close: String,
 		photoOpen: String,
 		photoClose: String,
-		id: Number
+		id: Number,
+		index: Number, //家具索引
+		roomId: Number //房间索引
 	});
 	const emit = defineEmits(['popup']);
 	let selected = ref(false);
@@ -53,7 +55,7 @@
 		if (!selected.value)
 			selected.value = !selected.value;
 
-		emit('popup', props.title);
+		emit('popup', props.title, props.id, props.index);
 	}
 </script>
 

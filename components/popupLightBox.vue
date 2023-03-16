@@ -20,37 +20,42 @@
 		title: String,
 	});
 	const emit = defineEmits(['lightComplete']);
-	let level = ref(0);
+	let level = ref(0); //0最大
 	let beforeIndex = 0;
 	let nowIndex = 0;
 	let moveY = ref(0);
 	const complete = () => {
-		if (level.value == 1)
+		emit('lightComplete', level.value);
+		/*
+		if (level.value == 1){
 			emit('lightComplete', false);
-		else
+		}
+		else{
 			emit('lightComplete');
+		}
+			*/
 	};
 
 	const moveHandler = (e) => {
 		e.preventDefault();
 		beforeIndex = nowIndex;
 		nowIndex = e.changedTouches[0].clientY;
-		if (nowIndex <= 500) {
+		if (nowIndex <= 420) {
 			moveY.value = 0;
 			level.value = 0;
 			return;
 		}
-		if (nowIndex <= 600) {
+		if (nowIndex <= 520) {
 			moveY.value = 100;
 			level.value = .3;
 			return;
 		}
-		if (nowIndex <= 700) {
+		if (nowIndex <= 620) {
 			moveY.value = 200;
 			level.value = .7;
 			return;
 		}
-		if (nowIndex <= 800) {
+		if (nowIndex <= 720) {
 			moveY.value = 300;
 			level.value = 1;
 			return;

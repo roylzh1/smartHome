@@ -64,12 +64,21 @@
 		}
 		//获取成功,拿用户信息
 		const userInfo = uni.getStorageSync('smartHome_userInfo');
-		account.homeTcp = userInfo.homeList[0].sessionId;
+		//更新会话号
+		const res = await myRequest({
+			url: `Home/GetHomeSession`,
+			method: 'get',
+			data: {
+				homeId: userInfo.homeList[0].id,
+			}
+		});
+		account.homeTcp = res.data;
 		account.homeSeleted = userInfo.homeList[0].id;
 		account.userinfo.userName = userInfo.name;
 		account.userinfo.userId = userInfo.id;
 		account.userinfo.email = userInfo.email;
 		account.userinfo.phoneNumber = userInfo.phone;
+		account.userinfo.hasImage = userInfo.hasImage;
 		isLogin.value = true;
 	});
 	//登录还是注册
@@ -107,7 +116,8 @@
 		account.userinfo.userName = name.value;
 		account.userinfo.userId = res2.data.value.id;
 		account.userinfo.email = res2.data.value.email;
-		account.userinfo.phoneNumber = res2.data.value.phone;
+		account.userinfo.phoneNumber = res2.data.value.phone; //hasImage
+		account.userinfo.hasImage = res2.data.value.hasImage;
 		//刷新页面
 		uni.switchTab({
 			url: `/pages/user/user`,

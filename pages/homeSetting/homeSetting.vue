@@ -1,11 +1,11 @@
 <template>
 	<view class="content">
 		<view class="home-backGround"></view>
-		<view :class="IfShowUserBox == true ? 'backGround-up':''"></view>
+		<view :class="IfShowUserBox || showAddHome ? 'backGround-up':''"></view>
 		<view class="home-page">
 			<!--头部-->
 			<view class="home-header">
-				<view class="homeHeader-text">添加新家</view>
+				<view class="homeHeader-text" @click="addNewHome">添加新家</view>
 				<view class="homeHeader-return" @click="complete">完成</view>
 			</view>
 			<view class="home-content">
@@ -53,12 +53,27 @@
 						房间
 					</view>
 					<view class="home-box-userName">
-						<view class="home-userName" v-for="room in nowHome.rooms">
+						<view class="home-userName" v-for="(room,index) in nowHome.rooms" :key="room.id">
 							<view class="home-room-details">
 								<view>
 									{{room.name}}
 								</view>
-								<image class="home-userName-img" src="/static/images/rightArrow.png"></image>
+								<image @click="removeRoom(room.id,index)" class="home-userName-img"
+									src="/static/images/x-regular-24.png"></image>
+							</view>
+						</view>
+					</view>
+					<view class="home-box-name" style="margin-top: 30rpx;">
+						家庭
+					</view>
+					<view class="home-box-userName">
+						<view class="home-userName" v-for="home in otherHome">
+							<view class="home-room-details">
+								<view>
+									{{home.homeName}}
+								</view>
+								<image class="home-userName-img" src="/static/images/rightArrow.png"
+									@click="switchHome(home.id)"></image>
 							</view>
 						</view>
 					</view>
@@ -71,9 +86,12 @@
 			</view>
 		</view>
 		<popup-user @touchmove.stop.prevent :name="nowUserInfo.name" :email="nowUserInfo.email"
-			:phoneNumber="nowUserInfo.phoneNumber" v-show="IfShowUserBox"
+			:phoneNumber="nowUserInfo.phoneNumber" :hasImage="nowUserInfo.hasImage" v-show="IfShowUserBox"
 			:class="IfShowUserBox == true ? 'content-fade-up-animation' : ''" @userComplete="closeUserBoxHandler">
 		</popup-user>
+		<add-home v-show="showAddHome" :class="showAddHome == true ? 'content-fade-up' : ''"
+			@addHomeComplete="closeAddHomeHandler">
+		</add-home>
 	</view>
 </template>
 
@@ -86,7 +104,8 @@
 		reactive,
 		ref
 	} from "vue";
-	import popupUser from '/components/popupUser.vue'
+	import popupUser from '/components/popupUser.vue';
+	import addHome from '/components/addHome.vue';
 	import myRequest from '/utils/request.js';
 	import {
 		useAccountStore
@@ -98,7 +117,8 @@
 	const nowUserInfo = reactive({
 		name: '',
 		email: '',
-		phoneNumber: ''
+		phoneNumber: '',
+		hasImage: ''
 	})
 	//展示用户个人信息
 	const IfShowUserBox = ref(false);
@@ -106,10 +126,48 @@
 		nowUserInfo.name = nowHome.value.userList[index].userName;
 		nowUserInfo.email = nowHome.value.userList[index].email;
 		nowUserInfo.phoneNumber = nowHome.value.userList[index].phoneNumber;
+		nowUserInfo.hasImage = nowHome.value.userList[index].hasImage;
 		IfShowUserBox.value = true;
 	}
+	//关闭页面
 	const closeUserBoxHandler = (index) => {
 		IfShowUserBox.value = false;
+	}
+	//切换家庭,要连接数据库,新增首选家庭字段才能真正实现
+	const switchHome = (homeId) => {
+		uni.showModal({
+			content: '确认删除该家庭',
+			success: function(res) {
+				if (res.confirm) {
+					account.homeSeleted = homeId;
+					console.log('点击了确认')
+				} else {
+					console.log('点击了取消')
+				}
+			}
+		})
+	}
+	//移除房间
+	const removeRoom = (roomId, index) => {
+		uni.showModal({
+			content: '确认删除该房间',
+			success: function(res) {
+				if (res.confirm) {
+					nowHome.value.rooms.splice(index, 1);
+					console.log('点击了确认')
+				} else {
+					console.log('点击了取消')
+				}
+			}
+		})
+	}
+	//添加家庭
+	const showAddHome = ref(false);
+	const addNewHome = () => {
+		showAddHome.value = true;
+	}
+	const closeAddHomeHandler = () => {
+		showAddHome.value = false;
 	}
 	onShow(async () => {
 		//console.log(homeId.value)
@@ -122,16 +180,13 @@
 			}
 		});
 		nowHome.value = hoomInfo.data;
-		console.log(nowHome.value)
+		//console.log(nowHome.value)
 
 		account.homeList.forEach(home => {
-			if (home.id == homeId.value) {
-				//nowHome.value = home;
-			} else {
+			if (home.id != homeId.value)
 				otherHome.value.push(home)
-			}
 		});
-		console.log(nowHome.value)
+		console.log(otherHome.value)
 	});
 	onLoad((option) => {
 		console.log(option);
@@ -271,7 +326,7 @@
 		display: flex;
 		justify-content: flex-start;
 		align-items: center;
-		margin-top: 30rpx;
+		margin-top: 50rpx;
 		height: 80rpx;
 		background-color: #fff;
 		color: #fa1b44;

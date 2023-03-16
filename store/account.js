@@ -10,6 +10,7 @@ export const useAccountStore = defineStore('account', {
 			userId: '',
 			email: '',
 			phoneNumber: '',
+			hasImage: false,
 		},
 		//家庭信息
 		homeList: [],
@@ -26,6 +27,7 @@ export const useAccountStore = defineStore('account', {
 			this.userinfo.userId = userinfo.userId;
 			this.userinfo.email = userinfo.email;
 			this.userinfo.phoneNumber = userinfo.phoneNumber;
+			this.userinfo.hasImage = userinfo.hasImage;
 		},
 	}
 })

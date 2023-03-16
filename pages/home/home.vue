@@ -35,7 +35,7 @@
 							:style="{gridRowStart: item.type == 'middle' ? `span 2` : 'span 1'}">
 							<small-box @popup="popupHandler" v-if="item.type !='middle'" :title="item.title"
 								:open="item.open" :close="item.close" :photoClose="item.photoClose"
-								:photoOpen="item.photoOpen" id="item.id"></small-box>
+								:photoOpen="item.photoOpen" :id="item.id" :roomId="index"></small-box>
 							<middle-box @popup="popupHandler" v-if="item.type == 'middle'" class="item"
 								:title="item.title" :open="item.open" :close="item.close" :photoClose="item.photoClose"
 								:photoOpen="item.photoOpen">
@@ -46,8 +46,9 @@
 			</view>
 		</view>
 		<tab-bar selected="0"></tab-bar>
-		<popup-light-box @touchmove.stop.prevent :title="popupMessage.title" v-show="popupBoxIfShow"
-			:class="popupBoxIfShow == true ? 'content-fade-up-animation' : ''" @lightComplete="closeBoxHandler">
+		<popup-light-box @touchmove.stop.prevent :title="popupMessage.title" :index="popupMessage.index"
+			v-show="popupBoxIfShow" :class="popupBoxIfShow == true ? 'content-fade-up-animation' : ''"
+			@lightComplete="closeBoxHandler">
 		</popup-light-box>
 		<add-new-room v-show="ifShowAddRoom" :class="ifShowAddRoom == true ? 'content-fade-up' : ''"
 			@addRoomComplete="closeAddRoomBoxHandler"></add-new-room>
@@ -91,26 +92,43 @@
 	const account = useAccountStore();
 	let roomList = ref([]);
 	let showRoom = ref(true);
-	let popupBoxIfShow = ref(false); //普通弹窗
+	//普通弹窗
+	let popupBoxIfShow = ref(false);
+	//弹窗信息注入
 	let popupMessage = reactive({
 		title: '',
-		name: ''
+		id: '', //家具索引
 	});
 	let lightName = ref('');
 	let opacityStyle = reactive({
 		opacity: 0
 	});
-	const popupHandler = (title, name) => {
+	//基础家具弹窗
+	const popupHandler = (title, id, index) => {
 		popupBoxIfShow.value = true;
 		popupMessage.title = title;
-		popupMessage.name = name;
+		popupMessage.id = id;
+		popupMessage.index = index;
+		console.log(popupMessage)
 	}
-
-	const closeBoxHandler = (judege) => {
-		if (!judege) {
-			//拿ID才能做出判断是那盏灯熄灭
-		}
+	//处理详细控制灯
+	const closeBoxHandler = async (level) => {
 		popupBoxIfShow.value = false;
+		console.log(level);
+		/*
+		const res = await myRequest({
+			url: `Home/GetHomeSession`,
+			method: 'get',
+			data: {
+				homeId: userInfo.homeList[0].id,
+			}
+		});
+		*/
+		uni.switchTab({
+			url: `/pages/home/home`,
+			animationType: 'pop-in',
+			animationDuration: 0
+		});
 	}
 	//添加房间
 	const ifShowAddRoom = ref(false);
@@ -209,6 +227,14 @@
 	onShow(async () => {
 		let userInfo = uni.getStorageSync('smartHome_userInfo');
 		console.log(userInfo)
+		const res = await myRequest({
+			url: `Home/GetHomeSession`,
+			method: 'get',
+			data: {
+				homeId: userInfo.homeList[0].id,
+			}
+		});
+		account.homeTcp = res.data;
 		//获取房间和家具信息
 		const roomInfo = await myRequest({
 			url: `Room/GetRoom`,
@@ -221,10 +247,10 @@
 			userName: userInfo.name,
 			userId: userInfo.id,
 			email: userInfo.email,
-			phoneNumber: userInfo.phone
+			phoneNumber: userInfo.phone,
+			hasImage: userInfo.hasImage
 		});
 		account.homeList = userInfo.homeList;
-		account.homeTcp = userInfo.homeList[0].sessionId; //默认为第一个家庭
 		account.homeSeleted = userInfo.homeList[0].id; //默认为第一个家庭
 		console.log(account.homeList)
 

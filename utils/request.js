@@ -1,4 +1,6 @@
-let baseURL = 'http://47.115.227.63:6600/api/'; //"https://localhost:7140/api/";
+let baseURL = 'http://47.115.227.63:6600/api/';
+//let baseURL = 'https://localhost:7140/api/';
+
 function myRequest(options) {
 	let headers = {}
 	var token = uni.getStorageSync('smartHome_userToken');
