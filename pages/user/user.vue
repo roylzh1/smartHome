@@ -16,8 +16,11 @@
 			<div class="login-btn" @click="loginHandler">{{loginBtn}}</div>
 			<div class="register" @click="LoginOrReg">没有账号?点击注册</div>
 		</view>
-		<card height="500" width="600" v-if="isLogin">
+		<card height="700" width="600" v-if="isLogin">
 			<view class="user-logined">
+				<image class="my-user-img"
+					:src="account.userinfo.hasImage ? `http://47.115.227.63:6600/userImage/${account.userinfo.userName}.jpg`: 'http://47.115.227.63:6600/userImage/deafult.jpg'">
+				</image>
 				<view class="user-name-box">
 					{{account.userinfo.userName}}
 				</view>
@@ -287,5 +290,12 @@
 		height: 130rpx;
 		z-index: 6;
 		overflow: hidden;
+	}
+
+	.my-user-img {
+		margin-top: 20px;
+		height: 80px;
+		width: 80px;
+		border-radius: 50%;
 	}
 </style>

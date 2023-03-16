@@ -19,15 +19,21 @@
 
 <script setup>
 	import {
-		ref
+		inject,
+		onMounted,
+		ref,
+		watch,
 	} from "vue";
 	import myRequest from '/utils/request.js';
+	import {
+		onShow,
+	} from '@dcloudio/uni-app'
 	import {
 		useAccountStore
 	} from '@/store/account.js';
 	const account = useAccountStore();
-	const props = defineProps({
-		type: String,
+	let props = defineProps({
+		type: String, //box大小
 		title: String,
 		open: String,
 		close: String,
@@ -35,10 +41,18 @@
 		photoClose: String,
 		id: Number,
 		index: Number, //家具索引
-		roomId: Number //房间索引
+		roomId: Number, //房间索引
+		state: Boolean,
+		fType: Number, //家具类型
 	});
+
 	const emit = defineEmits(['popup']);
-	let selected = ref(false);
+	let selected = ref(props.state)
+	console.log(selected)
+	watch(() => props.state, (newValue) => {
+		selected.value = newValue;
+	});
+
 	const handleClick = async () => {
 		selected.value = !selected.value;
 		const res = await myRequest({
@@ -46,6 +60,7 @@
 			method: 'get',
 			data: {
 				state: selected.value,
+				furnitureId: props.id,
 				sessionId: account.homeTcp
 			}
 		});
@@ -54,9 +69,12 @@
 	const pressHandler = async () => {
 		if (!selected.value)
 			selected.value = !selected.value;
-
-		emit('popup', props.title, props.id, props.index);
+		console.log(props.type)
+		emit('popup', props.fType, props.title, props.id, props.index);
 	}
+	onShow(() => {
+
+	})
 </script>
 
 <style scoped>

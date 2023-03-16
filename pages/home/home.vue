@@ -1,12 +1,12 @@
 <template>
 	<view class="backGround"></view>
 	<!--模糊-->
-	<view :class="popupBoxIfShow||ifShowAddRoom||ifShowCheckHome == true ? 'backGround-up':''"></view>
+	<view :class="popupBoxIfShow||ifShowAddRoom||ifShowCheckHome || popupFanBoxIfShow == true ? 'backGround-up':''">
+	</view>
 	<view class="page"
-		:style="{height: popupBoxIfShow||ifShowAddRoom||showAddFurniture||showRemoveFurniture||ifShowCheckHome == true ? '90vh':''}">
+		:style="{height: popupBoxIfShow||ifShowAddRoom||showAddFurniture||showRemoveFurniture||ifShowCheckHome|| popupFanBoxIfShow == true ? '90vh':''}">
 		<!-- 导航栏 -->
 		<view class="navBarBox">
-			<!--:style="headerStyle" :style="opacityStyle"-->
 			<view class="backgroundColor" :style="{opacity:opacityStyle.opacity}"></view>
 			<!-- 导航栏内容 -->
 			<view class="navBar">
@@ -21,7 +21,7 @@
 			<view class="topNaviagtion">
 				<top-navigation @popupNav="globalControlHandler"></top-navigation>
 			</view>
-			<view class="room" v-for="(r,index) in roomList" :key="index">
+			<view class="room" v-for="(r,index) in roomList" :key="r.id">
 				<view class="roomDetials">
 					<view class="r-navBar" @click="addOrRemoveHandler(r.id,r.name,index)">
 						<h3 class="r-title">{{r.name}}</h3>
@@ -31,11 +31,13 @@
 						</change-furniture>
 					</view>
 					<view class="gridBox">
-						<view v-for="(item,i) in r.furnitures"
+						<view v-for="(item,i) in r.furnitures" :key="item.id"
 							:style="{gridRowStart: item.type == 'middle' ? `span 2` : 'span 1'}">
 							<small-box @popup="popupHandler" v-if="item.type !='middle'" :title="item.title"
 								:open="item.open" :close="item.close" :photoClose="item.photoClose"
-								:photoOpen="item.photoOpen" :id="item.id" :roomId="index"></small-box>
+								:photoOpen="item.photoOpen" :id="item.id" :state="item.state" :roomId="index"
+								:fType="item.fType">
+							</small-box>
 							<middle-box @popup="popupHandler" v-if="item.type == 'middle'" class="item"
 								:title="item.title" :open="item.open" :close="item.close" :photoClose="item.photoClose"
 								:photoOpen="item.photoOpen">
@@ -47,9 +49,13 @@
 		</view>
 		<tab-bar selected="0"></tab-bar>
 		<popup-light-box @touchmove.stop.prevent :title="popupMessage.title" :index="popupMessage.index"
-			v-show="popupBoxIfShow" :class="popupBoxIfShow == true ? 'content-fade-up-animation' : ''"
-			@lightComplete="closeBoxHandler">
+			v-show="popupLightBoxIfShow" :class="popupLightBoxIfShow == true ? 'content-fade-up-animation' : ''"
+			@lightComplete="closeLightBoxHandler">
 		</popup-light-box>
+		<popup-fan @touchmove.stop.prevent :title="popupMessage.title" :index="popupMessage.index"
+			v-show="popupFanBoxIfShow" :class="popupFanBoxIfShow == true ? 'content-fade-up-animation' : ''"
+			@lightComplete="closeFanBoxHandler">
+		</popup-fan>
 		<add-new-room v-show="ifShowAddRoom" :class="ifShowAddRoom == true ? 'content-fade-up' : ''"
 			@addRoomComplete="closeAddRoomBoxHandler"></add-new-room>
 
@@ -72,12 +78,14 @@
 		onUnmounted,
 		reactive,
 		ref,
-		nextTick
+		nextTick,
+		provide
 	} from 'vue';
 	import tabBar from '/components/tabBar.vue'
 	import room from '/components/room.vue'
 	import topNavigation from '/components/topNaviagtion.vue'
 	import popupLightBox from '/components/popupLightBox.vue'
+	import popupFan from '/components/popupFan.vue'
 	import addNewRoom from '/components/addNewRoom.vue'
 	import checkHome from '/components/checkHome.vue'
 	import changeFurniture from '/components/changeFurniture.vue';
@@ -92,8 +100,7 @@
 	const account = useAccountStore();
 	let roomList = ref([]);
 	let showRoom = ref(true);
-	//普通弹窗
-	let popupBoxIfShow = ref(false);
+
 	//弹窗信息注入
 	let popupMessage = reactive({
 		title: '',
@@ -103,27 +110,57 @@
 	let opacityStyle = reactive({
 		opacity: 0
 	});
+	//普通弹窗
+	const popupLightBoxIfShow = ref(false);
+	const popupFanBoxIfShow = ref(false);
 	//基础家具弹窗
-	const popupHandler = (title, id, index) => {
-		popupBoxIfShow.value = true;
+	const popupHandler = (type, title, id, index) => {
+		//灯
+		if (type == 0 || type == 1) {
+			popupLightBoxIfShow.value = true;
+		}
+		//风扇
+		if (type == 2) {
+			popupFanBoxIfShow.value = true;
+		}
 		popupMessage.title = title;
 		popupMessage.id = id;
 		popupMessage.index = index;
 		console.log(popupMessage)
 	}
-	//处理详细控制灯
-	const closeBoxHandler = async (level) => {
-		popupBoxIfShow.value = false;
+	//处理详细控制灯,风扇
+	const closeLightBoxHandler = async (level) => {
+		popupLightBoxIfShow.value = false;
 		console.log(level);
-		/*
 		const res = await myRequest({
-			url: `Home/GetHomeSession`,
+			url: `Tcp/ChangeLightIntensity`,
 			method: 'get',
 			data: {
-				homeId: userInfo.homeList[0].id,
+				lightId: popupMessage.id,
+				level,
+				sessionId: account.homeTcp
 			}
 		});
-		*/
+		console.log(res);
+		uni.switchTab({
+			url: `/pages/home/home`,
+			animationType: 'pop-in',
+			animationDuration: 0
+		});
+	}
+	const closeFanBoxHandler = async (level) => {
+		popupFanBoxIfShow.value = false;
+		console.log(level);
+		const res = await myRequest({
+			url: `Tcp/ChangeWindSpeed`,
+			method: 'get',
+			data: {
+				lightId: popupMessage.id,
+				level,
+				sessionId: account.homeTcp
+			}
+		});
+		console.log(res);
 		uni.switchTab({
 			url: `/pages/home/home`,
 			animationType: 'pop-in',
@@ -243,6 +280,7 @@
 				homeId: account.homeSeleted,
 			}
 		});
+		console.log(roomInfo)
 		account.changeUserInfo({
 			userName: userInfo.name,
 			userId: userInfo.id,
@@ -252,9 +290,7 @@
 		});
 		account.homeList = userInfo.homeList;
 		account.homeSeleted = userInfo.homeList[0].id; //默认为第一个家庭
-		console.log(account.homeList)
-
-
+		//console.log(account.homeList)
 		roomList.value = [];
 		account.airConditionCount = 0;
 		account.roomList = roomInfo.data;
@@ -274,7 +310,9 @@
 					close: "已关",
 					photoClose: `/static/images/${f.type}.png`,
 					photoOpen: `/static/images/${f.type}-light.png`,
-					id: f.id
+					id: f.id,
+					state: f.state,
+					fType: f.type
 				});
 			}
 			roomList.value[i].furnitures = tempFurnitures;
@@ -286,7 +324,7 @@
 			showRoom.value = true;
 		})
 
-		console.log(roomList.value)
+		console.log(account.roomList)
 	})
 
 	//导航栏渐变

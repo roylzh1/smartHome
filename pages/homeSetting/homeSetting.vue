@@ -64,7 +64,7 @@
 						</view>
 					</view>
 					<view class="home-box-name" style="margin-top: 30rpx;">
-						家庭
+						其他家
 					</view>
 					<view class="home-box-userName">
 						<view class="home-userName" v-for="home in otherHome">
