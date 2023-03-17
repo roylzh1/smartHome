@@ -52,9 +52,9 @@
 				console.log('chooseImage-----》》》》》》》》', res);
 
 				console.log(res.tempFiles, 'beforre--------');
-				if (res.tempFiles[0]['size'] > 20 * 1024 * 1024) {
+				if (res.tempFiles[0]['size'] > 10 * 1024 * 1024) {
 					uni.showToast({
-						title: '图片大小不能超过20M',
+						title: '图片大小不能超过10M',
 						icon: 'none',
 						duration: 3000
 					});
@@ -65,7 +65,7 @@
 					title: '上传中...'
 				})
 
-				if (res.tempFiles[0]['size'] < 5 * 1024 * 1024) { //图片小于5M不压缩，大于5M压缩
+				if (res.tempFiles[0]['size'] < 0.5 * 1024 * 1024) { //图片小于.5M不压缩，大于5M压缩
 					uploadImgFile(res.tempFilePaths[0])
 				} else {
 					uni.compressImage({

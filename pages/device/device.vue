@@ -16,7 +16,7 @@
 	import globalAirCondition from '/components/globalAirCondition.vue'
 	import {
 		onMounted,
-		ref
+		ref,
 	} from "vue";
 	import myRequest from '/utils/request.js';
 	import {

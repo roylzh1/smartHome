@@ -15,7 +15,8 @@
 					</view>
 					<view class="air-open">
 						<view class="temperatureBox" :style="{color: isCold? '#1296db':'#1afa29'}">
-							26°C</view>
+							{{temperatureValue}}°C
+						</view>
 						<view class="temperature-text">
 							<image @click="temperatureHandler(0)" class="tempLogo" src="/static/images/tempDown.png">
 							</image>
@@ -41,23 +42,39 @@
 	import card from '/components/card.vue';
 	import {
 		ref,
-		reactive
+		reactive,
+		watch,
 	} from "vue";
-	const temperatureValue = ref(26);
-	const imageSrc = ref('/static/images/center-airconditioner.png');
+	import myRequest from '/utils/request.js';
+	import {
+		useAccountStore
+	} from '@/store/account.js';
+	const account = useAccountStore();
+	const airConditionList = ref(account.airList);
+	watch(() => account.airList, (newValue) => {
+		airConditionList.value = newValue;
+	});
+	//平均温度
+	const avgTemperature = airConditionList.value.map(air => air.tempreture).reduce((pre, cur) =>
+		pre + cur
+	) / airConditionList.value.length;
+	console.log(avgTemperature)
+	const temperatureValue = ref(avgTemperature.toFixed(0));
+	const imageSrc = ref('/static/images/center-airconditioner.png'); //开关机图片
 	const vLevel = ref(0);
 	const vSrc = ref(`/static/images/v0.png`);
 	const modeSrc = ref('/static/images/cold.png');
 	const isCold = ref(true);
 	const ifAirOpen = ref(false);
 	const airStatus = ref('关闭');
-	const level = ref(1);
+	const level = ref(1); //开关
 	const popupBoxIfShow = ref(false);
 	let popupMessage = reactive({
 		title: '',
 		temperature: '',
 		wind: ''
 	});
+	//控制开关
 	const openAirHandler = () => {
 		ifAirOpen.value = !ifAirOpen.value;
 		if (ifAirOpen.value) {
@@ -79,25 +96,7 @@
 		}
 
 	};
-	const airHandler = () => {
-		ifAirOpen.value = !ifAirOpen.value;
-		if (ifAirOpen.value) {
-			airStatus.value = '开启中';
-			if (isCold.value)
-				imageSrc.value = '/static/images/center-airconditioner-open.png';
-			else
-				imageSrc.value = '/static/images/center-airconditioner-open-hot.png';
-			level.value = 0;
-		} else {
-			airStatus.value = '关闭';
-			if (isCold.value)
-				imageSrc.value = '/static/images/center-airconditioner.png';
-			else
-				imageSrc.value = '/static/images/center-airconditioner-hot.png';
-			level.value = 1;
-		}
 
-	};
 	const temperatureHandler = type => {
 		if (type === 0) {
 			if (temperatureValue.value > 16) {

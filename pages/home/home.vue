@@ -63,7 +63,8 @@
 			:name="whichRoom" :roomId="roomId" :homeId="account.homeSeleted" @addRoomComplete="closeFurnitureHandler">
 		</add-furniture>
 		<remove-furniture v-show="showRemoveFurniture" :class="showRemoveFurniture == true ? 'content-fade-up' : ''"
-			:name="whichRoom" @addRoomComplete="closeFurnitureHandler"></remove-furniture>
+			:name="whichRoom" :roomId="roomId" :homeId="account.homeSeleted" @addRoomComplete="closeFurnitureHandler">
+		</remove-furniture>
 	</view>
 </template>
 
@@ -258,12 +259,12 @@
 		uni.hideTabBar({
 			animation: false
 		});
-
 	});
 
 	onShow(async () => {
 		let userInfo = uni.getStorageSync('smartHome_userInfo');
 		console.log(userInfo)
+		//更新会话号
 		const res = await myRequest({
 			url: `Home/GetHomeSession`,
 			method: 'get',
@@ -292,7 +293,9 @@
 		account.homeSeleted = userInfo.homeList[0].id; //默认为第一个家庭
 		//console.log(account.homeList)
 		roomList.value = [];
-		account.airConditionCount = 0;
+		account.airList = [];
+		account.lightList = [];
+		account.airConditionCount = 0; //空调数量
 		account.roomList = roomInfo.data;
 		roomList.value = roomInfo.data;
 		let tempFurnitures = [];
@@ -301,6 +304,15 @@
 				let f = roomList.value[i].furnitures[j];
 				if (f.type == 4) {
 					account.airConditionCount += 1;
+					account.airList.push({
+						roomId: roomList.value[i].id,
+						roomName: roomList.value[i].name,
+						title: f.name,
+						id: f.id,
+						state: f.state,
+						mode: f.mode,
+						tempreture: f.tempreture,
+					})
 					continue;
 				} //不显示空调
 				tempFurnitures.push({
@@ -324,7 +336,8 @@
 			showRoom.value = true;
 		})
 
-		console.log(account.roomList)
+		//console.log(account.roomList)
+		console.log(account.airList)
 	})
 
 	//导航栏渐变

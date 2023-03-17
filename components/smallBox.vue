@@ -48,7 +48,7 @@
 
 	const emit = defineEmits(['popup']);
 	let selected = ref(props.state)
-	console.log(selected)
+	//console.log(selected)
 	watch(() => props.state, (newValue) => {
 		selected.value = newValue;
 	});

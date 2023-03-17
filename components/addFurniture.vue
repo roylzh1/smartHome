@@ -37,14 +37,14 @@
 		if (res.statusCode == 400)
 			uni.showToast({
 				title: '添加家具失败',
-				icon: 'none', //如果要纯文本，不要icon，将值设为'none'
-				duration: 2000 //持续时间为 2秒
+				icon: 'none',
+				duration: 2000
 			})
 		else
 			uni.showToast({
 				title: '添加家具成功',
-				icon: 'success', //将值设置为 success 或者 ''
-				duration: 2000 //持续时间为 2秒
+				icon: 'success',
+				duration: 2000
 			})
 		console.log(res)
 		emit('addRoomComplete');
