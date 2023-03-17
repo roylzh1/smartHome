@@ -7,29 +7,16 @@
 					<view class="air-status">
 						<image @click="openAirHandler" class="air-status-logo" :src="imageSrc"
 							:style="{filter: `grayscale(${level}) brightness(${level+1})`}"></image>
-						<view class="air-status-text"
-							:style="{color: ifAirOpen == true ?`rgba(240,214,105,1)` : `#c8c8c8`}">开启
+						<view class="air-status-text" :style="{color: ifAirOpen == true ?`#fff` : `#c8c8c8`}">
+							{{airStatus}}
 						</view>
-						<view class="air-status-text-num"
-							:style="{color: ifAirOpen == true ?`rgba(240,214,105,1)` : `#c8c8c8`}">1台</view>
+						<view class="air-status-text-num" :style="{color: ifAirOpen == true ?`#fff` : `#c8c8c8`}">
+							{{num}}台
+						</view>
 					</view>
 					<view class="air-open">
 						<view class="temperatureBox" :style="{color: isCold? '#1296db':'#1afa29'}">
-							{{temperatureValue}}°C
-						</view>
-						<view class="temperature-text">
-							<image @click="temperatureHandler(0)" class="tempLogo" src="/static/images/tempDown.png">
-							</image>
-							<image @click="temperatureHandler(1)" class="tempLogo" src="/static/images/tempUp.png">
-							</image>
-						</view>
-					</view>
-					<view class="vChange">
-						<view @click="vHandler" class="temperatureBox">
-							<image :src="vSrc" class="vLogo"></image>
-						</view>
-						<view @click="modeHandler" class="temperatureBox">
-							<image :src="modeSrc" class="vLogo"></image>
+							{{avgTemperature}}°C
 						</view>
 					</view>
 				</view>
@@ -44,6 +31,7 @@
 		ref,
 		reactive,
 		watch,
+		computed,
 	} from "vue";
 	import myRequest from '/utils/request.js';
 	import {
@@ -51,23 +39,58 @@
 	} from '@/store/account.js';
 	const account = useAccountStore();
 	const airConditionList = ref(account.airList);
+	const avgTemperature = ref(); //平均温度
+	const temp = (airConditionList.value.map(air => air.tempreture).reduce((pre, cur) =>
+		pre + cur
+	) / airConditionList.value.length).toFixed(0);
+	avgTemperature.value = temp;
+	const isCold = ref(null);
+	console.log(airConditionList.value[0])
+	if (airConditionList.value[0].mode == 1) { //暖风
+		isCold.value = false;
+	} else {
+		isCold.value = true;
+	}
+	const airStatus = ref('关闭');
+	const ifAirOpen = ref(false);
+	const imageSrc = ref('/static/images/center-airconditioner.png'); //开关机图片
+	const num = ref(0);
+	const level = ref(1); //开关样式设置
+	airConditionList.value.forEach(air => {
+		if (air.state == true) {
+			airStatus.value = '开启';
+			ifAirOpen.value = true;
+			num.value++;
+		}
+	});
+	//空调图标
+	if (ifAirOpen.value == true && isCold.value == true)
+		imageSrc.value = '/static/images/center-airconditioner-open.png'
+	else if (ifAirOpen.value == true && isCold.value == false)
+		imageSrc.value = '/static/images/center-airconditioner-open-hot.png'
+	else
+		imageSrc.value = '/static/images/center-airconditioner.png';
+
 	watch(() => account.airList, (newValue) => {
 		airConditionList.value = newValue;
+		//重置平均温度
+		avgTemperature.value = (airConditionList.value.map(air => air.tempreture).reduce((pre, cur) =>
+			pre + cur
+		) / airConditionList.value.length).toFixed(0);
+		//重置冷暖
+		if (airConditionList.value[0].mode == 1) { //暖风
+			isCold.value = false;
+		} else {
+			isCold.value = true;
+		}
+		//重置开关
+		airStatus.value = '关闭';
+		num.value = 0;
+		airConditionList.value.forEach(air => {
+			if (air.state == true) airStatus.value = '开启';
+		});
 	});
-	//平均温度
-	const avgTemperature = airConditionList.value.map(air => air.tempreture).reduce((pre, cur) =>
-		pre + cur
-	) / airConditionList.value.length;
-	console.log(avgTemperature)
-	const temperatureValue = ref(avgTemperature.toFixed(0));
-	const imageSrc = ref('/static/images/center-airconditioner.png'); //开关机图片
-	const vLevel = ref(0);
-	const vSrc = ref(`/static/images/v0.png`);
-	const modeSrc = ref('/static/images/cold.png');
-	const isCold = ref(true);
-	const ifAirOpen = ref(false);
-	const airStatus = ref('关闭');
-	const level = ref(1); //开关
+
 	const popupBoxIfShow = ref(false);
 	let popupMessage = reactive({
 		title: '',
@@ -75,7 +98,7 @@
 		wind: ''
 	});
 	//控制开关
-	const openAirHandler = () => {
+	const openAirHandler = async () => {
 		ifAirOpen.value = !ifAirOpen.value;
 		if (ifAirOpen.value) {
 			airStatus.value = '开启中';
@@ -84,7 +107,17 @@
 			else
 				imageSrc.value = '/static/images/center-airconditioner-open-hot.png';
 			level.value = 0;
-			//livingRoom.forEach(item=>{item.status=true});//全局控制
+			num.value = airConditionList.value.length;
+			/*
+			const res = await myRequest({
+				url: `Room/GetRoom`,
+				method: 'get',
+				data: {
+					
+				}
+			});
+			if (res.data.status == 400) return;
+			*/
 		} else {
 			airStatus.value = '关闭';
 			if (isCold.value)
@@ -92,58 +125,8 @@
 			else
 				imageSrc.value = '/static/images/center-airconditioner-hot.png';
 			level.value = 1;
-			//livingRoom.forEach(item=>item.status=false);
-		}
+			num.value = 0;
 
-	};
-
-	const temperatureHandler = type => {
-		if (type === 0) {
-			if (temperatureValue.value > 16) {
-				--temperatureValue.value;
-				//livingRoom.forEach(item=>item.temperature = temperatureValue.value.toString());
-			}
-		} else {
-			if (temperatureValue.value < 32) {
-				++temperatureValue.value;
-				//livingRoom.forEach(item=>item.temperature = temperatureValue.value.toString());
-			}
-		}
-	};
-	const vHandler = () => {
-		if (vLevel.value < 3) {
-			vLevel.value++;
-			if (isCold.value)
-				vSrc.value = `/static/images/v${vLevel.value}.png`;
-			else
-				vSrc.value = `/static/images/v${vLevel.value}-hot.png`;
-			//livingRoom.forEach(item=>item.wind = vLevel.value.toString());//统一
-		} else {
-			vLevel.value = 0;
-			if (isCold.value)
-				vSrc.value = `/static/images/v${vLevel.value}.png`;
-			else
-				vSrc.value = `/static/images/v${vLevel.value}-hot.png`;
-			//livingRoom.forEach(item=>item.wind = "0");//统一
-		}
-	}
-	const modeHandler = () => {
-		if (isCold.value) {
-			isCold.value = !isCold.value;
-			modeSrc.value = `/static/images/hot.png`;
-			vSrc.value = `/static/images/v${vLevel.value}-hot.png`;
-			if (ifAirOpen.value)
-				imageSrc.value = '/static/images/center-airconditioner-open-hot.png';
-			else
-				imageSrc.value = '/static/images/center-airconditioner-hot.png';
-		} else {
-			isCold.value = !isCold.value;
-			modeSrc.value = `/static/images/cold.png`;
-			vSrc.value = `/static/images/v${vLevel.value}.png`;
-			if (ifAirOpen.value)
-				imageSrc.value = '/static/images/center-airconditioner-open.png';
-			else
-				imageSrc.value = '/static/images/center-airconditioner.png';
 		}
 	};
 </script>
@@ -206,46 +189,17 @@
 		display: flex;
 		justify-content: center;
 		align-items: center;
-		height: 80rpx;
-		width: 80rpx;
+		height: 90rpx;
+		width: 90rpx;
 		margin-top: 20rpx;
 		transition: .2s;
 		background-color: #ffffff;
 		color: rgba(0, 0, 0, .8);
-		font-size: 25rpx;
+		font-size: 30rpx;
 		font-weight: 600;
 		border-radius: 50%;
 	}
 
-	.temperature-text {
-		margin-top: 20rpx;
-		display: flex;
-		justify-content: center;
-	}
-
-	.tempLogo {
-		height: 60rpx;
-		width: 60rpx;
-		margin-top: 20rpx;
-		margin-left: 10rpx;
-		margin-right: 10rpx;
-	}
-
-	.vChange {
-		display: flex;
-		flex-direction: column;
-		align-items: center;
-		height: 230rpx;
-		width: 100rpx;
-		margin-left: 30rpx;
-		margin-right: 10rpx;
-		margin-top: 15rpx;
-	}
-
-	.vLogo {
-		height: 60rpx;
-		width: 60rpx;
-	}
 
 	.content-fade-up-animation {
 		animation-duration: .2s;
