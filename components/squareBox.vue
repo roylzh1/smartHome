@@ -8,10 +8,16 @@
 				</view>
 			</view>
 			<view class="statusBox1">
-				<view class="title1" :style="{color: props.status == true ?`rgba(0,0,0,1)` : `#ffffff`}">{{title}}</view>
+				<view class="status2" :style="{color: props.status == true ?`rgba(0,0,0,1)` : `#ffffff`}">
+					<view class="">
+						风速: {{props.wind}}
+					</view>
+					<view class="air-mode">
+						模式: 除湿
+					</view>
+				</view>
 				<view class="status1">{{props.status ? open : close}}</view>
 			</view>
-
 		</view>
 	</view>
 </template>
@@ -20,6 +26,14 @@
 	import {
 		ref,
 	} from "vue";
+	import {
+		onShow
+	} from '@dcloudio/uni-app';
+	import myRequest from '/utils/request.js';
+	import {
+		useAccountStore
+	} from '@/store/account.js'
+	const account = useAccountStore();
 	const props = defineProps({
 		title: String,
 		open: String,
@@ -27,17 +41,15 @@
 		temperature: String,
 		isCold: String,
 		status: Boolean,
-		wind: String
+		wind: String,
+		index: Number
 	});
-	const emit = defineEmits(['popup','checkStatus']);
+	const emit = defineEmits(['popup', 'checkStatus']);
+	const windName = ref(null);
 
 	const handleClick = () => {
-		emit('checkStatus',!props.status,props.title);
+		emit('popup', props.index);
 	}
-	const pressHandler = () => {
-		emit('popup', props.title, props.temperature,props.wind);
-	}
-	
 </script>
 
 <style scoped>
@@ -76,17 +88,32 @@
 	.status1 {
 		height: 30rpx;
 		width: 80rpx;
-		margin-left: 20rpx;
-		padding-top: 20rpx;
-		margin-bottom: 20rpx;
-		color: #8a8a8a;
+		margin-bottom: 20px;
 		font-weight: 600;
 		z-index: 3;
 		transition: 0.5s;
 	}
 
 	.statusBox1 {
-		margin-bottom: 5rpx;
+		display: flex;
+		justify-content: space-between;
+		align-items: center;
+		margin-bottom: 20px;
+	}
+
+	.status2 {
+		height: 30rpx;
+		width: 80px;
+		font-size: 14px;
+		margin-top: -20px;
+		margin-left: 10px;
+		font-weight: 600;
+		z-index: 3;
+		transition: 0.5s;
+	}
+
+	.air-mode {
+		margin-top: 10px;
 	}
 
 	.thing-content1 {

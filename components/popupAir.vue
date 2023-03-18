@@ -98,7 +98,8 @@
 		temperture: String,
 		mode: Number,
 		airStatus: String,
-		idList: Array,
+		id: String,
+		index: Number
 	});
 	const mode = ref(null);
 	const modeNum = ref(null);
@@ -110,7 +111,7 @@
 	const openBoxClass = ref(null);
 	const state = ref(null);
 
-	const emit = defineEmits(['airGlobalComplete']);
+	const emit = defineEmits(['airComplete']);
 	onShow(() => {
 		if (props.mode == 0) {
 			mode.value = '制冷';
@@ -123,7 +124,7 @@
 			modeNum.value = 2;
 		}
 		temperture.value = props.temperture;
-		if (props.airStatus == '开启') {
+		if (props.airStatus == true) {
 			switchSrc.value = '/static/images/switch-open.png';
 			openClass.value = 'openImage-box-open';
 			openBoxClass.value = 'open-open';
@@ -188,11 +189,12 @@
 	}
 	//完成
 	const complete = async () => {
+
 		const res = await myRequest({
-			url: `Tcp/GlobalChangeAirCondition`,
+			url: `Tcp/ChangeAirCondition`,
 			method: 'post',
 			data: {
-				"airConditionId": props.idList,
+				"airConditionId": props.id,
 				"state": state.value,
 				"mode": modeNum.value,
 				"temperature": temperture.value,
@@ -200,14 +202,17 @@
 				"sessionId": account.homeTcp
 			}
 		});
-		for (let i = 0; i < account.airList.length; i++) {
-			account.airList[i].state = state.value;
-			account.airList[i].mode = modeNum.value;
-			account.airList[i].level = levelNum.value;
-			account.airList[i].tempreture = temperture.value;
-		}
+		account.airList[props.index].state = state.value;
+		account.airList[props.index].mode = modeNum.value;
+		account.airList[props.index].level = levelNum.value;
+		account.airList[props.index].tempreture = temperture.value;
+		emit('airComplete');
+		uni.navigateTo({
+			url: `/pages/airConditioner/airConditioner`,
+			animationType: 'pop-in',
+			animationDuration: 0
+		});
 
-		emit('airGlobalComplete');
 	};
 </script>
 
@@ -255,7 +260,6 @@
 		margin-bottom: 1px;
 		height: 20px;
 		width: 20px;
-
 	}
 
 	.open-text {

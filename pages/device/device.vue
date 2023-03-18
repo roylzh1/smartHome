@@ -5,19 +5,19 @@
 		<h1 class="title">管理设备</h1>
 		<view class="room">
 			<view class="centerControl" v-show="hasAirCondition">
-				<h3 class="g-title">智能中控</h3>
-				<card @click="clickAirCondition">
+				<h3 class="g-title">智能暖通中控</h3>
+				<card @click="clickAirCondition" @longpress="longPressAirHandler">
 					<template #default>
 						<view class="box">
 							<view class="air-status">
-								<image @click="openAirHandler" class="air-status-logo" :src="imageSrc"
+								<image class="air-status-logo" :src="imageSrc"
 									:style="{filter: `grayscale(${level}) brightness(${level+1})`}"></image>
 								<view class="air-status-text" :style="{color: ifAirOpen == true ?`#fff` : `#c8c8c8`}">
 									{{airStatus}}
 								</view>
 								<view class="air-status-text-num"
 									:style="{color: ifAirOpen == true ?`#fff` : `#c8c8c8`}">
-									{{num}}台
+									{{num}}台 开启
 								</view>
 							</view>
 							<view class="air-open">
@@ -28,12 +28,24 @@
 						</view>
 					</template>
 				</card>
-
-
+				<h3 class="g-title">智能灯光中控</h3>
+				<card>
+					<template #default>
+						<view class="light-box">
+							<view class="slider" @click="openLight">
+								<view :class="lightClass" class="slider-thumb"></view>
+							</view>
+							<view class="light-text">
+								亮着 {{lightNum}} 盏
+							</view>
+						</view>
+					</template>
+				</card>
 			</view>
 		</view>
-		<popup-global-air v-if="popupAirIfShow" @airGlobalComplete="closeAirHandler" title="空调中控" :temperture="26"
-			:idList="airConditionIdList" airStatus="开启" :mode="0">
+		<popup-global-air v-if="popupAirIfShow" @airGlobalComplete="closeAirHandler" title="空调中控"
+			:temperture="avgTemperature" :idList="airConditionIdList" :airStatus="airStatus"
+			:mode="account.airList[0].mode" :class="popupAirIfShow == true ? 'content-fade-up-animation' : ''">
 		</popup-global-air>
 		<tab-bar selected="2"></tab-bar>
 	</view>
@@ -56,33 +68,37 @@
 		useAccountStore
 	} from '@/store/account.js';
 	const account = useAccountStore();
-	const popupAirIfShow = ref(true) //空调全局弹窗
+	const popupAirIfShow = ref(false) //空调全局弹窗
 	const hasAirCondition = ref(true); //是否显示空调
 	const avgTemperature = ref(null); //平均温度
 	const isCold = ref(null);
 	const airStatus = ref('关闭');
-	const ifAirOpen = ref(false); //判断是否开启
+	const ifAirOpen = ref(null); //判断是否开启
 	const imageSrc = ref('/static/images/center-airconditioner.png'); //开关机图片
 	const num = ref(0);
 	const level = ref(1); //开关样式设置
 	let airConditionIdList = ref([]); //所有空调的id
+	//-----------------灯光------------------------
+	const lightOpen = ref(null);
+	const lightClass = ref('');
+	const lightNum = ref(null);
 	onShow(async () => {
 		console.log(account.airList);
 		if (account.airConditionCount != 0) {
 			hasAirCondition.value = true;
 			//重置开关
-			num.value = account.airConditionCount;
-			if (num.value != 0) {
-				airStatus.value = '开启';
-				ifAirOpen.value = true;
-				level.value = 0;
-			} else {
-				airStatus.value = '关闭';
-			}
+			airStatus.value = '关闭';
+			ifAirOpen.value = false;
 			airConditionIdList.value = [];
+			num.value = 0;
 			account.airList.forEach(air => {
 				airConditionIdList.value.push(air.id);
-				if (air.state == true) airStatus.value = '开启';
+				if (air.state == true) {
+					airStatus.value = '开启';
+					ifAirOpen.value = true;
+					level.value = 0;
+					num.value++;
+				}
 			});
 			avgTemperature.value = (account.airList.map(air => air.tempreture).reduce((pre, cur) =>
 				pre + cur
@@ -97,11 +113,25 @@
 				imageSrc.value = '/static/images/center-airconditioner-open.png'
 			else if (ifAirOpen.value == true && isCold.value == false)
 				imageSrc.value = '/static/images/center-airconditioner-open-hot.png'
-			else
+			else {
 				imageSrc.value = '/static/images/center-airconditioner.png'
-
+				level.value = 1;
+			}
 
 		}
+		lightNum.value = 0;
+		lightOpen.value = false;
+		account.lightList.forEach(light => {
+			if (light.state) {
+				lightOpen.value = true;
+				lightNum.value++;
+			}
+		})
+		if (lightOpen.value)
+			lightClass.value = 'slider-on';
+		else
+			lightClass.value = 'slider-off';
+
 	})
 	//点击空调
 	const clickAirCondition = async () => {
@@ -110,8 +140,83 @@
 	}
 	const closeAirHandler = () => {
 		popupAirIfShow.value = false;
-	}
+		if (account.airConditionCount != 0) {
+			hasAirCondition.value = true;
+			//重置开关
+			airStatus.value = '关闭';
+			ifAirOpen.value = false;
+			airConditionIdList.value = [];
+			num.value = 0;
+			account.airList.forEach(air => {
+				airConditionIdList.value.push(air.id);
+				if (air.state == true) {
+					airStatus.value = '开启';
+					ifAirOpen.value = true;
+					level.value = 0;
+					num.value++;
+				}
+			});
+			avgTemperature.value = 0;
+			console.log(account.airList)
+			let arr = account.airList.map(air => air.tempreture);
+			arr.forEach(temp => {
+				avgTemperature.value += (temp * 1);
+			})
+			avgTemperature.value = (avgTemperature.value / account.airList.length).toFixed(0);
+			if (account.airList[0].mode == 1) { //暖风
+				isCold.value = false;
+			} else {
+				isCold.value = true;
+			}
+			//空调图标
+			if (ifAirOpen.value == true && isCold.value == true)
+				imageSrc.value = '/static/images/center-airconditioner-open.png'
+			else if (ifAirOpen.value == true && isCold.value == false)
+				imageSrc.value = '/static/images/center-airconditioner-open-hot.png'
+			else {
+				imageSrc.value = '/static/images/center-airconditioner.png'
+				level.value = 1;
+			}
 
+		}
+	}
+	const longPressAirHandler = () => {
+		uni.navigateTo({
+			url: `/pages/airConditioner/airConditioner`,
+			animationType: 'pop-in',
+			animationDuration: 500
+		});
+	}
+	//灯光开关
+	const openLight = async () => {
+		lightOpen.value = !lightOpen.value;
+		if (lightOpen.value) {
+			lightClass.value = 'slider-on';
+			lightNum.value = account.lightList.length;
+			const res = await myRequest({
+				url: `Tcp/GlobalChangeLight`,
+				method: 'post',
+				data: {
+					"lightId": account.lightList.map(light => light.id),
+					"state": true,
+					"sessionId": account.homeTcp
+				}
+			});
+		} else {
+			lightClass.value = 'slider-off';
+			lightNum.value = 0;
+			const res = await myRequest({
+				url: `Tcp/GlobalChangeLight`,
+				method: 'post',
+				data: {
+					"lightId": account.lightList.map(light => light.id),
+					"state": false,
+					"sessionId": account.homeTcp
+				}
+			});
+		}
+
+	}
 
 	const pressHandler = () => {
 
@@ -147,6 +252,7 @@
 		margin-left: 30rpx;
 		height: 40px;
 		z-index: 2;
+		letter-spacing: 1px;
 		color: #fff;
 	}
 
@@ -161,6 +267,7 @@
 	}
 
 	.g-title {
+		margin-top: 20px;
 		color: #ffffff;
 	}
 
@@ -185,7 +292,10 @@
 	}
 
 	.air-status-text-num {
-		margin-bottom: 10rpx;
+		margin-top: 5px;
+		width: 50px;
+		margin-bottom: 2px;
+		font-size: 13px;
 		transition: 1s;
 	}
 
@@ -224,6 +334,60 @@
 		border-radius: 50%;
 	}
 
+	.light-box {
+		display: flex;
+		flex-wrap: nowrap;
+		flex-direction: column;
+
+	}
+
+	.slider {
+		position: relative;
+		margin-top: 10px;
+		width: 100px;
+		height: 40px;
+		margin-left: 10px;
+		background-color: #e7e7e7;
+		border-radius: 20px;
+		cursor: pointer;
+		box-shadow: inset 3px 3px 4px rgba(0, 0, 0, 0.35),
+			inset -2px -2px 4px rgba(0, 0, 0, 0.25);
+	}
+
+	.slider-thumb {
+		position: absolute;
+		top: 50%;
+		left: 0;
+		transform: translateY(-50%);
+		width: 40px;
+		height: 40px;
+		box-shadow: 3px 3px 5px rgba(0, 0, 0, 0.4);
+		border-radius: 50%;
+		transition: transform 0.3s ease, background 0.5s ease-in-out;
+	}
+
+	.slider-on {
+		background: linear-gradient(to bottom right, rgba(240, 214, 105, 1) 0%, rgba(240, 214, 105, .8) 50%, rgba(240, 214, 105, .6) 100%);
+		transform: translate(60px, -50%);
+		transition: transform 0.3s ease, background 0.5s ease-in-out;
+	}
+
+	.slider-off {
+		transform: translate(0, -50%);
+		background: linear-gradient(to bottom right, rgba(255, 255, 255, 1) 0%, rgba(255, 255, 255, 0.5) 50%, rgba(229, 229, 229, 0) 100%);
+		transition: transform 0.3s ease, background 0.5s ease-in-out;
+	}
+
+	.light-text {
+		font-weight: 700;
+		margin-top: 35px;
+		margin-left: 20px;
+		transition: 1s;
+		color: #fff;
+	}
+
+
+
 	.backGround {
 		height: 100vh;
 		width: 100%;
@@ -247,13 +411,6 @@
 		backdrop-filter: blur(3px);
 		-webkit-transform: scale(1);
 		z-index: 7;
-	}
-
-	.content-fade-up {
-		animation-duration: .2s;
-		animation-name: fadeInUp1;
-		animation-timing-function: cubic-bezier(0.280, 0.840, 0.420, 1);
-		-webkit-animation-fill-mode: backwards;
 	}
 
 	.content-fade-up-animation {
@@ -283,16 +440,6 @@
 
 		to {
 			transform: translateY(0);
-		}
-	}
-
-	@keyframes fadeInUp1 {
-		from {
-			height: 0vh;
-		}
-
-		to {
-			height: 35vh;
 		}
 	}
 </style>

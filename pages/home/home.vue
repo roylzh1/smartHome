@@ -313,10 +313,20 @@
 							title: f.name,
 							id: f.id,
 							state: f.state,
+							level: f.level,
 							mode: f.mode,
 							tempreture: f.tempreture,
 						})
 						continue;
+					} //不显示空调
+					if (f.type == 0 || f.type == 1) {
+						account.lightList.push({
+							roomId: roomList.value[i].id,
+							roomName: roomList.value[i].name,
+							title: f.name,
+							id: f.id,
+							state: f.state
+						})
 					} //不显示空调
 					tempFurnitures.push({
 						type: f.size,
