@@ -23,25 +23,57 @@
 					开关
 				</view>
 			</view>
-			<view class="temperture">
+			<view class="function-box">
 				<view class="temperture-title">
 					温度调节 16°C-32°C
 				</view>
 				<view class="temperture-btn">
-					<view class="temperture-add">
+					<view class="temperture-add" @click="changeTemperture(1)">
 						<view style="margin-left: 20px; margin-bottom: 2px;">
 							+
 						</view>
 
 					</view>
-					<view class="temperture-sub">
+					<view class="temperture-sub" @click="changeTemperture(0)">
 						<view style="margin-right: 20px;">
 							-
 						</view>
 
 					</view>
 				</view>
+				<view class="mode-title">
+					模式
+				</view>
+				<view class="mode">
+					<div class="mode-btn" @click="clickModeBtn(0)" :class="modeNum===0 ? 'mode-choose-btn': ''">
+						<image class="mode-img" src="../static/images/cold.png"></image>
+					</div>
+					<div class="mode-btn" @click="clickModeBtn(1)" :class="modeNum===1 ? 'mode-choose-btn': ''">
+						<image class="mode-img" src="../static/images/hot.png"></image>
+					</div>
+					<div class="mode-btn" @click="clickModeBtn(2)" :class="modeNum===2 ? 'mode-choose-btn': ''">
+						<image class="mode-img" src="../static/images/fan-globe.png"></image>
+					</div>
+				</view>
+				<view class="level-title">
+					风速
+				</view>
+				<view class="level">
+					<div class="mode-btn " @click="clickLevelBtn(0)" :class="levelNum===0 ? 'mode-choose-btn': ''">
+						<image class="mode-img" src="../static/images/v0.png"></image>
+					</div>
+					<div class="mode-btn" @click="clickLevelBtn(1)" :class="levelNum===1 ? 'mode-choose-btn': ''">
+						<image class="mode-img" src="../static/images/v1.png"></image>
+					</div>
+					<div class="mode-btn" @click="clickLevelBtn(2)" :class="levelNum===2 ? 'mode-choose-btn': ''">
+						<image class="mode-img" src="../static/images/v2.png"></image>
+					</div>
+					<div class="mode-btn" @click="clickLevelBtn(3)" :class="levelNum===3 ? 'mode-choose-btn': ''">
+						<image class="mode-img" src="../static/images/v3.png"></image>
+					</div>
+				</view>
 			</view>
+
 		</view>
 	</popup-card>
 </template>
@@ -52,31 +84,43 @@
 		ref,
 		watch,
 	} from "vue";
-	import popupCard from '/components/popupCard.vue'
+	import popupCard from '/components/popupCard.vue';
+	import myRequest from '/utils/request.js';
+	import {
+		useAccountStore
+	} from '@/store/account.js';
 	import {
 		onShow,
 	} from '@dcloudio/uni-app'
+	const account = useAccountStore();
 	const props = defineProps({
 		title: String,
 		temperture: String,
 		mode: Number,
 		airStatus: String,
+		idList: Array,
 	});
 	const mode = ref(null);
+	const modeNum = ref(null);
 	const temperture = ref(null);
 	const level = ref('自动');
+	const levelNum = ref(0);
 	const switchSrc = ref(null);
 	const openClass = ref(null);
 	const openBoxClass = ref(null);
 	const state = ref(null);
+
 	const emit = defineEmits(['airGlobalComplete']);
 	onShow(() => {
 		if (props.mode == 0) {
 			mode.value = '制冷';
+			modeNum.value = 0;
 		} else if (props.mode == 1) {
 			mode.value = '制热';
+			modeNum.value = 1;
 		} else {
 			mode.value = '除湿';
+			modeNum.value = 2;
 		}
 		temperture.value = props.temperture;
 		if (props.airStatus == '开启') {
@@ -90,9 +134,8 @@
 			openBoxClass.value = 'open-close';
 			state.value = false;
 		}
-
-
 	})
+	//开关按钮
 	const openAir = () => {
 		state.value = !state.value;
 		if (state.value) {
@@ -105,8 +148,57 @@
 			openBoxClass.value = 'open-close';
 		}
 	}
+	//温度按钮
+	const changeTemperture = (judge) => {
+		if (judge == 1 && temperture.value < 32) { //add
+			temperture.value++;
+		}
+		if (judge == 0 && temperture.value > 16) {
+			temperture.value--;
+		}
+	}
+	//风速按钮
+	const clickLevelBtn = (index) => {
+		if (index === 0) {
+			levelNum.value = index;
+			level.value = '自动'
+		} else if (index === 1) {
+			levelNum.value = index;
+			level.value = '低';
+		} else if (index === 2) {
+			levelNum.value = index;
+			level.value = '中';
+		} else if (index === 3) {
+			levelNum.value = index;
+			level.value = '高';
+		}
+	}
+	const clickModeBtn = (index) => {
+		if (index === 0) {
+			modeNum.value = index;
+			mode.value = '制冷'
+		} else if (index === 1) {
+			modeNum.value = index;
+			mode.value = '制热';
+		} else {
+			modeNum.value = index;
+			mode.value = '除湿';
+		}
+	}
 	//完成
-	const complete = () => {
+	const complete = async () => {
+		const res = await myRequest({
+			url: `Tcp/GlobalChangeAirCondition`,
+			method: 'post',
+			data: {
+				"airConditionId": props.idList,
+				"state": state.value,
+				"mode": modeNum.value,
+				"temperature": temperture.value,
+				"level": levelNum.value,
+				"sessionId": account.homeTcp
+			}
+		});
 		emit('airGlobalComplete');
 	};
 </script>
@@ -187,14 +279,15 @@
 		transition: .5s;
 	}
 
-	.temperture {
+	.function-box {
 		position: relative;
 		display: flex;
+		flex-direction: column;
 		align-items: center;
-		justify-content: center;
-		margin-top: 40px;
+		justify-content: flex-start;
+		margin-top: 20px;
 		background-color: #fff;
-		height: 120px;
+		height: 350px;
 		width: 80%;
 		border-radius: 10px;
 	}
@@ -203,7 +296,7 @@
 		display: flex;
 		height: 70px;
 		width: 90%;
-		margin-top: 20px;
+		margin-top: 30px;
 		border-radius: 10px;
 	}
 
@@ -268,7 +361,7 @@
 	}
 
 	.temperture-add:active {
-		box-shadow: inset -5px 0px 5px -5px rgba(0, 0, 0, 0.5);
+		box-shadow: inset 5px 0px 5px -5px rgba(0, 0, 0, 0.5);
 		transform: translateX(1px);
 	}
 
@@ -287,6 +380,73 @@
 		margin-left: 10px;
 		margin-top: 5px;
 		color: #bfbfbf;
+	}
+
+	.mode {
+		display: flex;
+		justify-content: space-around;
+		align-items: center;
+		width: 90%;
+		height: 100px;
+		margin-top: 30px;
+	}
+
+	.mode-title {
+		position: absolute;
+		top: 110px;
+		left: 0;
+		height: 20px;
+		width: 120px;
+		font-size: 12px;
+		margin-left: 10px;
+		margin-top: 5px;
+		color: #bfbfbf;
+	}
+
+	.mode-btn {
+		display: flex;
+		justify-content: center;
+		align-items: center;
+		background-color: #f7f7f7;
+		border-radius: 50%;
+		width: 50px;
+		height: 50px;
+		font-size: 12px;
+		box-shadow: 0px 3px 5px rgba(0, 0, 0, 0.2);
+		transition: all 0.2s ease-in-out;
+	}
+
+	.mode-choose-btn {
+		transform: translateY(-5px) scale(1.1);
+		background-color: #fff;
+		box-shadow: 0px 5px 10px rgba(0, 0, 0, 0.4);
+	}
+
+	.mode-img {
+		width: 35px;
+		height: 35px;
+	}
+
+	.level-title {
+		position: absolute;
+		top: 215px;
+		left: 0;
+		height: 20px;
+		width: 120px;
+		font-size: 12px;
+		margin-left: 10px;
+		margin-top: 5px;
+		color: #bfbfbf;
+	}
+
+	.level {
+		display: flex;
+		justify-content: space-around;
+		align-items: center;
+		width: 90%;
+		height: 100px;
+		margin-top: 10px;
+		margin-bottom: 20px;
 	}
 
 	.backgroundColor {

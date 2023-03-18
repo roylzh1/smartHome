@@ -33,7 +33,7 @@
 			</view>
 		</view>
 		<popup-global-air v-if="popupAirIfShow" @airGlobalComplete="closeAirHandler" title="空调中控" :temperture="26"
-			airStatus="开启" :mode="0">
+			:idList="airConditionIdList" airStatus="开启" :mode="0">
 		</popup-global-air>
 		<tab-bar selected="2"></tab-bar>
 	</view>
@@ -65,11 +65,25 @@
 	const imageSrc = ref('/static/images/center-airconditioner.png'); //开关机图片
 	const num = ref(0);
 	const level = ref(1); //开关样式设置
-	let airConditionIdList = []; //所有空调的id
+	let airConditionIdList = ref([]); //所有空调的id
 	onShow(async () => {
 		console.log(account.airList);
 		if (account.airConditionCount != 0) {
 			hasAirCondition.value = true;
+			//重置开关
+			num.value = account.airConditionCount;
+			if (num.value != 0) {
+				airStatus.value = '开启';
+				ifAirOpen.value = true;
+				level.value = 0;
+			} else {
+				airStatus.value = '关闭';
+			}
+			airConditionIdList.value = [];
+			account.airList.forEach(air => {
+				airConditionIdList.value.push(air.id);
+				if (air.state == true) airStatus.value = '开启';
+			});
 			avgTemperature.value = (account.airList.map(air => air.tempreture).reduce((pre, cur) =>
 				pre + cur
 			) / account.airList.length).toFixed(0);
@@ -85,14 +99,7 @@
 				imageSrc.value = '/static/images/center-airconditioner-open-hot.png'
 			else
 				imageSrc.value = '/static/images/center-airconditioner.png'
-			//重置开关
-			airStatus.value = '关闭';
-			num.value = 0;
-			airConditionIdList = [];
-			account.airList.forEach(air => {
-				airConditionIdList.push(air.id);
-				if (air.state == true) airStatus.value = '开启';
-			});
+
 
 		}
 	})
