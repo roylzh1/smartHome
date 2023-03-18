@@ -33,60 +33,62 @@
 		watch,
 		computed,
 	} from "vue";
+	import {
+		onShow,
+	} from '@dcloudio/uni-app'
 	import myRequest from '/utils/request.js';
 	import {
 		useAccountStore
 	} from '@/store/account.js';
+	const props = defineProps({
+		ConditionList: Array
+	})
 	const account = useAccountStore();
-	const airConditionList = ref(account.airList);
+	let airConditionList = account.airList;
 	const avgTemperature = ref(); //平均温度
-	const temp = (airConditionList.value.map(air => air.tempreture).reduce((pre, cur) =>
+	const temp = (airConditionList.map(air => air.tempreture).reduce((pre, cur) =>
 		pre + cur
-	) / airConditionList.value.length).toFixed(0);
+	) / airConditionList.length).toFixed(0);
 	avgTemperature.value = temp;
 	const isCold = ref(null);
-	console.log(airConditionList.value[0])
-	if (airConditionList.value[0].mode == 1) { //暖风
+	console.log(airConditionList)
+	if (airConditionList[0].mode == 1) { //暖风
 		isCold.value = false;
 	} else {
 		isCold.value = true;
 	}
 	const airStatus = ref('关闭');
-	const ifAirOpen = ref(false);
+	const ifAirOpen = ref(false); //判断是否开启
 	const imageSrc = ref('/static/images/center-airconditioner.png'); //开关机图片
 	const num = ref(0);
 	const level = ref(1); //开关样式设置
-	airConditionList.value.forEach(air => {
-		if (air.state == true) {
-			airStatus.value = '开启';
-			ifAirOpen.value = true;
-			num.value++;
-		}
-	});
-	//空调图标
-	if (ifAirOpen.value == true && isCold.value == true)
-		imageSrc.value = '/static/images/center-airconditioner-open.png'
-	else if (ifAirOpen.value == true && isCold.value == false)
-		imageSrc.value = '/static/images/center-airconditioner-open-hot.png'
-	else
-		imageSrc.value = '/static/images/center-airconditioner.png';
+	let airConditionIdList = []; //所有空调的id
 
-	watch(() => account.airList, (newValue) => {
-		airConditionList.value = newValue;
+	watch(() => props.ConditionList, (newValue) => {
+		airConditionList = newValue;
 		//重置平均温度
-		avgTemperature.value = (airConditionList.value.map(air => air.tempreture).reduce((pre, cur) =>
+		avgTemperature.value = (airConditionList.map(air => air.tempreture).reduce((pre, cur) =>
 			pre + cur
-		) / airConditionList.value.length).toFixed(0);
+		) / airConditionList.length).toFixed(0);
 		//重置冷暖
-		if (airConditionList.value[0].mode == 1) { //暖风
+		if (airConditionList[0].mode == 1) { //暖风
 			isCold.value = false;
 		} else {
 			isCold.value = true;
 		}
+		//空调图标
+		if (ifAirOpen.value == true && isCold.value == true)
+			imageSrc.value = '/static/images/center-airconditioner-open.png'
+		else if (ifAirOpen.value == true && isCold.value == false)
+			imageSrc.value = '/static/images/center-airconditioner-open-hot.png'
+		else
+			imageSrc.value = '/static/images/center-airconditioner.png'
 		//重置开关
 		airStatus.value = '关闭';
 		num.value = 0;
-		airConditionList.value.forEach(air => {
+		airConditionIdList = [];
+		airConditionList.forEach(air => {
+			airConditionIdList.push(air.id);
 			if (air.state == true) airStatus.value = '开启';
 		});
 	});
@@ -97,6 +99,25 @@
 		temperature: '',
 		wind: ''
 	});
+	onShow(() => {
+		airConditionList = account.airList;
+		airConditionList.forEach(air => {
+			airConditionIdList.push(air.id);
+			if (air.state == true) {
+				airStatus.value = '开启';
+				ifAirOpen.value = true;
+				num.value++;
+			}
+		});
+		//空调图标
+		if (ifAirOpen.value == true && isCold.value == true)
+			imageSrc.value = '/static/images/center-airconditioner-open.png'
+		else if (ifAirOpen.value == true && isCold.value == false)
+			imageSrc.value = '/static/images/center-airconditioner-open-hot.png'
+		else
+			imageSrc.value = '/static/images/center-airconditioner.png';
+
+	})
 	//控制开关
 	const openAirHandler = async () => {
 		ifAirOpen.value = !ifAirOpen.value;
@@ -107,19 +128,35 @@
 			else
 				imageSrc.value = '/static/images/center-airconditioner-open-hot.png';
 			level.value = 0;
-			num.value = airConditionList.value.length;
-			/*
+			num.value = airConditionList.length;
+
 			const res = await myRequest({
-				url: `Room/GetRoom`,
-				method: 'get',
+				url: `Tcp/GlobalChangeAirCondition`,
+				method: 'post',
 				data: {
-					
+					"airConditionId": airConditionIdList,
+					"state": ifAirOpen.value,
+					"mode": airConditionList[0].mode,
+					"temperature": avgTemperature.value,
+					"level": 0,
+					"sessionId": account.homeTcp
 				}
 			});
-			if (res.data.status == 400) return;
-			*/
+
 		} else {
 			airStatus.value = '关闭';
+			const res = await myRequest({
+				url: `Tcp/GlobalChangeAirCondition`,
+				method: 'post',
+				data: {
+					"airConditionId": airConditionIdList,
+					"state": ifAirOpen.value,
+					"mode": airConditionList[0].mode,
+					"temperature": avgTemperature.value,
+					"level": 0,
+					"sessionId": account.homeTcp
+				}
+			});
 			if (isCold.value)
 				imageSrc.value = '/static/images/center-airconditioner.png';
 			else

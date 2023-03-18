@@ -68,6 +68,7 @@
 				if (res.tempFiles[0]['size'] < 0.1 * 1024 * 1024) { //图片小于.1M不压缩，大于5M压缩
 					uploadImgFile(res.tempFilePaths[0])
 				} else {
+					//只能在app端使用
 					uni.compressImage({
 						src: res.tempFilePaths[0],
 						quality: 80,

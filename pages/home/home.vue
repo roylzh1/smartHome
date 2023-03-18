@@ -262,82 +262,93 @@
 	});
 
 	onShow(async () => {
-		let userInfo = uni.getStorageSync('smartHome_userInfo');
-		console.log(userInfo)
-		//更新会话号
-		const res = await myRequest({
-			url: `Home/GetHomeSession`,
-			method: 'get',
-			data: {
-				homeId: userInfo.homeList[0].id,
-			}
-		});
-		account.homeTcp = res.data;
-		//获取房间和家具信息
-		const roomInfo = await myRequest({
-			url: `Room/GetRoom`,
-			method: 'get',
-			data: {
-				homeId: account.homeSeleted,
-			}
-		});
-		console.log(roomInfo)
-		account.changeUserInfo({
-			userName: userInfo.name,
-			userId: userInfo.id,
-			email: userInfo.email,
-			phoneNumber: userInfo.phone,
-			hasImage: userInfo.hasImage
-		});
-		account.homeList = userInfo.homeList;
-		account.homeSeleted = userInfo.homeList[0].id; //默认为第一个家庭
-		//console.log(account.homeList)
-		roomList.value = [];
-		account.airList = [];
-		account.lightList = [];
-		account.airConditionCount = 0; //空调数量
-		account.roomList = roomInfo.data;
-		roomList.value = roomInfo.data;
-		let tempFurnitures = [];
-		for (let i = 0; i < roomList.value.length; i++) {
-			for (let j = 0; j < roomList.value[i].furnitures.length; j++) {
-				let f = roomList.value[i].furnitures[j];
-				if (f.type == 4) {
-					account.airConditionCount += 1;
-					account.airList.push({
-						roomId: roomList.value[i].id,
-						roomName: roomList.value[i].name,
+		try {
+
+
+			let userInfo = uni.getStorageSync('smartHome_userInfo');
+			console.log(userInfo)
+			//更新会话号
+			const res = await myRequest({
+				url: `Home/GetHomeSession`,
+				method: 'get',
+				data: {
+					homeId: userInfo.homeList[0].id,
+				}
+			});
+			account.homeTcp = res.data;
+			//获取房间和家具信息
+			const roomInfo = await myRequest({
+				url: `Room/GetRoom`,
+				method: 'get',
+				data: {
+					homeId: account.homeSeleted,
+				}
+			});
+			console.log(roomInfo)
+			account.changeUserInfo({
+				userName: userInfo.name,
+				userId: userInfo.id,
+				email: userInfo.email,
+				phoneNumber: userInfo.phone,
+				hasImage: userInfo.hasImage
+			});
+			account.homeList = userInfo.homeList;
+			account.homeSeleted = userInfo.homeList[0].id; //默认为第一个家庭
+			//console.log(account.homeList)
+			roomList.value = [];
+			account.airList = [];
+			account.lightList = [];
+			account.airConditionCount = 0; //空调数量
+			account.roomList = roomInfo.data;
+			roomList.value = roomInfo.data;
+			let tempFurnitures = [];
+			for (let i = 0; i < roomList.value.length; i++) {
+				for (let j = 0; j < roomList.value[i].furnitures.length; j++) {
+					let f = roomList.value[i].furnitures[j];
+					if (f.type == 4) {
+						account.airConditionCount += 1;
+						account.airList.push({
+							roomId: roomList.value[i].id,
+							roomName: roomList.value[i].name,
+							title: f.name,
+							id: f.id,
+							state: f.state,
+							mode: f.mode,
+							tempreture: f.tempreture,
+						})
+						continue;
+					} //不显示空调
+					tempFurnitures.push({
+						type: f.size,
 						title: f.name,
+						open: "已开",
+						close: "已关",
+						photoClose: `/static/images/${f.type}.png`,
+						photoOpen: `/static/images/${f.type}-light.png`,
 						id: f.id,
 						state: f.state,
-						mode: f.mode,
-						tempreture: f.tempreture,
-					})
-					continue;
-				} //不显示空调
-				tempFurnitures.push({
-					type: f.size,
-					title: f.name,
-					open: "已开",
-					close: "已关",
-					photoClose: `/static/images/${f.type}.png`,
-					photoOpen: `/static/images/${f.type}-light.png`,
-					id: f.id,
-					state: f.state,
-					fType: f.type
-				});
+						fType: f.type
+					});
+				}
+				roomList.value[i].furnitures = tempFurnitures;
+				tempFurnitures = [];
 			}
-			roomList.value[i].furnitures = tempFurnitures;
-			tempFurnitures = [];
+			showRoom.value = false;
+
+			nextTick(() => {
+				showRoom.value = true;
+			})
+
+			//console.log(account.roomList)
+			console.log(account.airList)
+		} catch (e) {
+			console.log(e)
+			uni.switchTab({
+				url: `/pages/user/user`,
+				animationType: 'pop-in',
+				animationDuration: 500
+			});
 		}
-		showRoom.value = false;
-
-		nextTick(() => {
-			showRoom.value = true;
-		})
-
-		//console.log(account.roomList)
-		console.log(account.airList)
 	})
 
 	//导航栏渐变
