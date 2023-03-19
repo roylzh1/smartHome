@@ -7,43 +7,65 @@
 				<view class="airHeader-text">{{name}}</view>
 				<view class="airHeader-return" @click="complete">完成</view>
 			</view>
-			<view class="globalControl">
-				<view class="global-title">智能灯光中控</view>
-				<card height="100" width="300">
-					<template #default>
-						<my-switch @click="globalLightHandler"></my-switch>
-					</template>
-				</card>
-			</view>
-			<view class="air-room" v-for="room in livingRoom">
-				<view class="global-title" >{{room.name}}</view>
-				<middle-box @popup="popupHandler" :title="room.name" :open="room.open" :close="room.close" :photoClose="room.photoClose" :photoOpen="room.photoOpen"></middle-box>
+			<view class="air-room" v-for="(room,i) in roomList">
+				<view class="global-title">{{room[0].roomName}}</view>
+				<light-box @popup="popupHandler" :lighted="room[0].light" :rooms="room[0].idList"></light-box>
 			</view>
 		</view>
-		<popup-global-light v-show="popupBoxIfShow" :name="popupMessage.name" @touchmove.stop.prevent @lightComplete="closeBoxHandler" :class="popupBoxIfShow == true ? 'content-fade-up-animation' : ''"></popup-global-light>
+		<popup-global-light v-show="popupBoxIfShow" :name="popupMessage.name" @touchmove.stop.prevent
+			@lightComplete="closeBoxHandler" :class="popupBoxIfShow == true ? 'content-fade-up-animation' : ''">
+		</popup-global-light>
 	</view>
 </template>
 
 <script setup>
 	import {
-		onLoad
+		onLoad,
+		onShow
 	} from '@dcloudio/uni-app';
 	import {
 		ref,
-		reactive
+		reactive,
 	} from "vue";
 	import card from '/components/card.vue'
-	import mySwitch from '/components/mySwitch.vue'
-	import middleBox from '/components/middleBox.vue'
+	import lightBox from '/components/lightBox.vue'
 	import popupGlobalLight from '/components/popupGlobalLight.vue'
-	const name = ref('');
-	onLoad((option) => {
-		console.log(option);
-		name.value = option.name;
-
-	});
+	import myRequest from '/utils/request.js';
+	import {
+		useAccountStore
+	} from '@/store/account.js';
+	const account = useAccountStore();
+	onLoad((option) => {});
+	const roomList = ref(null);
+	const roomLighted = ref();
 	const popupMessage = reactive({
 		name: ''
+	});
+
+	onShow(() => {
+		roomList.value = account.lightList.reduce((group, light) => {
+			const {
+				roomName
+			} = light;
+			group[roomName] = group[roomName] ?? [];
+			group[roomName].push(light);
+			return group;
+		}, {});
+		console.log(roomList.value)
+		roomLighted.value = {};
+		let j = 0;
+		for (const room in roomList.value) {
+			console.log(roomList.value[room]);
+			roomLighted.value[j] = 0;
+			roomList.value[room][0].idList = [];
+			for (const light in roomList.value[room]) {
+				if (roomList.value[room][light].state) roomLighted.value[j]++;
+				roomList.value[room][0].idList.push(roomList.value[room][light].id);
+			}
+			roomList.value[room][0].light = roomLighted.value[j];
+			j++;
+		}
+		console.log(roomLighted.value)
 	})
 	//开启弹窗
 	const popupHandler = (name) => {
@@ -51,53 +73,17 @@
 		popupBoxIfShow.value = true;
 	}
 	const globalLightHandler = () => {
-		
+
 	}
 	const popupBoxIfShow = ref(false);
 	//关闭弹窗
 	const closeBoxHandler = () => {
 		popupBoxIfShow.value = false;
 	}
-	const livingRoom = reactive([{
-		name: "门厅",
-		open: "已开",
-		close: "已关",
-		status: true,
-		photoClose: "/static/images/bulb.png",
-		photoOpen: "/static/images/bulb-light.png"
-	}, {
-		name: "主卧",
-		open: "已开",
-		close: "已关",
-		status: true,
-		photoClose: "/static/images/bulb.png",
-		photoOpen: "/static/images/bulb-light.png"
-	}, {
-		name: "客卧",
-		open: "已开",
-		close: "已关",
-		status: false,
-		photoClose: "/static/images/chandelier.png",
-		photoOpen: "/static/images/chandelier-light.png"
-	}, {
-		name: "书房",
-		open: "已开",
-		close: "已关",
-		status: true,
-		photoClose: "/static/images/chandelier.png",
-		photoOpen: "/static/images/chandelier-light.png"
-	}, {
-		name: "洗手间",
-		open: "已开",
-		close: "已关",
-		status: true,
-		photoClose: "/static/images/chandelier.png",
-		photoOpen: "/static/images/chandelier-light.png"
-	}]);
 
 	const complete = () => {
 		uni.switchTab({
-			url: '/pages/home/home',
+			url: '/pages/device/device',
 			animationType: 'pop-out',
 			animationDuration: 300
 		});
@@ -151,7 +137,8 @@
 		margin-left: 10rpx;
 		color: #ffffff;
 	}
-	.air-room{
+
+	.air-room {
 		margin-top: 30rpx;
 		margin-left: 30rpx;
 	}

@@ -29,7 +29,7 @@
 					</template>
 				</card>
 				<h3 class="g-title">智能灯光中控</h3>
-				<card>
+				<card @longpress="longPressLightHandler">
 					<template #default>
 						<view class="light-box">
 							<view class="slider" @click="openLight">
@@ -217,7 +217,13 @@
 		}
 
 	}
-
+	const longPressLightHandler = () => {
+		uni.navigateTo({
+			url: `/pages/lamp/lamp`,
+			animationType: 'pop-in',
+			animationDuration: 500
+		});
+	}
 	const pressHandler = () => {
 
 	}

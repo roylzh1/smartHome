@@ -40,7 +40,8 @@
 							</small-box>
 							<middle-box @popup="popupHandler" v-if="item.type == 'middle'" class="item"
 								:title="item.title" :open="item.open" :close="item.close" :photoClose="item.photoClose"
-								:photoOpen="item.photoOpen">
+								:photoOpen="item.photoOpen" :index="i" :id="item.id" :state="item.state" :roomId="index"
+								:fType="item.fType">
 							</middle-box>
 						</view>
 					</view>
@@ -56,6 +57,10 @@
 			v-show="popupFanBoxIfShow" :class="popupFanBoxIfShow == true ? 'content-fade-up-animation' : ''"
 			@lightComplete="closeFanBoxHandler">
 		</popup-fan>
+		<popup-door @touchmove.stop.prevent :title="popupMessage.title" :state="popupMessage.state"
+			:id="popupMessage.id" :fIndex="popupMessage.index" :rIndex="popupMessage.roomId" v-if="popupdoorBoxIfShow"
+			:class="popupdoorBoxIfShow == true ? 'content-fade-up-animation' : ''" @doorComplete="closedoorBoxHandler">
+		</popup-door>
 		<add-new-room v-show="ifShowAddRoom" :class="ifShowAddRoom == true ? 'content-fade-up' : ''"
 			@addRoomComplete="closeAddRoomBoxHandler"></add-new-room>
 
@@ -87,6 +92,7 @@
 	import topNavigation from '/components/topNaviagtion.vue'
 	import popupLightBox from '/components/popupLightBox.vue'
 	import popupFan from '/components/popupFan.vue'
+	import popupDoor from '/components/popupDoor.vue'
 	import addNewRoom from '/components/addNewRoom.vue'
 	import checkHome from '/components/checkHome.vue'
 	import changeFurniture from '/components/changeFurniture.vue';
@@ -114,8 +120,9 @@
 	//普通弹窗
 	const popupLightBoxIfShow = ref(false);
 	const popupFanBoxIfShow = ref(false);
-	//基础家具弹窗
-	const popupHandler = (type, title, id, index) => {
+	const popupdoorBoxIfShow = ref(false);
+	//基础家具弹窗,大的小的都在这
+	const popupHandler = (type, title, id, index, state, roomId) => {
 		//灯
 		if (type == 0 || type == 1) {
 			popupLightBoxIfShow.value = true;
@@ -124,13 +131,18 @@
 		if (type == 2) {
 			popupFanBoxIfShow.value = true;
 		}
+		if (type === 3) {
+			popupdoorBoxIfShow.value = true;
+		}
 		popupMessage.title = title;
 		popupMessage.id = id;
-		popupMessage.index = index;
+		popupMessage.index = index; //家具索引
+		popupMessage.state = state;
+		popupMessage.roomId = roomId;
 		console.log(popupMessage)
 	}
 	//处理详细控制灯,风扇
-	const closeLightBoxHandler = async (level) => {
+	const closeLightBoxHandler = async level => {
 		popupLightBoxIfShow.value = false;
 		console.log(level);
 		const res = await myRequest({
@@ -149,7 +161,7 @@
 			animationDuration: 0
 		});
 	}
-	const closeFanBoxHandler = async (level) => {
+	const closeFanBoxHandler = async level => {
 		popupFanBoxIfShow.value = false;
 		console.log(level);
 		const res = await myRequest({
@@ -162,6 +174,15 @@
 			}
 		});
 		console.log(res);
+		uni.switchTab({
+			url: `/pages/home/home`,
+			animationType: 'pop-in',
+			animationDuration: 0
+		});
+	}
+	//处理详细控制门
+	const closedoorBoxHandler = async () => {
+		popupdoorBoxIfShow.value = false;
 		uni.switchTab({
 			url: `/pages/home/home`,
 			animationType: 'pop-in',

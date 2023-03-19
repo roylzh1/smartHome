@@ -8,7 +8,7 @@
 				<image class="mbox-thing" :src="selected == true ? photoOpen : photoClose"></image>
 			</view>
 			<view class="mbox-statusBox">
-				<view class="mbox-title" :style="{color: selected == true ?`rgba(0,0,0,1)` : `#ffffff`}">{{title}}
+				<view class="mbox-title" :style="{color: selected == true ?`rgba(0,0,0,1)` : `#ffffff`}">{{lighted}} 盏亮着
 				</view>
 				<view class="mbox-status">{{selected ? open : close}}</view>
 			</view>
@@ -19,56 +19,47 @@
 
 <script setup>
 	import {
-		ref,
-		watch,
+		ref
 	} from "vue";
-	import myRequest from '/utils/request.js';
 	import {
-		onShow,
-	} from '@dcloudio/uni-app'
+		onShow
+	} from '@dcloudio/uni-app';
+	import myRequest from '/utils/request.js';
 	import {
 		useAccountStore
 	} from '@/store/account.js';
 	const account = useAccountStore();
 	const props = defineProps({
-		title: String,
-		open: String,
-		close: String,
-		photoOpen: String,
-		photoClose: String,
-		id: Number,
-		index: Number, //家具索引
-		roomId: Number, //房间索引
-		state: Boolean,
-		fType: Number, //家具类型
+		lighted: Number,
+		rooms: Array,
 	});
-	const emit = defineEmits(['popup']);
+	const open = "已开";
+	const close = "已关";
+	const photoClose = "/static/images/0.png";
+	const photoOpen = "/static/images/0-light.png";
 	let selected = ref(false);
-	watch(() => props.state, (newValue) => {
-		selected.value = newValue;
-	});
+	const emit = defineEmits(['popup']);
+	onShow(() => {
+		if (props.lighted != 0) selected.value = true;
+	})
 	const handleClick = async () => {
 		selected.value = !selected.value;
+		console.log(props.rooms.toString());
 		const res = await myRequest({
-			url: `Tcp/ChangeFurnitureState`,
-			method: 'get',
+			url: `Tcp/GlobalChangeLight`,
+			method: 'post',
 			data: {
-				state: selected.value,
-				furnitureId: props.id,
-				sessionId: account.homeTcp
+				"lightId": props.rooms,
+				"state": selected.value,
+				"sessionId": account.homeTcp
 			}
 		});
-		console.log(props.index)
-		console.log(account.roomList[props.roomId].furnitures)
-		account.roomList[props.roomId].furnitures[props.index].state = selected.value;
 	}
 	const pressHandler = () => {
-		emit('popup', props.fType, props.title, props.id, props.index, selected.value, props.roomId);
+		if (!selected.value)
+			selected.value = !selected.value;
+		emit('popup', props.lighted);
 	}
-	onShow(() => {
-		console.log(props.state)
-		selected.value = props.state;
-	})
 </script>
 
 <style scoped>
@@ -97,7 +88,7 @@
 
 	.mbox-title {
 		height: 30rpx;
-		width: 80rpx;
+		width: 80px;
 		margin-left: 20rpx;
 		z-index: 3;
 		font-weight: 800;
@@ -116,7 +107,7 @@
 	}
 
 	.mbox-statusBox {
-		margin-bottom: 5rpx;
+		margin-bottom: 5px;
 	}
 
 	.mbox-thing-content {

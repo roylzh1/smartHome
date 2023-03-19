@@ -223,12 +223,15 @@
 	}
 
 	.home-header {
+		position: fixed;
+		top: 0;
+		left: 0;
 		display: flex;
 		justify-content: space-between;
 		align-items: center;
 		height: 140rpx;
 		width: 100%;
-		background-color: rgba(0, 0, 0, .4);
+		background-color: hsla(0, 0%, 30%, .95);
 		z-index: 4;
 	}
 
@@ -352,7 +355,7 @@
 	.home-content {
 		height: 100%;
 		margin: 0 30rpx;
-
+		margin-top: 80px;
 	}
 
 	.content-fade-up-animation {
