@@ -101,9 +101,21 @@
 				password: password.value
 			}
 		});
-		if (res.data.status == 400) return;
+		if (res.data.status == 400) {
+			uni.showToast({
+				title: '用户名或密码错误',
+				icon: 'none',
+				duration: 3000
+			});
+			return;
+		}
 		isLogin.value = true;
 		uni.setStorageSync('smartHome_userToken', res.data.message);
+		uni.showToast({
+			title: '登录成功',
+			icon: 'none',
+			duration: 3000
+		});
 		const res2 = await myRequest({
 			url: `User/GetUserInfo`,
 			method: 'get',

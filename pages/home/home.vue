@@ -284,11 +284,10 @@
 
 	onShow(async () => {
 		try {
-
-
 			let userInfo = uni.getStorageSync('smartHome_userInfo');
 			console.log(userInfo)
 			//更新会话号
+			uni.showNavigationBarLoading();
 			const res = await myRequest({
 				url: `Home/GetHomeSession`,
 				method: 'get',
@@ -365,7 +364,7 @@
 				tempFurnitures = [];
 			}
 			showRoom.value = false;
-
+			uni.hideNavigationBarLoading();
 			nextTick(() => {
 				showRoom.value = true;
 			})
