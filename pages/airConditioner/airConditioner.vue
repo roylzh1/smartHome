@@ -71,7 +71,6 @@
 		popupBoxIfShow.value = true;
 	};
 	const closeBoxHandler = () => {
-		console.log(1111)
 		popupBoxIfShow.value = false;
 	}
 

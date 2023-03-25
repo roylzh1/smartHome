@@ -15,8 +15,9 @@ function myRequest(options) {
 			data: options.data,
 			header: headers,
 			success(data) {
-				//console.log(data)
-				if (data.data == '未认证' || data.data == '请先登录' || data.data.message == '请先登录') {
+				console.log(data)
+				if (data.data == '未认证' || data.data == '请先登录' || data.data.message == '请先登录' || data
+					.statusCode == 401) {
 					uni.setStorageSync('smartHome_userToken', '');
 					uni.switchTab({
 						url: `/pages/user/user`,
