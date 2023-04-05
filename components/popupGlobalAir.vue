@@ -73,7 +73,18 @@
 					</div>
 				</view>
 			</view>
-
+			<view class="picker">
+				<view class="input-text">
+					定时
+				</view>
+				<picker class="input-picker" mode="time" :value="time" start="09:01" end="21:01"
+					@change="bindTimeChange">
+					<view class="input-time">{{time}}</view>
+				</picker>
+				<view class="pick-btn">
+					确定
+				</view>
+			</view>
 		</view>
 	</popup-card>
 </template>
@@ -109,7 +120,7 @@
 	const openClass = ref(null);
 	const openBoxClass = ref(null);
 	const state = ref(null);
-
+	const time = ref('');
 	const emit = defineEmits(['airGlobalComplete']);
 	onShow(() => {
 		if (props.mode == 0) {
@@ -134,7 +145,7 @@
 			openBoxClass.value = 'open-close';
 			state.value = false;
 		}
-
+		time.value = new Date(Date.now()).getHours() + ":" + new Date(Date.now()).getMinutes();
 	})
 	//开关按钮
 	const openAir = () => {
@@ -206,8 +217,10 @@
 			account.airList[i].level = levelNum.value;
 			account.airList[i].tempreture = temperture.value;
 		}
-
 		emit('airGlobalComplete');
+	};
+	const bindTimeChange = e => {
+		time.value = e.detail.value
 	};
 </script>
 
@@ -235,7 +248,7 @@
 		display: flex;
 		justify-content: space-around;
 		width: 150px;
-		color: #bfbfbf;
+		color: #fff;
 	}
 
 
@@ -458,6 +471,64 @@
 		height: 100px;
 		margin-top: 10px;
 		margin-bottom: 20px;
+	}
+
+	.picker {
+		margin-top: 10px;
+		display: flex;
+		justify-content: space-between;
+		align-items: center;
+		height: 40px;
+		width: 280px;
+		font-size: 14px;
+		font-weight: 600;
+		background-color: #fff;
+		border-radius: 5px;
+	}
+
+	.picker .input-time {
+		display: flex;
+		justify-content: center;
+		align-items: center;
+		height: 30px;
+		width: 50px;
+		padding: 0 20px;
+		background-color: #bfbfbf;
+		border-radius: 5px;
+		margin: 0 5px;
+	}
+
+	.pick-btn {
+		display: flex;
+		justify-content: center;
+		align-items: center;
+		height: 30px;
+		width: 60px;
+		background-color: rgba(240, 214, 105, 1);
+		border-radius: 5px;
+		margin: 0 5px;
+	}
+
+	.input-text {
+		display: flex;
+		justify-content: center;
+		align-items: center;
+		height: 30px;
+		width: 60px;
+		color: #bfbfbf;
+		background-color: rgb(244, 68, 78);
+		border-radius: 5px;
+		margin: 0 5px;
+	}
+
+	.input-picker {
+		display: flex;
+		justify-content: center;
+		align-items: center;
+		height: 40px;
+		width: 60px;
+		color: #fff;
+		font-size: 16px;
 	}
 
 	.backgroundColor {
