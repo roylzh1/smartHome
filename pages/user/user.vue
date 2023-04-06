@@ -135,7 +135,7 @@
 		account.userinfo.hasImage = res2.data.value.hasImage;
 		//刷新页面
 		uni.switchTab({
-			url: `/pages/home/home`,
+			url: `/pages/user/user`,
 			animationType: 'pop-in',
 			animationDuration: 500
 		});

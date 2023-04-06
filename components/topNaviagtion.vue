@@ -1,13 +1,13 @@
 <template>
 	<view class="content2">
-		<view @click="handleClick" class="content">
+		<view class="content">
 			<view class="backgroundColor"></view>
 			<view class="s-content">
-				<view class="thing-content">
+				<view class="thing-content" v-for="mode in modes" @click="handleClick(mode.id)">
 					<image class="thing" src="/static/images/fan-globe.png"></image>
 				</view>
 				<view class="statusBox">
-					<view class="title">观影模式</view>
+					<view class="title">{{mode?.name}}</view>
 				</view>
 			</view>
 		</view>
@@ -15,9 +15,37 @@
 </template>
 
 <script setup>
+	import myRequest from '/utils/request.js';
+	import {
+		onMounted,
+		ref,
+		nextTick,
+	} from "vue";
+	import {
+		onShow,
+	} from '@dcloudio/uni-app'
+	import {
+		useAccountStore
+	} from '@/store/account.js';
+	const account = useAccountStore();
+	const modes = ref([]);
 	const emit = defineEmits(['popupNav']);
-	const handleClick = () => {
-		emit('popup', prop.title);
+	onShow(async () => {
+		const {
+			data
+		} = await myRequest({
+			url: `Home/GetHomeInformation`,
+			method: 'get',
+			data: {
+				homeId: account.homeSeleted,
+			}
+		});
+		modes.value = [];
+		modes.value = data.modes;
+		console.log(data)
+	});
+	const handleClick = (id) => {
+		emit('popup', id);
 	}
 	const itemArray = [{
 		title: "观影模式",
@@ -32,9 +60,6 @@
 		open: "1个没锁",
 		photoOpen: "/static/images/lock.png"
 	}];
-	const popupHandler = name => {
-		emit('popupNav', name);
-	}
 </script>
 
 <style scoped>

@@ -18,9 +18,10 @@
 		<!-- 页面内容 -->
 		<view class="content">
 			<h1 class="title">我的家</h1>
+			<!--
 			<view class="topNaviagtion">
 				<top-navigation @popupNav="globalControlHandler"></top-navigation>
-			</view>
+			</view>-->
 			<view class="room" v-for="(r,index) in roomList" :key="r.id">
 				<view class="roomDetials">
 					<view class="r-navBar" @click="addOrRemoveHandler(r.id,r.name,index)">
@@ -281,7 +282,6 @@
 			animation: false
 		});
 	});
-
 	onShow(async () => {
 		try {
 			let userInfo = uni.getStorageSync('smartHome_userInfo');

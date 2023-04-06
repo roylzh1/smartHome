@@ -16,6 +16,8 @@
 		}, {
 			"path": "pages/lamp/lamp"
 		}, {
+			"path": "pages/createMode/createMode"
+		}, {
 			"path": "pages/homeSetting/homeSetting"
 		}
 	],

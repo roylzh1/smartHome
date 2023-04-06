@@ -17,14 +17,12 @@
 				type: String,
 				default: 0
 			}
-
 		},
 
 		data() {
 			return {
 				color: "#bababa",
 				selectedColor: "#ffffff",
-
 				list: [{ // 最少2个、最多5个 tab
 					"pagePath": "/pages/home/home", // 页面路径，必须在 pages 中先定义
 					"iconPath": "/static/tabbar/home-solid-unSelect.png", // 图片路径

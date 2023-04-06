@@ -82,8 +82,68 @@
 	const lightOpen = ref(null);
 	const lightClass = ref('');
 	const lightNum = ref(null);
+	const roomList = ref([]);
 	onShow(async () => {
 		console.log(account.airList);
+		if (account.airList) {
+			const roomInfo = await myRequest({
+				url: `Room/GetRoom`,
+				method: 'get',
+				data: {
+					homeId: account.homeSeleted,
+				}
+			});
+			console.log(roomInfo)
+			roomList.value = [];
+			account.airList = [];
+			account.lightList = [];
+			account.airConditionCount = 0; //空调数量
+			account.roomList = roomInfo.data;
+			roomList.value = roomInfo.data;
+			let tempFurnitures = [];
+			for (let i = 0; i < roomList.value.length; i++) {
+				for (let j = 0; j < roomList.value[i].furnitures.length; j++) {
+					let f = roomList.value[i].furnitures[j];
+					if (f.type == 4) {
+						account.airConditionCount += 1;
+						account.airList.push({
+							roomId: roomList.value[i].id,
+							roomName: roomList.value[i].name,
+							title: f.name,
+							id: f.id,
+							state: f.state,
+							level: f.level,
+							mode: f.mode,
+							tempreture: f.tempreture,
+						})
+						continue;
+					} //不显示空调
+					if (f.type == 0 || f.type == 1) {
+						account.lightList.push({
+							roomId: roomList.value[i].id,
+							roomName: roomList.value[i].name,
+							title: f.name,
+							id: f.id,
+							state: f.state
+						})
+					} //不显示空调
+					tempFurnitures.push({
+						type: f.size,
+						title: f.name,
+						open: "已开",
+						close: "已关",
+						photoClose: `/static/images/${f.type}.png`,
+						photoOpen: `/static/images/${f.type}-light.png`,
+						id: f.id,
+						state: f.state,
+						fType: f.type
+					});
+				}
+				roomList.value[i].furnitures = tempFurnitures;
+				tempFurnitures = [];
+			}
+			uni.hideNavigationBarLoading();
+		}
 		if (account.airConditionCount != 0) {
 			hasAirCondition.value = true;
 			//重置开关
