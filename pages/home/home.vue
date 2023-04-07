@@ -15,6 +15,16 @@
 				<image class="logo" @click="checkHomeHandler" src="/static/images/more.png"></image>
 			</view>
 		</view>
+		<view class="msg-box">
+			<view class="msg-content" v-for="(msg,index) in messageList">
+				<view class="msg-left">
+					{{msg.content}}
+				</view>
+				<view class="msg-right" @click="deleteMsg(msg.id,index)">
+
+				</view>
+			</view>
+		</view>
 		<!-- 页面内容 -->
 		<view class="content">
 			<h1 class="title">我的家</h1>
@@ -108,7 +118,7 @@
 	const account = useAccountStore();
 	let roomList = ref([]);
 	let showRoom = ref(true);
-
+	let messageList = ref([]);
 	//弹窗信息注入
 	let popupMessage = reactive({
 		title: '',
@@ -274,7 +284,22 @@
 			});
 	};
 	const disabledScroll = () => {}
-
+	//删除信息
+	const deleteMsg = async (id, index) => {
+		await myRequest({
+			url: `Home/DeleteMessage`,
+			method: 'get',
+			data: {
+				messageId: id,
+			}
+		});
+		uni.showToast({
+			title: '删除成功',
+			icon: 'none',
+			duration: 1000
+		});
+		messageList.value.splice(index, 1);
+	}
 	//-------------------onMounted-------------------
 	onMounted(async () => {
 		//获取手机状态栏高度
@@ -285,17 +310,9 @@
 	onShow(async () => {
 		try {
 			let userInfo = uni.getStorageSync('smartHome_userInfo');
-			console.log(userInfo)
+			//console.log(userInfo)
 			//更新会话号
 			uni.showNavigationBarLoading();
-			const res = await myRequest({
-				url: `Home/GetHomeSession`,
-				method: 'get',
-				data: {
-					homeId: userInfo.homeList[0].id,
-				}
-			});
-			account.homeTcp = res.data;
 			//获取房间和家具信息
 			const roomInfo = await myRequest({
 				url: `Room/GetRoom`,
@@ -304,7 +321,7 @@
 					homeId: account.homeSeleted,
 				}
 			});
-			console.log(roomInfo)
+			//console.log(roomInfo)
 			account.changeUserInfo({
 				userName: userInfo.name,
 				userId: userInfo.id,
@@ -370,7 +387,16 @@
 			})
 
 			//console.log(account.roomList)
-			console.log(account.airList)
+			//console.log(account.airList)
+			//获取信息
+			const msg = await myRequest({
+				url: `Home/GetMessage`,
+				method: 'get',
+				data: {
+					homeId: account.homeSeleted,
+				}
+			});
+			messageList.value = msg.data
 		} catch (e) {
 			console.log(e)
 			uni.switchTab({
@@ -454,11 +480,13 @@
 		font-size: 35px;
 		margin-left: 30rpx;
 		margin-top: 50rpx;
+		margin-bottom: 10rpx;
 		z-index: 3;
 	}
 
 	.room {
 		margin: 0 30rpx;
+		margin-top: 20rpx;
 	}
 
 	.roomDetials {
@@ -526,6 +554,41 @@
 		z-index: 3;
 		margin-top: 10rpx;
 		margin-bottom: 10rpx;
+	}
+
+	.msg-box {
+		position: fixed;
+		top: 150rpx;
+		right: 0;
+		width: 120px;
+		font-size: 12px;
+		z-index: 99;
+	}
+
+	.msg-content {
+		display: flex;
+		justify-content: flex-start;
+		align-items: center;
+		height: 30px;
+		width: 100%;
+		margin-top: 5px;
+	}
+
+	.msg-left {
+		display: flex;
+		justify-content: flex-start;
+		align-items: center;
+		width: 85%;
+		height: 100%;
+		background-color: rgba(255, 255, 255, .7);
+		padding-left: 7px;
+		border-radius: 7px 0 0 7px;
+	}
+
+	.msg-right {
+		width: 15%;
+		height: 100%;
+		background-color: rgba(240, 214, 105, 1);
 	}
 
 	.backgroundColor {

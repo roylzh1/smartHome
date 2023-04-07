@@ -77,6 +77,19 @@
 							</view>
 						</view>
 					</view>
+					<view class="home-box-name" style="margin-top: 30rpx;">
+						留言
+					</view>
+					<view class="home-box-userName">
+						<view class="home-userName" v-for="home in otherHome">
+							<view class="home-room-details">
+								<input class="myInput" v-model="textarea" :rows="2" placeholder="提醒事项..." />
+								<image class="home-userName-img" src="/static/images/rightArrow.png"
+									@click="addMessage">
+								</image>
+							</view>
+						</view>
+					</view>
 					<view class="home-box-remove">
 						<view style="margin-left: 30rpx">
 							移除家庭
@@ -129,6 +142,7 @@
 		nowUserInfo.hasImage = nowHome.value.userList[index].hasImage;
 		IfShowUserBox.value = true;
 	}
+	const textarea = ref('');
 	//关闭页面
 	const closeUserBoxHandler = (index) => {
 		IfShowUserBox.value = false;
@@ -168,6 +182,38 @@
 	}
 	const closeAddHomeHandler = () => {
 		showAddHome.value = false;
+	}
+	const addMessage = async () => {
+		uni.showModal({
+			content: '确认发布留言',
+			success: async function(res) {
+				if (res.confirm) {
+					const res = await myRequest({
+						url: `Home/CreateMessage`,
+						method: 'get',
+						data: {
+							homeId: account.homeSeleted,
+							message: textarea.value
+						}
+					});
+					if (res.statusCode == 400)
+						uni.showToast({
+							title: '留言失败',
+							icon: 'none',
+							duration: 2000
+						})
+					else
+						uni.showToast({
+							title: '留言成功',
+							icon: 'success',
+							duration: 2000
+						})
+					console.log('点击了确认')
+				} else {
+					console.log('点击了取消')
+				}
+			}
+		})
 	}
 	onShow(async () => {
 		//console.log(homeId.value)
