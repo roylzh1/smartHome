@@ -76,10 +76,10 @@
 			@addRoomComplete="closeAddRoomBoxHandler"></add-new-room>
 
 		<add-furniture v-show="showAddFurniture" :class="showAddFurniture == true ? 'content-fade-up' : ''"
-			:name="whichRoom" :roomId="roomId" :homeId="account.homeSeleted" @addRoomComplete="closeFurnitureHandler">
+			:name="whichRoom" :roomId="roomId" :homeId="account.homeSeleted" @addFurComplete="closeFurnitureHandler">
 		</add-furniture>
 		<remove-furniture v-show="showRemoveFurniture" :class="showRemoveFurniture == true ? 'content-fade-up' : ''"
-			:name="whichRoom" :roomId="roomId" :homeId="account.homeSeleted" @addRoomComplete="closeFurnitureHandler">
+			:name="whichRoom" :roomId="roomId" :homeId="account.homeSeleted" @removeFurComplete="closeFurnitureHandler">
 		</remove-furniture>
 	</view>
 </template>
@@ -229,10 +229,8 @@
 	}
 	const closeFurnitureHandler = () => {
 		//刷新页面
-		uni.switchTab({
-			url: `/pages/home/home`,
-			animationType: 'pop-in',
-			animationDuration: 500
+		uni.reLaunch({
+			url: '/pages/home/home'
 		});
 		showAddFurniture.value = false;
 		showRemoveFurniture.value = false;
@@ -462,9 +460,9 @@
 	}
 
 	.page {
-		height: 120vh;
 		width: 100%;
 		z-index: 2;
+		padding-bottom: 80px;
 	}
 
 	.content {
@@ -572,6 +570,7 @@
 		height: 30px;
 		width: 100%;
 		margin-top: 5px;
+		transition: 1s;
 	}
 
 	.msg-left {

@@ -3,7 +3,8 @@
 		<template #default>
 			<view class="addContent">
 				<view class="add-room-title">{{name}} 添加配件</view>
-				<input class="myInput" v-model="textarea" :rows="2" placeholder="  序列号" />
+				<input class="myInput" v-model="textarea" :rows="2" placeholder="输入序列号" />
+				<view class="QRcode" @click="scan">扫描二维码</view>
 			</view>
 		</template>
 	</popup-small-card>
@@ -21,7 +22,7 @@
 		roomId: Number,
 		homeId: Number
 	});
-	const emit = defineEmits(['addRoomComplete']);
+	const emit = defineEmits(['addFurComplete']);
 	const textarea = ref('')
 	const complete = async () => {
 		console.log(textarea.value + "id: " + prop.roomId);
@@ -47,8 +48,21 @@
 				duration: 2000
 			})
 		console.log(res)
-		emit('addRoomComplete');
+		emit('addFurComplete');
 	};
+	const scan = async () => {
+		uni.scanCode({
+			success: async (res) => {
+				//console.log(res);
+				textarea.value = res.result;
+				uni.showToast({
+					title: '扫描成功',
+					icon: 'none',
+					duration: 1000
+				});
+			}
+		})
+	}
 </script>
 
 <style scoped>
@@ -78,6 +92,20 @@
 		font-weight: 700;
 		letter-spacing: 2px;
 		color: #000000;
+	}
+
+	.QRcode {
+		display: flex;
+		justify-content: center;
+		align-items: center;
+		font-size: 12px;
+		letter-spacing: 1px;
+		font-weight: 600;
+		margin-top: 20px;
+		height: 30px;
+		width: 100px;
+		border-radius: 10px;
+		background-color: #1afa29;
 	}
 
 	.backgroundColor {
