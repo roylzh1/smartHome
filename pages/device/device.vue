@@ -41,6 +41,9 @@
 						</view>
 					</template>
 				</card>
+				<view class="charts-box">
+					<qiun-data-charts type="line" :opts="opts" :chartData="chartData" />
+				</view>
 			</view>
 		</view>
 		<popup-global-air v-if="popupAirIfShow" @airGlobalComplete="closeAirHandler" title="空调中控"
@@ -59,9 +62,11 @@
 		onMounted,
 		ref,
 		nextTick,
+		getCurrentInstance,
 	} from "vue";
 	import {
 		onShow,
+		onLoad,
 	} from '@dcloudio/uni-app'
 	import myRequest from '/utils/request.js';
 	import {
@@ -83,8 +88,35 @@
 	const lightClass = ref('');
 	const lightNum = ref(null);
 	const roomList = ref([]);
+	//-------------------图表--------------------
+	let chartData = ref();
+	let opts = {
+		color: ["#1890FF"],
+		padding: [15, 0, 0, 0],
+		enableScroll: false,
+		legend: {},
+		width: '100%',
+		height: '100%',
+		xAxis: {
+			disableGrid: true,
+			fontColor: '#ffffff'
+		},
+		yAxis: {
+			gridType: "dash",
+			dashLength: 1,
+			disableGrid: true,
+		},
+		extra: {
+			line: {
+				type: "curve",
+				width: 2,
+				activeType: "hollow"
+			}
+		}
+	};
+
 	onShow(async () => {
-		console.log(account.airList);
+		getServerData();
 		if (account.airList) {
 			const roomInfo = await myRequest({
 				url: `Room/GetRoom`,
@@ -287,6 +319,17 @@
 	const pressHandler = () => {
 
 	}
+	const getServerData = () => {
+		let res = {
+			categories: ["10:00", "12:00", "14:00", "16:00", "18:00", "20:00"],
+			series: [{
+				name: "温度",
+				data: [28, 30, 32, 32, 28, 25]
+			}, ]
+		};
+		chartData.value = JSON.parse(JSON.stringify(res));
+	};
+
 
 	/*
 	uni.navigateTo({
@@ -452,7 +495,11 @@
 		color: #fff;
 	}
 
-
+	.charts-box {
+		margin-top: 20px;
+		width: 300px;
+		height: 210px;
+	}
 
 	.backGround {
 		height: 100vh;
