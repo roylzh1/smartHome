@@ -19,6 +19,8 @@ export const useAccountStore = defineStore('account', {
 		roomList: [],
 		airConditionCount: 0,
 		homeTcp: '',
+		homeEnvId: 1,
+		homeEnvInfo: {},
 		lightList: [],
 		airList: [],
 	}),

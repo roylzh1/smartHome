@@ -11,7 +11,7 @@
 	// 只能在App.vue里监听应用的生命周期
 	export default {
 		onLaunch: async function() {
-			uni.hideTabBar()
+			uni.hideTabBar();
 			const account = useAccountStore();
 			const userToken = uni.getStorageSync('smartHome_userToken');
 			if (userToken == '') {
@@ -43,14 +43,10 @@
 							homeId: account.homeSeleted,
 						}
 					});
-					let data = res.data;
-					console.log(res);
-					if (data) {
-						console.log('报警')
+					console.log('发送警报');
+					if (res.data) {
 						uni.vibrateLong({
-							success: function() {
-								console.log('success');
-							}
+							success: function() {}
 						});
 						uni.showModal({
 							content: '警报!!!',
@@ -69,10 +65,12 @@
 									console.log('点击了取消')
 								}
 							}
-						})
-					} else {}
-				}, 13000);
+						});
+
+					}
+				}, 15000);
 			} catch (e) {
+
 				console.log(e.message)
 			}
 
@@ -82,7 +80,7 @@
 
 		},
 		onShow: async function() {
-
+			uni.hideTabBar();
 		},
 		onHide: function() {
 			console.log('App Hide')

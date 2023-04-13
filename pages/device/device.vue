@@ -73,6 +73,7 @@
 	import {
 		onShow,
 		onLoad,
+		onPullDownRefresh,
 	} from '@dcloudio/uni-app'
 	import myRequest from '/utils/request.js';
 	import {
@@ -96,7 +97,8 @@
 	const roomList = ref([]);
 	//-------------------图表--------------------
 	let chartData = ref();
-	let opts = {
+	let homeEnv = ref();
+	const opts = {
 		color: ["#1890FF", "#91CB74", "#FAC858", "#EE6666"],
 		fontColor: '#d0d0d0',
 		padding: [20, 0, -10, 0],
@@ -137,7 +139,6 @@
 	};
 
 	onShow(async () => {
-		getServerData();
 		if (account.airList) {
 			const roomInfo = await myRequest({
 				url: `Room/GetRoom`,
@@ -245,7 +246,142 @@
 		else
 			lightClass.value = 'slider-off';
 
-	})
+		const homeInfo = await myRequest({
+			url: `HomeEnvironment/GetHomeEnvInformation`,
+			method: 'get',
+			data: {
+				homeEnvId: 1
+			}
+		});
+		//console.log(homeInfo.data)
+		homeEnv.value = homeInfo.data;
+		console.log(homeEnv.value);
+
+		getServerData(); //获取图表的数据
+	});
+
+	onPullDownRefresh(async () => {
+		if (account.airList) {
+			const roomInfo = await myRequest({
+				url: `Room/GetRoom`,
+				method: 'get',
+				data: {
+					homeId: account.homeSeleted,
+				}
+			});
+			console.log(roomInfo)
+			roomList.value = [];
+			account.airList = [];
+			account.lightList = [];
+			account.airConditionCount = 0; //空调数量
+			account.roomList = roomInfo.data;
+			roomList.value = roomInfo.data;
+			let tempFurnitures = [];
+			for (let i = 0; i < roomList.value.length; i++) {
+				for (let j = 0; j < roomList.value[i].furnitures.length; j++) {
+					let f = roomList.value[i].furnitures[j];
+					if (f.type == 4) {
+						account.airConditionCount += 1;
+						account.airList.push({
+							roomId: roomList.value[i].id,
+							roomName: roomList.value[i].name,
+							title: f.name,
+							id: f.id,
+							state: f.state,
+							level: f.level,
+							mode: f.mode,
+							tempreture: f.tempreture,
+						})
+						continue;
+					} //不显示空调
+					if (f.type == 0 || f.type == 1) {
+						account.lightList.push({
+							roomId: roomList.value[i].id,
+							roomName: roomList.value[i].name,
+							title: f.name,
+							id: f.id,
+							state: f.state
+						})
+					} //不显示空调
+					tempFurnitures.push({
+						type: f.size,
+						title: f.name,
+						open: "已开",
+						close: "已关",
+						photoClose: `/static/images/${f.type}.png`,
+						photoOpen: `/static/images/${f.type}-light.png`,
+						id: f.id,
+						state: f.state,
+						fType: f.type
+					});
+				}
+				roomList.value[i].furnitures = tempFurnitures;
+				tempFurnitures = [];
+			}
+			uni.hideNavigationBarLoading();
+		}
+		if (account.airConditionCount != 0) {
+			hasAirCondition.value = true;
+			//重置开关
+			airStatus.value = '关闭';
+			ifAirOpen.value = false;
+			airConditionIdList.value = [];
+			num.value = 0;
+			account.airList.forEach(air => {
+				airConditionIdList.value.push(air.id);
+				if (air.state == true) {
+					airStatus.value = '开启';
+					ifAirOpen.value = true;
+					level.value = 0;
+					num.value++;
+				}
+			});
+			avgTemperature.value = (account.airList.map(air => air.tempreture).reduce((pre, cur) =>
+				pre + cur
+			) / account.airList.length).toFixed(0);
+			if (account.airList[0].mode == 1) { //暖风
+				isCold.value = false;
+			} else {
+				isCold.value = true;
+			}
+			//空调图标
+			if (ifAirOpen.value == true && isCold.value == true)
+				imageSrc.value = '/static/images/center-airconditioner-open.png'
+			else if (ifAirOpen.value == true && isCold.value == false)
+				imageSrc.value = '/static/images/center-airconditioner-open-hot.png'
+			else {
+				imageSrc.value = '/static/images/center-airconditioner.png'
+				level.value = 1;
+			}
+
+		}
+		lightNum.value = 0;
+		lightOpen.value = false;
+		account.lightList.forEach(light => {
+			if (light.state) {
+				lightOpen.value = true;
+				lightNum.value++;
+			}
+		})
+		if (lightOpen.value)
+			lightClass.value = 'slider-on';
+		else
+			lightClass.value = 'slider-off';
+
+		const homeInfo = await myRequest({
+			url: `HomeEnvironment/GetHomeEnvInformation`,
+			method: 'get',
+			data: {
+				homeEnvId: 1
+			}
+		});
+		//console.log(homeInfo.data)
+		homeEnv.value = homeInfo.data;
+		console.log(homeEnv.value);
+
+		getServerData(); //获取图表的数据
+		uni.stopPullDownRefresh();
+	});
 	//点击空调
 	const clickAirCondition = async () => {
 		console.log(111)
@@ -345,7 +481,10 @@
 			categories: ["3:00", "8:00", "12:00", "16:00", "19:00", "22:00"],
 			series: [{
 					name: "温度",
-					data: [24, 27, 32, 32, 29, 26],
+					data: [homeEnv.value.temperatures.time3, homeEnv.value.temperatures.time8, homeEnv.value
+						.temperatures.time12, homeEnv.value.temperatures.time16, homeEnv.value.temperatures
+						.time19, homeEnv.value.temperatures.time22
+					],
 					setShadow: [
 						8,
 						12,
@@ -355,7 +494,10 @@
 				},
 				{
 					name: "湿度",
-					data: [70, 75, 77, 80, 82, 79],
+					data: [homeEnv.value.humiditys.time3, homeEnv.value.humiditys.time8, homeEnv.value
+						.humiditys.time12, homeEnv.value.humiditys.time16, homeEnv.value.humiditys.time19,
+						homeEnv.value.humiditys.time22
+					],
 					setShadow: [
 						12,
 						8,
@@ -382,7 +524,7 @@
 	.content {
 		display: flex;
 		flex-direction: column;
-		height: 100vh;
+		height: 100%;
 		width: 100vw;
 		z-index: 2;
 		background-color: #ffffff;

@@ -89,6 +89,7 @@
 		onPageScroll,
 		onTabItemTap,
 		onShow,
+		onPullDownRefresh,
 	} from '@dcloudio/uni-app'
 	import {
 		onMounted,
@@ -404,7 +405,98 @@
 			});
 		}
 	})
-
+	onPullDownRefresh(async () => {
+		try {
+			let userInfo = uni.getStorageSync('smartHome_userInfo');
+			console.log(userInfo)
+			//更新会话号
+			uni.showNavigationBarLoading();
+			//获取房间和家具信息
+			const roomInfo = await myRequest({
+				url: `Room/GetRoom`,
+				method: 'get',
+				data: {
+					homeId: account.homeSeleted,
+				}
+			});
+			//console.log(roomInfo)
+			account.changeUserInfo({
+				userName: userInfo.name,
+				userId: userInfo.id,
+				email: userInfo.email,
+				phoneNumber: userInfo.phone,
+				hasImage: userInfo.hasImage
+			});
+			account.homeList = userInfo.homeList;
+			account.homeSeleted = userInfo.homeList[0].id; //默认为第一个家庭
+			//console.log(account.homeList)
+			roomList.value = [];
+			account.airList = [];
+			account.lightList = [];
+			account.airConditionCount = 0; //空调数量
+			account.roomList = roomInfo.data;
+			roomList.value = roomInfo.data;
+			let tempFurnitures = [];
+			for (let i = 0; i < roomList.value.length; i++) {
+				for (let j = 0; j < roomList.value[i].furnitures.length; j++) {
+					let f = roomList.value[i].furnitures[j];
+					if (f.type == 4) {
+						account.airConditionCount += 1;
+						account.airList.push({
+							roomId: roomList.value[i].id,
+							roomName: roomList.value[i].name,
+							title: f.name,
+							id: f.id,
+							state: f.state,
+							level: f.level,
+							mode: f.mode,
+							tempreture: f.tempreture,
+						})
+						continue;
+					} //不显示空调
+					if (f.type == 0 || f.type == 1) {
+						account.lightList.push({
+							roomId: roomList.value[i].id,
+							roomName: roomList.value[i].name,
+							title: f.name,
+							id: f.id,
+							state: f.state
+						})
+					} //不显示空调
+					tempFurnitures.push({
+						type: f.size,
+						title: f.name,
+						open: "已开",
+						close: "已关",
+						photoClose: `/static/images/${f.type}.png`,
+						photoOpen: `/static/images/${f.type}-light.png`,
+						id: f.id,
+						state: f.state,
+						fType: f.type
+					});
+				}
+				roomList.value[i].furnitures = tempFurnitures;
+				tempFurnitures = [];
+			}
+			showRoom.value = false;
+			uni.hideNavigationBarLoading();
+			nextTick(() => {
+				showRoom.value = true;
+			})
+			//获取信息
+			const msg = await myRequest({
+				url: `Home/GetMessage`,
+				method: 'get',
+				data: {
+					homeId: account.homeSeleted,
+				}
+			});
+			messageList.value = msg.data;
+			uni.stopPullDownRefresh();
+		} catch (e) {
+			console.log(e)
+		}
+	})
 	//导航栏渐变
 	onPageScroll(e => {
 		let opacity = e.scrollTop / 50;
@@ -447,7 +539,7 @@
 	}
 
 	.backGround {
-		height: 100vh;
+		height: 100%;
 		width: 100%;
 		position: fixed;
 		top: 0;
