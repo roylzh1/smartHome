@@ -41,9 +41,15 @@
 						</view>
 					</template>
 				</card>
-				<view class="charts-box">
-					<qiun-data-charts type="line" :opts="opts" :chartData="chartData" />
-				</view>
+				<h3 class="g-title">智能环境检测</h3>
+				<card width="600" height="350">
+					<template #default>
+						<view class="charts-box">
+							<qiun-data-charts type="line" :opts="opts" :chartData="chartData" />
+						</view>
+					</template>
+				</card>
+
 			</view>
 		</view>
 		<popup-global-air v-if="popupAirIfShow" @airGlobalComplete="closeAirHandler" title="空调中控"
@@ -91,26 +97,41 @@
 	//-------------------图表--------------------
 	let chartData = ref();
 	let opts = {
-		color: ["#1890FF"],
-		padding: [15, 0, 0, 0],
+		color: ["#1890FF", "#91CB74", "#FAC858", "#EE6666"],
+		fontColor: '#d0d0d0',
+		padding: [20, 0, -10, 0],
 		enableScroll: false,
-		legend: {},
-		width: '100%',
-		height: '100%',
+		legend: {
+			float: 'top',
+			margin: 10,
+			padding: 10
+		},
+		height: 170,
+		series: {
+			textOffset: -10
+		},
 		xAxis: {
 			disableGrid: true,
-			fontColor: '#ffffff'
+			fontColor: '#d0d0d0',
+			axisLine: false,
+			marginTop: 5,
 		},
 		yAxis: {
 			gridType: "dash",
 			dashLength: 1,
 			disableGrid: true,
+			disabled: true
 		},
 		extra: {
 			line: {
 				type: "curve",
 				width: 2,
-				activeType: "hollow"
+				activeType: "hollow",
+				onShadow: true,
+				animation: "horizontal"
+			},
+			markLine: {
+				type: "dash"
 			}
 		}
 	};
@@ -321,11 +342,28 @@
 	}
 	const getServerData = () => {
 		let res = {
-			categories: ["10:00", "12:00", "14:00", "16:00", "18:00", "20:00"],
+			categories: ["3:00", "8:00", "12:00", "16:00", "19:00", "22:00"],
 			series: [{
-				name: "温度",
-				data: [28, 30, 32, 32, 28, 25]
-			}, ]
+					name: "温度",
+					data: [24, 27, 32, 32, 29, 26],
+					setShadow: [
+						8,
+						12,
+						20,
+						"#1890FF"
+					],
+				},
+				{
+					name: "湿度",
+					data: [70, 75, 77, 80, 82, 79],
+					setShadow: [
+						12,
+						8,
+						20,
+						"#91CB74"
+					],
+				}
+			]
 		};
 		chartData.value = JSON.parse(JSON.stringify(res));
 	};
@@ -496,9 +534,8 @@
 	}
 
 	.charts-box {
-		margin-top: 20px;
-		width: 300px;
-		height: 210px;
+		width: 280px;
+		height: 170px;
 	}
 
 	.backGround {

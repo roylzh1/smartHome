@@ -13,6 +13,14 @@
 			<view class="popup-user-detail-phone">
 				{{phoneNumber}}
 			</view>
+			<view class="popup-user-detail-family">
+				<view class="family-text">
+					权限级别
+				</view>
+				<picker @change="bindPickerChange" :value="index" :range="family">
+					<view class="famliy-input">{{family[index]}}</view>
+				</picker>
+			</view>
 			<view class="remove-user">
 				<view>
 					移除用户
@@ -39,10 +47,15 @@
 	});
 	const imageUrl = ref('http://47.115.227.63:6600/userImage/deafult.png');
 	const emit = defineEmits(['userComplete']);
-
+	const index = ref(0);
+	const family = ['亲属', '亲戚', '朋友', '儿童']
 	const complete = () => {
 		emit('userComplete');
 	};
+	const bindPickerChange = (e) => {
+		console.log('picker发送选择改变，携带值为', e.detail.value)
+		index.value = e.detail.value
+	}
 	const updateImage = () => {
 		uni.chooseImage({
 			count: 1, // 最多可以选择的图片张数，默认9
@@ -146,7 +159,7 @@
 		display: flex;
 		justify-content: center;
 		align-items: center;
-		margin-top: 600rpx;
+		margin-top: 350rpx;
 		height: 60rpx;
 		width: 200rpx;
 		background-color: #fff;
@@ -160,5 +173,31 @@
 		height: 120px;
 		width: 120px;
 		border-radius: 50%;
+	}
+
+	.family-text {
+		font-size: 16px;
+		color: #efefef;
+		margin-bottom: 10px;
+	}
+
+	.popup-user-detail-family {
+		margin-top: 30px;
+		display: flex;
+		flex-direction: column;
+		justify-content: center;
+		align-items: center;
+	}
+
+	.famliy-input {
+		display: flex;
+		justify-content: center;
+		align-items: center;
+		height: 40px;
+		width: 100px;
+		color: #bfe33a;
+		font-weight: 700;
+		background-color: #fff;
+		border-radius: 10px;
 	}
 </style>
