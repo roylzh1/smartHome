@@ -135,6 +135,7 @@
 	const popupdoorBoxIfShow = ref(false);
 	//基础家具弹窗,大的小的都在这
 	const popupHandler = (type, title, id, index, state, roomId) => {
+		account.furnitureId = id;
 		//灯
 		if (type == 0 || type == 1) {
 			popupLightBoxIfShow.value = true;

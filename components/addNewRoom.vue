@@ -3,7 +3,7 @@
 		<template #default>
 			<view class="addContent">
 				<view class="add-room-title">添加房间</view>
-				<el-input class="myInput" v-model="textarea" :rows="2" placeholder="            房间名" />
+				<input class="myInput" v-model="textarea" :rows="2" placeholder="            房间名" />
 			</view>
 		</template>
 	</popup-small-card>

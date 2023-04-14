@@ -22,31 +22,27 @@
 	const emit = defineEmits(['addHomeComplete']);
 	const textarea = ref('')
 	const complete = async () => {
-		console.log(textarea.value + "id: " + prop.roomId);
-		/*
 		const res = await myRequest({
-			url: `Room/InsertFurniture`,
+			url: `Hoom/CreateHome`,
 			method: 'get',
 			data: {
-				furnitureId: textarea.value,
-				roomId: prop.roomId,
-				homeId: prop.homeId
+				homeName: textarea.value
 			}
 		});
 		if (res.statusCode == 400)
 			uni.showToast({
-				title: '添加家具失败',
+				title: '添加家庭失败',
 				icon: 'none', //如果要纯文本，不要icon，将值设为'none'
 				duration: 2000 //持续时间为 2秒
 			})
 		else
 			uni.showToast({
-				title: '添加家具成功',
+				title: '添加家庭成功',
 				icon: 'success', //将值设置为 success 或者 ''
 				duration: 2000 //持续时间为 2秒
 			})
 		console.log(res)
-		*/
+
 		emit('addHomeComplete');
 	};
 </script>

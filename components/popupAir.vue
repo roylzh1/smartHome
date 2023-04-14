@@ -202,6 +202,10 @@
 	}
 	//完成
 	const complete = async () => {
+		account.airList[props.index].state = state.value;
+		account.airList[props.index].mode = modeNum.value;
+		account.airList[props.index].level = levelNum.value;
+		account.airList[props.index].tempreture = temperture.value;
 		const res = await myRequest({
 			url: `Tcp/ChangeAirCondition`,
 			method: 'post',
@@ -214,10 +218,6 @@
 				"sessionId": account.homeTcp
 			}
 		});
-		account.airList[props.index].state = state.value;
-		account.airList[props.index].mode = modeNum.value;
-		account.airList[props.index].level = levelNum.value;
-		account.airList[props.index].tempreture = temperture.value;
 		emit('airComplete');
 		uni.navigateTo({
 			url: `/pages/airConditioner/airConditioner`,

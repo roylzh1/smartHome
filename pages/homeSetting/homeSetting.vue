@@ -55,9 +55,8 @@
 					<view class="home-box-userName">
 						<view class="home-userName" v-for="(room,index) in nowHome.rooms" :key="room.id">
 							<view class="home-room-details">
-								<view>
-									{{room.name}}
-								</view>
+								<input class="lightHeader-text" v-model="textarea1[index]" :placeholder="room.name"
+									placeholder-style="color:rgba(0,0, 0, 1);" />
 								<image @click="removeRoom(room.id,index)" class="home-userName-img"
 									src="/static/images/x-regular-24.png"></image>
 							</view>
@@ -81,9 +80,9 @@
 						留言
 					</view>
 					<view class="home-box-userName">
-						<view class="home-userName" v-for="home in otherHome">
+						<view class="home-userName">
 							<view class="home-room-details">
-								<input class="myInput" v-model="textarea" :rows="2" placeholder="提醒事项..." />
+								<input v-model="textarea" :rows="2" placeholder="提醒事项..." />
 								<image class="home-userName-img" src="/static/images/rightArrow.png"
 									@click="addMessage">
 								</image>
@@ -143,6 +142,7 @@
 		IfShowUserBox.value = true;
 	}
 	const textarea = ref('');
+	const textarea1 = ref([]);
 	//关闭页面
 	const closeUserBoxHandler = (index) => {
 		IfShowUserBox.value = false;
@@ -150,7 +150,7 @@
 	//切换家庭,要连接数据库,新增首选家庭字段才能真正实现
 	const switchHome = (homeId) => {
 		uni.showModal({
-			content: '确认删除该家庭',
+			content: '确认切换至该家庭',
 			success: function(res) {
 				if (res.confirm) {
 					account.homeSeleted = homeId;
@@ -165,9 +165,29 @@
 	const removeRoom = (roomId, index) => {
 		uni.showModal({
 			content: '确认删除该房间',
-			success: function(res) {
+			success: async function(res) {
 				if (res.confirm) {
 					nowHome.value.rooms.splice(index, 1);
+					const res = await myRequest({
+						url: `Room/DeleteRoom`,
+						method: 'get',
+						data: {
+							roomId: roomId,
+							homeId: account.homeSeleted
+						}
+					});
+					if (res.statusCode == 400)
+						uni.showToast({
+							title: '删除房间失败',
+							icon: 'none',
+							duration: 2000
+						})
+					else
+						uni.showToast({
+							title: '删除房间成功',
+							icon: 'success',
+							duration: 2000
+						})
 					console.log('点击了确认')
 				} else {
 					console.log('点击了取消')
@@ -225,6 +245,7 @@
 				homeId: account.homeSeleted,
 			}
 		});
+		nowHome.value = []
 		nowHome.value = hoomInfo.data;
 		//console.log(nowHome.value)
 

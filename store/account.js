@@ -23,6 +23,7 @@ export const useAccountStore = defineStore('account', {
 		homeEnvInfo: {},
 		lightList: [],
 		airList: [],
+		furnitureId: 0,
 	}),
 	actions: {
 		changeUserInfo(userinfo) {

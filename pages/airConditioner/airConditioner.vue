@@ -47,6 +47,8 @@
 	const level = ref(1);
 	const popupBoxIfShow = ref(false);
 	const airList = ref([]);
+	const isCold = ref(true);
+	const nowIndex = ref(0);
 	onShow(() => {
 		airList.value = account.airList;
 	})
@@ -68,9 +70,16 @@
 		popupMessage.id = airList.value[index].id;
 		popupMessage.status = airList.value[index].state;
 		popupMessage.index = index;
+		nowIndex.value = index;
 		popupBoxIfShow.value = true;
 	};
 	const closeBoxHandler = () => {
+		console.log(account.airList[nowIndex.value].mode)
+		if (account.airList[nowIndex.value].mode === 0)
+			isCold.value = true;
+		else
+			isCold.value = false;
+		console.log(isCold.value)
 		popupBoxIfShow.value = false;
 	}
 

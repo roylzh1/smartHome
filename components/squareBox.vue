@@ -25,6 +25,7 @@
 <script setup>
 	import {
 		ref,
+		watch,
 	} from "vue";
 	import {
 		onShow
@@ -43,6 +44,9 @@
 		status: Boolean,
 		wind: String,
 		index: Number
+	});
+	watch(() => props.isCold, (newValue) => {
+		console.log(newValue)
 	});
 	const emit = defineEmits(['popup', 'checkStatus']);
 	const windName = ref(null);
