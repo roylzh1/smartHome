@@ -23,6 +23,8 @@
 			"path": "pages/createMode/createMode"
 		}, {
 			"path": "pages/homeSetting/homeSetting"
+		}, {
+			"path": "pages/checkMode/checkMode"
 		}
 	],
 

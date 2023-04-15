@@ -1,5 +1,5 @@
 <template>
-	<popup-card :title="title" @return="complete">
+	<popup-card :title="title" @return="complete1">
 		<view class="air-g-content">
 			<view class="g-temp">
 				<span>{{temperture}}</span>
@@ -201,7 +201,7 @@
 		}
 	}
 	//完成
-	const complete = async () => {
+	const complete1 = async () => {
 		account.airList[props.index].state = state.value;
 		account.airList[props.index].mode = modeNum.value;
 		account.airList[props.index].level = levelNum.value;
@@ -221,7 +221,6 @@
 		emit('airComplete');
 		uni.navigateTo({
 			url: `/pages/airConditioner/airConditioner`,
-			animationType: 'pop-in',
 			animationDuration: 0
 		});
 	};

@@ -30,8 +30,7 @@
 	const emit = defineEmits(['return']);
 	const complete = async () => {
 		//<view class="lightHeader-text">{{title}}</view>
-
-		if (textarea.value != '') {
+		if (textarea.value != undefined) {
 			console.log(textarea.value)
 			const res = await myRequest({
 				url: `Furniture/ChangeFurnitureInfo`,

@@ -4,7 +4,7 @@
 		<h1 class="title">场景设置</h1>
 		<view class="room">
 			<card height="130" width="300" style="margin: 20rpx;" v-for="mode in modes"
-				@click="clickMode(mode.furnitures)" @longpress="deleteMode(mode.id)">
+				@click="clickMode(mode.furnitures)" @longpress="modeDetail(mode.id)">
 				<template #default>
 					<view class="box">
 						<view class="mode-pic-box">
@@ -89,6 +89,14 @@
 	const addMode = () => {
 		uni.navigateTo({
 			url: `/pages/createMode/createMode`,
+			animationType: 'pop-in',
+			animationDuration: 500
+		});
+	}
+	const modeDetail = (id) => {
+		console.log(id);
+		uni.navigateTo({
+			url: `/pages/checkMode/checkMode?id=${id}`,
 			animationType: 'pop-in',
 			animationDuration: 500
 		});

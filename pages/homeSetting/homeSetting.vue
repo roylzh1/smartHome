@@ -260,6 +260,8 @@
 		homeId.value = option.homeId;
 	});
 	const complete = () => {
+		//Room/ChangeRoomName?roomId=1&roomName
+		//console.log(textarea1.value)
 		uni.switchTab({
 			url: '/pages/home/home',
 			animationType: 'pop-out',
