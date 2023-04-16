@@ -427,6 +427,7 @@
 				level.value = 1;
 			}
 
+
 		}
 	}
 	const longPressAirHandler = () => {
@@ -442,6 +443,7 @@
 		if (lightOpen.value) {
 			lightClass.value = 'slider-on';
 			lightNum.value = account.lightList.length;
+			console.log(account.lightList)
 			const res = await myRequest({
 				url: `Tcp/GlobalChangeLight`,
 				method: 'post',

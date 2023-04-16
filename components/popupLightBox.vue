@@ -6,6 +6,11 @@
 			<view class="adjust-content" @touchmove="moveHandler">
 				<view class="adjust" :style="{transform:`translateY(${moveY}px)`}"></view>
 			</view>
+			<view class="color-box">
+				<view class="r"></view>
+				<view class="g"></view>
+				<view class="b"></view>
+			</view>
 		</view>
 	</popup-card>
 </template>
@@ -95,6 +100,50 @@
 	.logo {
 		height: 250rpx;
 		width: 250rpx;
+	}
+
+	.color-box {
+		margin-top: 20px;
+		display: flex;
+		justify-content: center;
+		align-items: center;
+	}
+
+	.r {
+		background: linear-gradient(#CD5C5C, #B22222);
+		box-shadow: rgba(0, 0, 0, .1) 2px 2px 5px;
+	}
+
+	.r:hover {
+		border: #fff 1px solid;
+	}
+
+	.g {
+		background: linear-gradient(#228B22, #006400);
+		box-shadow: rgba(0, 0, 0, .1) 2px 2px 5px;
+	}
+
+	.g:hover {
+		border: #fff 1px solid;
+	}
+
+	.b {
+		background: linear-gradient(#00BFFF, #4169E1);
+		box-shadow: rgba(0, 0, 0, .1) 2px 2px 5px;
+	}
+
+	.b:hover {
+		border: #fff 1px solid;
+	}
+
+	.r,
+	.g,
+	.b {
+		height: 50px;
+		width: 50px;
+		margin-right: 10px;
+		margin-left: 10px;
+		border-radius: 50%;
 	}
 
 	.backgroundColor {

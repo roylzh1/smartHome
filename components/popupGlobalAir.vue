@@ -211,6 +211,7 @@
 				"sessionId": account.homeTcp
 			}
 		});
+		console.log(res.data)
 		for (let i = 0; i < account.airList.length; i++) {
 			account.airList[i].state = state.value;
 			account.airList[i].mode = modeNum.value;

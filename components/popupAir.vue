@@ -218,6 +218,7 @@
 				"sessionId": account.homeTcp
 			}
 		});
+		console.log(res)
 		emit('airComplete');
 		uni.navigateTo({
 			url: `/pages/airConditioner/airConditioner`,

@@ -9,8 +9,8 @@
 			</view>
 			<view class="air-room" v-for="(air,index) in airList">
 				<view class="global-title">{{air.roomName+'空调'}}</view>
-				<square-box @popup="popupBoxHandler" :isCold="isCold?'#1296db':'#1afa29'" open="开启" close="关闭"
-					:temperature="air.tempreture" :wind="air.level" :status="air.state" :index="index">
+				<square-box @popup="popupBoxHandler" :isCold="air.mode===0?'#1296db':'#1afa29'" open="开启" close="关闭"
+					:temperature="air.tempreture" :wind="air.level" :status="air.state" :mode="air.mode" :index="index">
 				</square-box>
 			</view>
 		</view>
@@ -51,6 +51,7 @@
 	const nowIndex = ref(0);
 	onShow(() => {
 		airList.value = account.airList;
+		console.log(airList.value)
 	})
 	let popupMessage = reactive({
 		title: '',

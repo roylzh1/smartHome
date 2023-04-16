@@ -13,7 +13,7 @@
 						风速: {{props.wind}}
 					</view>
 					<view class="air-mode">
-						模式: 除湿
+						模式: {{modeName}}
 					</view>
 				</view>
 				<view class="status1">{{props.status ? open : close}}</view>
@@ -26,6 +26,7 @@
 	import {
 		ref,
 		watch,
+		computed
 	} from "vue";
 	import {
 		onShow
@@ -43,11 +44,17 @@
 		isCold: String,
 		status: Boolean,
 		wind: String,
-		index: Number
+		index: Number,
+		mode: Number
 	});
 	watch(() => props.isCold, (newValue) => {
 		console.log(newValue)
 	});
+	const modeName = computed(() => {
+		if (props.mode == 0) return '制冷'
+		if (props.mode == 1) return '制热'
+		if (props.mode == 2) return '除湿'
+	})
 	const emit = defineEmits(['popup', 'checkStatus']);
 	const windName = ref(null);
 
