@@ -24,6 +24,7 @@ export const useAccountStore = defineStore('account', {
 		lightList: [],
 		airList: [],
 		furnitureId: 0,
+		nowSelectedIndex: 9999
 	}),
 	actions: {
 		changeUserInfo(userinfo) {

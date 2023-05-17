@@ -439,6 +439,9 @@
 	}
 	//灯光开关
 	const openLight = async () => {
+		if (account.nowSelectedIndex != 9999) {
+			account.nowSelectedIndex = 9999;
+		}
 		lightOpen.value = !lightOpen.value;
 		if (lightOpen.value) {
 			lightClass.value = 'slider-on';
@@ -454,6 +457,9 @@
 				}
 			});
 		} else {
+			if (account.nowSelectedIndex != 9999) {
+				account.nowSelectedIndex = 9999;
+			}
 			lightClass.value = 'slider-off';
 			lightNum.value = 0;
 			const res = await myRequest({

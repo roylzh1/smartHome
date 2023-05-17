@@ -199,6 +199,9 @@
 	}
 	//完成
 	const complete = async () => {
+		if (account.nowSelectedIndex != 9999) {
+			account.nowSelectedIndex = 9999;
+		}
 		const res = await myRequest({
 			url: `Tcp/GlobalChangeAirCondition`,
 			method: 'post',

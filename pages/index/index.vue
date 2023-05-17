@@ -3,14 +3,16 @@
 	<view class="content">
 		<h1 class="title">场景设置</h1>
 		<view class="room">
-			<card height="130" width="300" style="margin: 20rpx;" v-for="mode in modes"
-				@click="clickMode(mode.furnitures)" @longpress="modeDetail(mode.id)">
+			<card height="130" width="300" style="margin: 20rpx;" v-for="(mode,index) in modes"
+				@click="clickMode(mode.furnitures,index)" @longpress="modeDetail(mode.id)"
+				:active="account.nowSelectedIndex == index ? true : false">
 				<template #default>
 					<view class="box">
 						<view class="mode-pic-box">
 							<image src="/static/images/moon-solid-40.png" alt=""></image>
 						</view>
-						<view class="mode-name">
+						<view class="mode-name"
+							:style="{color: account.nowSelectedIndex == index  ?`rgba(0,0,0,1)` : `#ffffff`}">
 							{{mode.name}}
 						</view>
 					</view>
@@ -42,6 +44,7 @@
 		onMounted,
 		ref,
 		nextTick,
+		inject,
 	} from "vue";
 	import {
 		onShow,
@@ -64,26 +67,45 @@
 		modes.value = [];
 		modes.value = data.modes;
 	})
-	const clickMode = async f => {
-		uni.showModal({
-			content: '确认开启此模式',
-			success: async function(res) {
-				if (res.confirm) {
-					await myRequest({
-						url: `Tcp/GlobalOpenOrClose`,
-						method: 'get',
-						data: {
-							furnitures: f,
-							sessionId: account.homeTcp,
-							state: true
-						}
-					});
-					console.log('点击了确认')
-				} else {
-					console.log('点击了取消')
+	const clickMode = async (f, index) => {
+		if (account.nowSelectedIndex != 9999) {
+			uni.showModal({
+				content: '确认关闭此模式',
+				success: async function(res) {
+					if (res.confirm) {
+
+						//更改所选的家具索引
+						account.nowSelectedIndex = 9999;
+						console.log('点击了确认')
+					} else {
+						console.log('点击了取消')
+					}
 				}
-			}
-		});
+			});
+		} else {
+			console.log(account.nowSelectedIndex)
+			uni.showModal({
+				content: '确认开启此模式',
+				success: async function(res) {
+					if (res.confirm) {
+						await myRequest({
+							url: `Tcp/GlobalOpenOrClose`,
+							method: 'get',
+							data: {
+								furnitures: f,
+								sessionId: account.homeTcp,
+								state: true
+							}
+						});
+						//更改所选的家具索引
+						account.nowSelectedIndex = index;
+						console.log('点击了确认')
+					} else {
+						console.log('点击了取消')
+					}
+				}
+			});
+		}
 	}
 
 	const addMode = () => {
@@ -162,6 +184,7 @@
 	.mode-name {
 		font-weight: 700;
 		letter-spacing: 1px;
+		transition: 0.8s;
 	}
 
 	.mode-pic-box {

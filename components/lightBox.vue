@@ -43,6 +43,9 @@
 		if (props.lighted != 0) selected.value = true;
 	})
 	const handleClick = async () => {
+		if (account.nowSelectedIndex != 9999) {
+			account.nowSelectedIndex = 9999;
+		}
 		selected.value = !selected.value;
 		console.log(props.rooms.toString());
 		const res = await myRequest({

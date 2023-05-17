@@ -8,6 +8,11 @@
 	import {
 		useAccountStore
 	} from '@/store/account.js';
+	import {
+		provide,
+		ref
+	} from "vue";
+
 	// 只能在App.vue里监听应用的生命周期
 	export default {
 		onLaunch: async function() {

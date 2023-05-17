@@ -54,6 +54,9 @@
 	});
 
 	const handleClick = async () => {
+		if (account.nowSelectedIndex != 9999) {
+			account.nowSelectedIndex = 9999;
+		}
 		selected.value = !selected.value;
 		const res = await myRequest({
 			url: `Tcp/ChangeFurnitureState`,

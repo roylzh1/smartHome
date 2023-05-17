@@ -30,6 +30,9 @@
 	const emit = defineEmits(['return']);
 	const complete = async () => {
 		//<view class="lightHeader-text">{{title}}</view>
+		if (account.nowSelectedIndex != 9999) {
+			account.nowSelectedIndex = 9999;
+		}
 		if (textarea.value != undefined) {
 			console.log(textarea.value)
 			const res = await myRequest({
