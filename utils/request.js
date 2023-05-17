@@ -1,5 +1,6 @@
-let baseURL = 'http://47.115.227.63:6600/api/';
+//let baseURL = 'http://47.115.227.63:6600/api/';
 //let baseURL = 'https://localhost:7140/api/';
+let baseURL = 'http://106.55.182.93:6600/api/'
 
 function myRequest(options) {
 	let headers = {}

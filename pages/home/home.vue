@@ -312,7 +312,7 @@
 			let userInfo = uni.getStorageSync('smartHome_userInfo');
 			//console.log(userInfo)
 			//更新会话号
-			uni.showNavigationBarLoading();
+			//uni.showNavigationBarLoading();
 			//获取房间和家具信息
 			const roomInfo = await myRequest({
 				url: `Room/GetRoom`,
@@ -381,7 +381,7 @@
 				tempFurnitures = [];
 			}
 			showRoom.value = false;
-			uni.hideNavigationBarLoading();
+			//uni.hideNavigationBarLoading();
 			nextTick(() => {
 				showRoom.value = true;
 			})

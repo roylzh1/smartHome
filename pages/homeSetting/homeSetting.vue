@@ -98,7 +98,8 @@
 			</view>
 		</view>
 		<popup-user @touchmove.stop.prevent :name="nowUserInfo.name" :email="nowUserInfo.email"
-			:phoneNumber="nowUserInfo.phoneNumber" :hasImage="nowUserInfo.hasImage" v-show="IfShowUserBox"
+			:phoneNumber="nowUserInfo.phoneNumber" :hasImage="nowUserInfo.hasImage" :master="nowHome.master"
+			:userId="nowUserInfo.id" v-show="IfShowUserBox"
 			:class="IfShowUserBox == true ? 'content-fade-up-animation' : ''" @userComplete="closeUserBoxHandler">
 		</popup-user>
 		<add-home v-show="showAddHome" :class="showAddHome == true ? 'content-fade-up' : ''"
@@ -130,7 +131,8 @@
 		name: '',
 		email: '',
 		phoneNumber: '',
-		hasImage: ''
+		hasImage: '',
+		id: 0
 	})
 	//展示用户个人信息
 	const IfShowUserBox = ref(false);
@@ -139,6 +141,7 @@
 		nowUserInfo.email = nowHome.value.userList[index].email;
 		nowUserInfo.phoneNumber = nowHome.value.userList[index].phoneNumber;
 		nowUserInfo.hasImage = nowHome.value.userList[index].hasImage;
+		nowUserInfo.id = nowHome.value.userList[index].id;
 		IfShowUserBox.value = true;
 	}
 	const textarea = ref('');
@@ -172,7 +175,7 @@
 						url: `Room/DeleteRoom`,
 						method: 'get',
 						data: {
-							roomId: roomId,
+							roomId,
 							homeId: account.homeSeleted
 						}
 					});

@@ -19,7 +19,7 @@
 		<card height="700" width="600" v-if="isLogin">
 			<view class="user-logined">
 				<image class="my-user-img"
-					:src="account.userinfo.hasImage ? `http://47.115.227.63:6600/userImage/${account.userinfo.userName}.jpg`: 'http://47.115.227.63:6600/userImage/deafult.jpg'">
+					:src="account.userinfo.hasImage ? `${base_url}/userImage/${account.userinfo.userName}.jpg`: `${base_url}/userImage/deafult.jpg`">
 				</image>
 				<view class="user-name-box">
 					{{account.userinfo.userName}}
@@ -40,6 +40,9 @@
 <script setup>
 	import tabBar from '/components/tabBar.vue';
 	import card from '/components/card.vue';
+	import {
+		base_url
+	} from '/utils/env_value.js';
 	import myRequest from '/utils/request.js';
 	import {
 		useAccountStore
