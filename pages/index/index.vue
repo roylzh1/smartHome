@@ -9,7 +9,7 @@
 				<template #default>
 					<view class="box">
 						<view class="mode-pic-box">
-							<image src="/static/images/moon-solid-40.png" alt=""></image>
+							<image :src="imgSrc(mode.types)"></image>
 						</view>
 						<view class="mode-name"
 							:style="{color: account.nowSelectedIndex == index  ?`rgba(0,0,0,1)` : `#ffffff`}">
@@ -54,6 +54,9 @@
 	} from '@/store/account.js';
 	const account = useAccountStore(); //D6EF2F
 	const modes = ref([]);
+	const imgSrc = (index) => {
+		return `/static/images/mode${index}.png`;
+	}
 	onShow(async () => {
 		const {
 			data
@@ -66,6 +69,7 @@
 		});
 		modes.value = [];
 		modes.value = data.modes;
+		console.log(modes.value)
 	})
 	const clickMode = async (f, index) => {
 		if (account.nowSelectedIndex != 9999) {
@@ -73,7 +77,6 @@
 				content: '确认关闭此模式',
 				success: async function(res) {
 					if (res.confirm) {
-
 						//更改所选的家具索引
 						account.nowSelectedIndex = 9999;
 						console.log('点击了确认')

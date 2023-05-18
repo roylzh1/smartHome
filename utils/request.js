@@ -34,6 +34,5 @@ function myRequest(options) {
 			}
 		})
 	})
-
 }
 export default myRequest;

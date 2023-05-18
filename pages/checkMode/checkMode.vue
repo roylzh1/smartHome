@@ -13,7 +13,21 @@
 				<template #default>
 					<view class="box">
 						<view class="mode-pic-box" style="backgroundColor: #fff; ">
-							<image src="/static/images/plus-medical-regular-40.png"></image>
+							<image src="/static/images/开启.png"></image>
+						</view>
+						<view class="mode-name">
+							{{f.name}}
+						</view>
+					</view>
+				</template>
+			</card>
+		</view>
+		<view class="room">
+			<card height="130" width="300" style="margin: 20rpx;" v-for="(f,index) in closeFur">
+				<template #default>
+					<view class="box">
+						<view class="mode-pic-box" style="backgroundColor: #6f6f6f; ">
+							<image src="/static/images/关闭.png"></image>
 						</view>
 						<view class="mode-name">
 							{{f.name}}
@@ -47,6 +61,7 @@
 	const furnitures = ref([]);
 	const modeName = ref('');
 	const haveFur = ref([]);
+	const closeFur = ref([]);
 	const id = ref();
 	onLoad((option) => {
 		console.log(option);
@@ -65,7 +80,7 @@
 		modeName.value = data.name;
 
 		//data.furnitures = data.furnitures.split(',');
-		console.log(data.furnitures)
+		console.log(data)
 		const res = await myRequest({
 			url: `Room/GetRoom`,
 			method: 'get',
@@ -75,13 +90,17 @@
 		});
 		furnitures.value = [];
 		let tempArr = res.data;
+
 		for (let i = 0; i < tempArr.length; i++) {
 			furnitures.value.push(...tempArr[i].furnitures)
 		}
+		console.log(furnitures.value)
 		for (let i = 0; i < furnitures.value.length; i++) {
-			console.log(furnitures.value[i].id)
-			if (data.furnitures.includes(furnitures.value[i].id + '')) {
+			console.log(furnitures.value[i].id); //furnituresClosed
+			if (data.furnituresOpen.includes(furnitures.value[i].id + '')) {
 				haveFur.value.push(furnitures.value[i]);
+			} else {
+				closeFur.value.push(furnitures.value[i]);
 			}
 		}
 
@@ -99,41 +118,7 @@
 			animationDuration: 0
 		});
 	}
-	const addMode = async () => {
-		let fs = '';
-		for (let i = 0; i < furnitures.value.length; i++) {
-			if (furnitures.value[i].state && i != furnitures.value.length - 1) {
-				fs += `${furnitures.value[i].id},`
-			}
-		}
-		fs = fs.substr(0, fs.length - 1);
-		const res = await myRequest({
-			url: `Home/CreateMode`,
-			method: 'get',
-			data: {
-				homeId: account.homeSeleted,
-				modeName: modeName.value,
-				furnitures: fs
-			}
-		});
-		if (res.statusCode == 400)
-			uni.showToast({
-				title: '新增场景失败',
-				icon: 'none',
-				duration: 2000
-			})
-		else
-			uni.showToast({
-				title: '新增场景成功',
-				icon: 'success',
-				duration: 2000
-			})
-		uni.switchTab({
-			url: `/pages/home/home`,
-			animationType: 'pop-in',
-			animationDuration: 0
-		});
-	}
+
 	/*
 	uni.navigateTo({
 		url: `/pages/airConditioner/airConditioner?name=${name}`,

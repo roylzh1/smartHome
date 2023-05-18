@@ -1,6 +1,12 @@
 <template>
 	<view class="backGround"></view>
 	<view class="content">
+		<h1 class="title">选择模式</h1>
+		<view class="choose-box">
+			<picker @change="bindPickerChange" :value="index" :range="modes">
+				<view class="choose-input">{{modes[index]}}</view>
+			</picker>
+		</view>
 		<h1 class="title">设置家具状态</h1>
 		<view class="room">
 			<card height="130" width="300" style="margin: 20rpx;" v-for="(f,index) in furnitures"
@@ -47,6 +53,8 @@
 	const account = useAccountStore(); //D6EF2F
 	const furnitures = ref([]);
 	const modeName = ref('');
+	const index = ref(5);
+	const modes = ['睡眠模式', '起床模式', '回家模式', '离家模式', '影院模式', '自定义模式'];
 	onShow(async () => {
 		const {
 			data
@@ -63,7 +71,7 @@
 			furnitures.value.push(...data[i].furnitures)
 		}
 		for (let i = 0; i < furnitures.value.length; i++) {
-			furnitures.value[i].state = false;
+			furnitures.value[i].state = true;
 		}
 		console.log(furnitures.value)
 	})
@@ -74,20 +82,27 @@
 	}
 
 	const addMode = async () => {
-		let fs = '';
+		let fsOP = '';
+		let fsCL = '';
 		for (let i = 0; i < furnitures.value.length; i++) {
 			if (furnitures.value[i].state && i != furnitures.value.length - 1) {
-				fs += `${furnitures.value[i].id},`
+				fsOP += `${furnitures.value[i].id},`
+			} else if (furnitures.value[i].state == false && i != furnitures.value.length - 1) {
+				fsCL += `${furnitures.value[i].id},`
 			}
+
 		}
-		fs = fs.substr(0, fs.length - 1);
+		fsOP = fsOP.substr(0, fsOP.length - 1);
+		fsCL = fsCL.substr(0, fsCL.length - 1);
 		const res = await myRequest({
 			url: `Home/CreateMode`,
 			method: 'get',
 			data: {
 				homeId: account.homeSeleted,
 				modeName: modeName.value,
-				furnitures: fs
+				furnituresOpen: fsOP,
+				furnituresClose: fsCL,
+				type: index.value
 			}
 		});
 		if (res.statusCode == 400)
@@ -108,6 +123,57 @@
 			animationDuration: 0
 		});
 	}
+	const bindPickerChange = (e) => {
+		console.log('picker发送选择改变，携带值为', e.detail.value)
+		index.value = e.detail.value;
+		//睡眠
+		if (index.value == 0) {
+			for (let i = 0; i < furnitures.value.length; i++) {
+				if (furnitures.value[i].type == 0 || furnitures.value[i].type == 1 || furnitures.value[i].type == 2 ||
+					furnitures.value[i].type == 3) {
+					furnitures.value[i].state = false;
+				} else {
+					furnitures.value[i].state = true;
+				}
+			}
+		} //起床
+		else if (index.value == 1) {
+			for (let i = 0; i < furnitures.value.length; i++) {
+				if (furnitures.value[i].type == 4 || furnitures.value[i].type == 3) {
+					furnitures.value[i].state = false;
+				} else {
+					furnitures.value[i].state = true;
+				}
+			}
+		} //回家
+		else if (index.value == 2) {
+			for (let i = 0; i < furnitures.value.length; i++) {
+				if (furnitures.value[i].type == 3) {
+					furnitures.value[i].state = false;
+				} else {
+					furnitures.value[i].state = true;
+				}
+			}
+		} //离家
+		else if (index.value == 3) {
+			for (let i = 0; i < furnitures.value.length; i++) {
+				furnitures.value[i].state = false;
+			}
+		} //影院
+		else if (index.value == 4) {
+			for (let i = 0; i < furnitures.value.length; i++) {
+				if (furnitures.value[i].type == 0 || furnitures.value[i].type == 1 || furnitures.value[i].type == 2) {
+					furnitures.value[i].state = false;
+				} else {
+					furnitures.value[i].state = true;
+				}
+			}
+		} else if (index.value == 5) {
+			for (let i = 0; i < furnitures.value.length; i++) {
+				furnitures.value[i].state = true;
+			}
+		}
+	}
 	/*
 	uni.navigateTo({
 		url: `/pages/airConditioner/airConditioner?name=${name}`,
@@ -121,9 +187,9 @@
 	.content {
 		display: flex;
 		flex-direction: column;
-		height: 100vh;
+		height: 120%;
 		width: 100vw;
-		z-index: 2;
+		z-index: 1;
 		background-color: #ffffff;
 	}
 
@@ -135,7 +201,7 @@
 		align-items: space-between;
 		justify-content: space-between;
 		width: 90%;
-		z-index: 99;
+		z-index: 3;
 		margin: 0 5%;
 		margin-top: 20rpx;
 	}
@@ -151,6 +217,7 @@
 
 	.box {
 		display: flex;
+		position: relative;
 		flex-wrap: nowrap;
 		flex-direction: row;
 		justify-content: flex-start;
@@ -158,6 +225,7 @@
 		font-size: 14px;
 		height: 100%;
 		color: #fff;
+		z-index: 1;
 	}
 
 	.mode-name {
@@ -190,7 +258,21 @@
 		background-color: #fff;
 		border-radius: 10px;
 		width: 50%;
-		z-index: 99;
+		z-index: 3;
+		margin: 0 5%;
+		margin-bottom: 200px;
+	}
+
+	.choose-box {
+		display: flex;
+		justify-content: center;
+		align-items: center;
+		height: 50px;
+		margin-top: 15px !important;
+		background-color: #fff;
+		border-radius: 10px;
+		width: 40%;
+		z-index: 3;
 		margin: 0 5%;
 	}
 
@@ -246,5 +328,17 @@
 		backdrop-filter: blur(3px);
 		-webkit-transform: scale(1);
 		z-index: 7;
+	}
+
+	.choose-input {
+		display: flex;
+		justify-content: center;
+		align-items: center;
+		height: 40px;
+		width: 100px;
+		color: #bfe33a;
+		font-weight: 700;
+		background-color: #fff;
+		border-radius: 10px;
 	}
 </style>

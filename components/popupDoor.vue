@@ -60,7 +60,7 @@
 	const generateRandomPassword = async () => {
 		if (ifPassword.value) {
 			const res = await myRequest({
-				url: `Tcp/CreateDoorPassword?doorId`,
+				url: `Tcp/CreateDoorPassword`,
 				method: 'get',
 				data: {
 					doorId: props.id,
