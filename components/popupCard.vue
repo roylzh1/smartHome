@@ -32,6 +32,15 @@
 		//<view class="lightHeader-text">{{title}}</view>
 		if (account.nowSelectedIndex != 9999) {
 			account.nowSelectedIndex = 9999;
+			await myRequest({
+				url: `Home/ChangeHomeMode`,
+				method: 'get',
+				data: {
+					homeId: account.homeSeleted,
+					types: 0,
+					mode: false
+				}
+			});
 		}
 		if (textarea.value != undefined) {
 			console.log(textarea.value)

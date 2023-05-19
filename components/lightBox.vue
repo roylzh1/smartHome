@@ -45,6 +45,15 @@
 	const handleClick = async () => {
 		if (account.nowSelectedIndex != 9999) {
 			account.nowSelectedIndex = 9999;
+			await myRequest({
+				url: `Home/ChangeHomeMode`,
+				method: 'get',
+				data: {
+					homeId: account.homeSeleted,
+					types: 0,
+					mode: false
+				}
+			});
 		}
 		selected.value = !selected.value;
 		console.log(props.rooms.toString());

@@ -201,6 +201,15 @@
 	const complete = async () => {
 		if (account.nowSelectedIndex != 9999) {
 			account.nowSelectedIndex = 9999;
+			await myRequest({
+				url: `Home/ChangeHomeMode`,
+				method: 'get',
+				data: {
+					homeId: account.homeSeleted,
+					types: 0,
+					mode: false
+				}
+			});
 		}
 		const res = await myRequest({
 			url: `Tcp/GlobalChangeAirCondition`,

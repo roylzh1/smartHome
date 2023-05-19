@@ -4,8 +4,8 @@
 		<h1 class="title">场景设置</h1>
 		<view class="room">
 			<card height="130" width="300" style="margin: 20rpx;" v-for="(mode,index) in modes"
-				@click="clickMode(mode.furnitures,index)" @longpress="modeDetail(mode.id)"
-				:active="account.nowSelectedIndex == index ? true : false">
+				@click="clickMode(mode.furnituresOpen,mode.furnituresOpen,mode.type,index)"
+				@longpress="modeDetail(mode.id)" :active="account.nowSelectedIndex == index ? true : false">
 				<template #default>
 					<view class="box">
 						<view class="mode-pic-box">
@@ -70,8 +70,18 @@
 		modes.value = [];
 		modes.value = data.modes;
 		console.log(modes.value)
+		const res = await myRequest({
+			url: `Home/GetHomeMode`,
+			method: 'get',
+			data: {
+				homeId: account.homeSeleted
+			}
+		});
+		if (res.data.modeState) {
+			account.nowSelectedIndex = res.data.types;
+		}
 	})
-	const clickMode = async (f, index) => {
+	const clickMode = async (fOp, fCl, type, index) => {
 		if (account.nowSelectedIndex != 9999) {
 			uni.showModal({
 				content: '确认关闭此模式',
@@ -79,6 +89,15 @@
 					if (res.confirm) {
 						//更改所选的家具索引
 						account.nowSelectedIndex = 9999;
+						await myRequest({
+							url: `Home/ChangeHomeMode`,
+							method: 'get',
+							data: {
+								homeId: account.homeSeleted,
+								types: 0,
+								mode: false
+							}
+						});
 						console.log('点击了确认')
 					} else {
 						console.log('点击了取消')
@@ -95,12 +114,30 @@
 							url: `Tcp/GlobalOpenOrClose`,
 							method: 'get',
 							data: {
-								furnitures: f,
+								furnitures: fOp,
 								sessionId: account.homeTcp,
 								state: true
 							}
 						});
-						//更改所选的家具索引
+						await myRequest({
+							url: `Tcp/GlobalOpenOrClose`,
+							method: 'get',
+							data: {
+								furnitures: fCl,
+								mode: true,
+								state: false
+							}
+						});
+						await myRequest({
+							url: `Home/ChangeHomeMode`,
+							method: 'get',
+							data: {
+								homeId: account.homeSeleted,
+								types: index,
+								mode: true
+							}
+						});
+						//更改索引
 						account.nowSelectedIndex = index;
 						console.log('点击了确认')
 					} else {
