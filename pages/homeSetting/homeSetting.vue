@@ -278,9 +278,10 @@
 <style scoped>
 	.home-page {
 		position: relative;
-		height: 100vh;
+		height: 100%;
 		width: 100vw;
 		z-index: 3;
+		padding-bottom: 50px;
 	}
 
 	.home-backGround {
@@ -417,19 +418,17 @@
 	}
 
 	.home-userName {
-
 		margin-top: 20rpx;
 		margin-left: 30rpx;
 		width: 90%;
 		border-bottom: #efefef 1px solid;
 	}
 
-
-
 	.home-content {
 		height: 100%;
 		margin: 0 30rpx;
 		margin-top: 80px;
+		margin-bottom: 100px;
 	}
 
 	.content-fade-up-animation {

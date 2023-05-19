@@ -124,7 +124,7 @@
 							method: 'get',
 							data: {
 								furnitures: fCl,
-								mode: true,
+								sessionId: account.homeTcp,
 								state: false
 							}
 						});

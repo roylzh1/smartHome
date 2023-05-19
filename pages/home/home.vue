@@ -1,7 +1,8 @@
 <template>
 	<view class="backGround"></view>
 	<!--模糊-->
-	<view :class="popupBoxIfShow||ifShowAddRoom||ifShowCheckHome || popupFanBoxIfShow == true ? 'backGround-up':''">
+	<view
+		:class="popupBoxIfShow||ifShowAddRoom||ifShowCheckHome || popupFanBoxIfShow ||showAddFurniture||showRemoveFurniture == true ? 'backGround-up':''">
 	</view>
 	<view class="page"
 		:style="{height: popupBoxIfShow||ifShowAddRoom||showAddFurniture||showRemoveFurniture||ifShowCheckHome|| popupFanBoxIfShow == true ? '90vh':''}">

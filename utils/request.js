@@ -25,6 +25,12 @@ function myRequest(options) {
 						animationType: 'pop-in',
 						animationDuration: 500
 					});
+				} else if (data.data.message == '权限不足!') {
+					uni.showToast({
+						title: '权限不足！请联系房主',
+						icon: 'none', //如果要纯文本，不要icon，将值设为'none'
+						duration: 2000 //持续时间为 2秒
+					});
 				}
 				res(data)
 			},

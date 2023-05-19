@@ -3,7 +3,8 @@
 		<template #default>
 			<view class="addContent">
 				<view class="add-room-title">添加房间</view>
-				<input class="myInput" v-model="textarea" :rows="2" placeholder="            房间名" />
+				<view style="margin: 10px 0;">房间名</view>
+				<input class="myInput" v-model="textarea" :rows="2" placeholder="" />
 			</view>
 		</template>
 	</popup-small-card>
@@ -72,6 +73,9 @@
 	.myInput {
 		margin-top: 30rpx;
 		width: 300rpx;
+		border-radius: 10px;
+		border: #000000 1px solid;
+		padding: 2px 10px;
 	}
 
 	.add-room-title {

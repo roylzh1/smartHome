@@ -57,13 +57,13 @@
 					title: '修改家具名失败',
 					icon: 'none', //如果要纯文本，不要icon，将值设为'none'
 					duration: 2000 //持续时间为 2秒
-				})
+				});
 			else
 				uni.showToast({
 					title: '修改家具名成功',
 					icon: 'success', //将值设置为 success 或者 ''
 					duration: 2000 //持续时间为 2秒
-				})
+				});
 		}
 		emit('return');
 	}
