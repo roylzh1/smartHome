@@ -2,7 +2,7 @@
 	<popup-card :title="name" @return="complete">
 		<view class="popup-user-detail">
 			<image @click="updateImage" class="user-img"
-				:src="hasImage ? `${base_url}/0/userImage/${name}.jpg`: '${base_url}/userImage/deafult.jpg'">
+				:src="hasImage ? `${base_url}/userImage/${name}.jpg`: `${base_url}/userImage/deafult.jpg`">
 			</image>
 			<view class="popup-user-detail-name">
 				{{name}}
@@ -33,7 +33,8 @@
 <script setup>
 	import {
 		onMounted,
-		ref
+		ref,
+		watch
 	} from "vue";
 	import {
 		onShow,
@@ -44,14 +45,16 @@
 	import {
 		checkMaster,
 	} from '../utils/auth.js';
-	import popupCard from '/components/popupCard.vue'
+	import popupCard from '/components/popupCard.vue';
+	import myRequest from '/utils/request.js';
 	const prop = defineProps({
 		name: String,
 		email: String,
 		phoneNumber: String,
 		hasImage: Boolean,
 		master: Number,
-		userId: Number
+		userId: Number,
+		role: Number
 	});
 	const imageUrl = ref(`${base_url}/userImage/deafult.png`);
 	const emit = defineEmits(['userComplete']);
@@ -60,11 +63,25 @@
 	const complete = () => {
 		emit('userComplete');
 	};
-	const bindPickerChange = (e) => {
+	const bindPickerChange = async (e) => {
 		const isMaster = checkMaster(prop.userId, prop.master);
 		if (isMaster) {
 			console.log('picker发送选择改变，携带值为', e.detail.value)
-			index.value = e.detail.value
+			index.value = e.detail.value; //User/ResetUserRole
+			const res = await myRequest({
+				url: `User/ResetUserRole`,
+				method: 'get',
+				data: {
+					name: prop.name,
+					newRoleName: index.value
+				}
+			});
+			if (res.status == 200)
+				uni.showToast({
+					title: '更改权限成功',
+					icon: 'none',
+					duration: 3000
+				});
 		} else {
 			uni.showToast({
 				title: '暂无权限，请联系房主',
@@ -149,9 +166,7 @@
 			}
 		});
 	}
-	onShow(() => {
-
-	});
+	onShow(() => {});
 	const checkUser = function(userName) {
 		try {
 			const userInfo = uni.getStorageSync('smartHome_userInfo');
@@ -170,6 +185,10 @@
 			// error
 		}
 	}
+	watch(() => prop.role, (newVal, oldVal) => {
+		//console.log(newVal)
+		index.value = newVal;
+	});
 </script>
 
 <style scoped>

@@ -99,7 +99,7 @@
 		</view>
 		<popup-user @touchmove.stop.prevent :name="nowUserInfo.name" :email="nowUserInfo.email"
 			:phoneNumber="nowUserInfo.phoneNumber" :hasImage="nowUserInfo.hasImage" :master="nowHome.master"
-			:userId="nowUserInfo.id" v-show="IfShowUserBox"
+			:userId="nowUserInfo.id" :role="nowUserInfo.role" v-show="IfShowUserBox"
 			:class="IfShowUserBox == true ? 'content-fade-up-animation' : ''" @userComplete="closeUserBoxHandler">
 		</popup-user>
 		<add-home v-show="showAddHome" :class="showAddHome == true ? 'content-fade-up' : ''"
@@ -132,8 +132,9 @@
 		email: '',
 		phoneNumber: '',
 		hasImage: '',
-		id: 0
-	})
+		id: 0,
+		role: 0
+	});
 	//展示用户个人信息
 	const IfShowUserBox = ref(false);
 	const showUserInfo = (index) => {
@@ -142,6 +143,7 @@
 		nowUserInfo.phoneNumber = nowHome.value.userList[index].phoneNumber;
 		nowUserInfo.hasImage = nowHome.value.userList[index].hasImage;
 		nowUserInfo.id = nowHome.value.userList[index].id;
+		nowUserInfo.role = nowHome.value.userList[index].userRole;
 		IfShowUserBox.value = true;
 	}
 	const textarea = ref('');
