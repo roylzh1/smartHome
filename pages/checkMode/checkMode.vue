@@ -13,7 +13,7 @@
 				<template #default>
 					<view class="box">
 						<view class="mode-pic-box" style="backgroundColor: #fff; ">
-							<image src="/static/images/开启.png"></image>
+							<image src="/static/images/modeOpen.png"></image>
 						</view>
 						<view class="mode-name">
 							{{f.name}}
@@ -27,7 +27,7 @@
 				<template #default>
 					<view class="box">
 						<view class="mode-pic-box" style="backgroundColor: #6f6f6f; ">
-							<image src="/static/images/关闭.png"></image>
+							<image src="/static/images/modeClose.png"></image>
 						</view>
 						<view class="mode-name">
 							{{f.name}}
